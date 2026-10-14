@@ -1,0 +1,94 @@
+<section class="card">
+  <h1>Register a subscription</h1>
+
+  @if (status() === 'success' && created(); as subscription) {
+    <!-- Estado de éxito -->
+    <div class="banner banner--success" role="status">
+      <p>Subscription <strong>{{ subscription.name }}</strong> created.</p>
+      <dl>
+        <div><dt>Amount</dt><dd>{{ subscription.amount }} {{ subscription.currency }}</dd></div>
+        <div><dt>Billing cycle</dt><dd>{{ subscription.billingCycle }}</dd></div>
+        <div><dt>Next billing date</dt><dd>{{ subscription.nextBillingDate }}</dd></div>
+        <div><dt>Status</dt><dd>{{ subscription.status }}</dd></div>
+      </dl>
+      <button type="button" (click)="startAnother()">Add another</button>
+    </div>
+  } @else {
+    @if (generalError(); as message) {
+      <div class="banner banner--error" role="alert">{{ message }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" autocomplete="off" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <small class="error">Name is required (max 120 characters).</small>
+        }
+        @for (message of errorsFor('name'); track message) {
+          <small class="error">{{ message }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="category">Category <span class="optional">(optional)</span></label>
+        <input id="category" type="text" formControlName="category" autocomplete="off" />
+        @if (form.controls.category.touched && form.controls.category.invalid) {
+          <small class="error">Category must be at most 60 characters.</small>
+        }
+        @for (message of errorsFor('category'); track message) {
+          <small class="error">{{ message }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="amount">Amount</label>
+        <input id="amount" type="number" step="0.01" min="0.01" formControlName="amount" />
+        @if (form.controls.amount.touched && form.controls.amount.invalid) {
+          <small class="error">Amount must be greater than zero.</small>
+        }
+        @for (message of errorsFor('amount'); track message) {
+          <small class="error">{{ message }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="currency">Currency</label>
+        <input id="currency" type="text" maxlength="3" formControlName="currency" />
+        @if (form.controls.currency.touched && form.controls.currency.invalid) {
+          <small class="error">Currency must be a 3-letter code (e.g. COP).</small>
+        }
+        @for (message of errorsFor('currency'); track message) {
+          <small class="error">{{ message }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="billingCycle">Billing cycle</label>
+        <select id="billingCycle" formControlName="billingCycle">
+          @for (cycle of billingCycles; track cycle) {
+            <option [value]="cycle">{{ cycle }}</option>
+          }
+        </select>
+        @for (message of errorsFor('billingCycle'); track message) {
+          <small class="error">{{ message }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="nextBillingDate">Next billing date</label>
+        <input id="nextBillingDate" type="date" formControlName="nextBillingDate" />
+        @if (form.controls.nextBillingDate.touched && form.controls.nextBillingDate.invalid) {
+          <small class="error">Next billing date is required.</small>
+        }
+        @for (message of errorsFor('nextBillingDate'); track message) {
+          <small class="error">{{ message }}</small>
+        }
+      </div>
+
+      <button type="submit" [disabled]="status() === 'loading'">
+        {{ status() === 'loading' ? 'Saving…' : 'Create subscription' }}
+      </button>
+    </form>
+  }
+</section>

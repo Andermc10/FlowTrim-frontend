@@ -1,3 +1,7 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { SubscriptionForm } from './features/subscriptions/subscription-form/subscription-form';
+
+export const routes: Routes = [
+  { path: '', component: SubscriptionForm },
+];

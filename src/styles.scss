@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales. El sistema de diseño definitivo está pendiente (CLAUDE.md §13). */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
