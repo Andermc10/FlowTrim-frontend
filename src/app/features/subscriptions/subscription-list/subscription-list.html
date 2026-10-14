@@ -1,0 +1,74 @@
+<section class="list">
+  <div class="list__head">
+    <h1>Subscriptions</h1>
+    <a class="btn" routerLink="/new">Add subscription</a>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">Loading…</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      Could not load subscriptions.
+      <button type="button" class="link" (click)="load()">Retry</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p>No subscriptions yet.</p>
+      <a class="btn" routerLink="/new">Add your first subscription</a>
+    </div>
+  } @else {
+    <input
+      class="search"
+      type="search"
+      placeholder="Search by name…"
+      #q
+      (input)="search.set(q.value)"
+    />
+
+    @if (deleteError(); as message) {
+      <div class="banner banner--error" role="alert">{{ message }}</div>
+    }
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Cycle</th>
+          <th>Next charge</th>
+          <th>Status</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (subscription of filtered(); track subscription.id) {
+          <tr>
+            <td>{{ subscription.name }}</td>
+            <td>{{ subscription.amount }} {{ subscription.currency }}</td>
+            <td>{{ subscription.billingCycle }}</td>
+            <td>{{ subscription.nextBillingDate }}</td>
+            <td>
+              <span class="status" [class.status--inactive]="subscription.status === 'Inactive'">
+                {{ subscription.status }}
+              </span>
+            </td>
+            <td class="actions-col">
+              @if (confirmingId() === subscription.id) {
+                <span class="confirm">Delete?</span>
+                <button type="button" class="danger" (click)="confirmDelete(subscription.id)">Yes</button>
+                <button type="button" class="link" (click)="cancelDelete()">No</button>
+              } @else {
+                <a class="link" [routerLink]="['/', subscription.id, 'edit']">Edit</a>
+                <button type="button" class="link link--danger" (click)="askDelete(subscription.id)">Delete</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="muted">No subscriptions match "{{ search() }}".</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

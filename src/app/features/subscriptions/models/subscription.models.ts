@@ -25,6 +25,19 @@ export interface SubscriptionResponse {
   updatedAt: string;
 }
 
+// Actualización completa de una suscripción (mismo contrato que la creación más status).
+export interface UpdateSubscriptionRequest extends CreateSubscriptionRequest {
+  status: SubscriptionStatus;
+}
+
+// Página de resultados devuelta por GET /api/subscriptions.
+export interface PagedResponse<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+}
+
 // Forma del cuerpo RFC 7807 que devuelve la API en un 400 (ValidationProblemDetails).
 export interface ValidationProblemDetails {
   title?: string;

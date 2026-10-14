@@ -1,9 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { CreateSubscriptionRequest, SubscriptionResponse } from '../models/subscription.models';
+import {
+  CreateSubscriptionRequest,
+  PagedResponse,
+  SubscriptionResponse,
+  UpdateSubscriptionRequest,
+} from '../models/subscription.models';
 
 /** Capa HTTP tipada para suscripciones. */
 @Injectable({ providedIn: 'root' })
@@ -14,5 +19,26 @@ export class SubscriptionService {
   /** Crea una suscripción. Devuelve 201 con el recurso creado o 400 con errores por campo. */
   create(request: CreateSubscriptionRequest): Observable<SubscriptionResponse> {
     return this.http.post<SubscriptionResponse>(this.baseUrl, request);
+  }
+
+  /** Lista paginada de suscripciones. */
+  list(page = 1, pageSize = 20): Observable<PagedResponse<SubscriptionResponse>> {
+    const params = new HttpParams().set('page', page).set('pageSize', pageSize);
+    return this.http.get<PagedResponse<SubscriptionResponse>>(this.baseUrl, { params });
+  }
+
+  /** Detalle de una suscripción (404 si no existe). */
+  get(id: string): Observable<SubscriptionResponse> {
+    return this.http.get<SubscriptionResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Actualiza una suscripción existente (200 / 400 / 404). */
+  update(id: string, request: UpdateSubscriptionRequest): Observable<SubscriptionResponse> {
+    return this.http.put<SubscriptionResponse>(`${this.baseUrl}/${id}`, request);
+  }
+
+  /** Elimina una suscripción (204 / 404). */
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

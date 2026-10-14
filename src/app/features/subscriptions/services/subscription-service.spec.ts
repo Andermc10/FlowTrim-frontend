@@ -53,4 +53,25 @@ describe('SubscriptionService', () => {
     expect(result?.id).toBe('4f6c0000-0000-0000-0000-000000000000');
     expect(result?.status).toBe('Active');
   });
+
+  it('GETs a paged list with page and pageSize params', () => {
+    service.list(2, 10).subscribe();
+
+    const httpRequest = httpMock.expectOne(
+      (r) => r.url === `${environment.apiUrl}/api/subscriptions`,
+    );
+    expect(httpRequest.request.method).toBe('GET');
+    expect(httpRequest.request.params.get('page')).toBe('2');
+    expect(httpRequest.request.params.get('pageSize')).toBe('10');
+    httpRequest.flush({ items: [], page: 2, pageSize: 10, totalCount: 0 });
+  });
+
+  it('DELETEs a subscription by id', () => {
+    const id = '4f6c0000-0000-0000-0000-000000000000';
+    service.delete(id).subscribe();
+
+    const httpRequest = httpMock.expectOne(`${environment.apiUrl}/api/subscriptions/${id}`);
+    expect(httpRequest.request.method).toBe('DELETE');
+    httpRequest.flush(null);
+  });
 });
