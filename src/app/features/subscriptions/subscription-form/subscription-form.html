@@ -1,18 +1,8 @@
 <section class="card">
-  <h1>Register a subscription</h1>
+  <h1>{{ isEdit() ? 'Edit subscription' : 'Register a subscription' }}</h1>
 
-  @if (status() === 'success' && created(); as subscription) {
-    <!-- Estado de éxito -->
-    <div class="banner banner--success" role="status">
-      <p>Subscription <strong>{{ subscription.name }}</strong> created.</p>
-      <dl>
-        <div><dt>Amount</dt><dd>{{ subscription.amount }} {{ subscription.currency }}</dd></div>
-        <div><dt>Billing cycle</dt><dd>{{ subscription.billingCycle }}</dd></div>
-        <div><dt>Next billing date</dt><dd>{{ subscription.nextBillingDate }}</dd></div>
-        <div><dt>Status</dt><dd>{{ subscription.status }}</dd></div>
-      </dl>
-      <button type="button" (click)="startAnother()">Add another</button>
-    </div>
+  @if (status() === 'loading') {
+    <p class="muted" role="status">Loading…</p>
   } @else {
     @if (generalError(); as message) {
       <div class="banner banner--error" role="alert">{{ message }}</div>
@@ -86,9 +76,26 @@
         }
       </div>
 
-      <button type="submit" [disabled]="status() === 'loading'">
-        {{ status() === 'loading' ? 'Saving…' : 'Create subscription' }}
-      </button>
+      @if (isEdit()) {
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status" formControlName="status">
+            @for (state of statuses; track state) {
+              <option [value]="state">{{ state }}</option>
+            }
+          </select>
+          @for (message of errorsFor('status'); track message) {
+            <small class="error">{{ message }}</small>
+          }
+        </div>
+      }
+
+      <div class="actions">
+        <button type="submit" [disabled]="status() === 'saving'">
+          {{ status() === 'saving' ? 'Saving…' : (isEdit() ? 'Save changes' : 'Create subscription') }}
+        </button>
+        <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+      </div>
     </form>
   }
 </section>
