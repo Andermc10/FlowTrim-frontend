@@ -1,0 +1,44 @@
+<section class="dashboard">
+  <h1>Financial summary</h1>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">Loading…</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      Could not load the summary.
+      <button type="button" class="link" (click)="load()">Retry</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p>No active subscriptions yet.</p>
+      <a class="btn" routerLink="/new">Add a subscription</a>
+    </div>
+  } @else {
+    <div class="cards">
+      @for (currency of currencies(); track currency.currency) {
+        <article class="card">
+          <h2>{{ currency.currency }}</h2>
+          <dl>
+            <div>
+              <dt>Monthly equivalent</dt>
+              <dd>{{ currency.monthlyEquivalent }} {{ currency.currency }}</dd>
+            </div>
+            <div>
+              <dt>Annual projection</dt>
+              <dd>{{ currency.annualProjection }} {{ currency.currency }}</dd>
+            </div>
+            <div>
+              <dt>Active subscriptions</dt>
+              <dd>{{ currency.activeCount }}</dd>
+            </div>
+          </dl>
+        </article>
+      }
+    </div>
+
+    <p class="caveat">
+      Assumes constant prices and active services. Excludes inactive subscriptions. No currency
+      conversion — totals are shown per currency and never combined.
+    </p>
+  }
+</section>

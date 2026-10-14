@@ -1,6 +1,7 @@
 .app-header {
   display: flex;
   align-items: center;
+  gap: 1.5rem;
   padding: 0.85rem 1.25rem;
   background: #111827;
   border-bottom: 1px solid #1f2937;
@@ -9,5 +10,21 @@
     font-weight: 800;
     letter-spacing: 0.02em;
     color: #38bdf8;
+    text-decoration: none;
+  }
+
+  &__nav {
+    display: flex;
+    gap: 1rem;
+
+    a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+
+      &:hover {
+        color: #e2e8f0;
+      }
+    }
   }
 }
