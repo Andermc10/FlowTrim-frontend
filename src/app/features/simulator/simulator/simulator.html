@@ -1,0 +1,65 @@
+<section class="simulator">
+  <h1>Cancellation simulator</h1>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">Loading…</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      Could not load subscriptions.
+      <button type="button" class="link" (click)="loadSubscriptions()">Retry</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p>No active subscriptions to simulate.</p>
+      <a class="btn" routerLink="/new">Add a subscription</a>
+    </div>
+  } @else {
+    <div class="layout">
+      <div class="picker">
+        <h2>Select services to cancel</h2>
+        <ul>
+          @for (sub of subscriptions(); track sub.id) {
+            <li>
+              <label>
+                <input type="checkbox" [checked]="isSelected(sub.id)" (change)="toggle(sub.id)" />
+                <span class="picker__name">{{ sub.name }}</span>
+                <span class="picker__meta">{{ sub.amount }} {{ sub.currency }} · {{ sub.billingCycle }}</span>
+              </label>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="results">
+        <h2>Potential savings</h2>
+        @if (result(); as sim) {
+          @for (currency of sim.currencies; track currency.currency) {
+            <article class="card">
+              <h3>{{ currency.currency }}</h3>
+              <dl>
+                <div><dt>Current monthly</dt><dd>{{ currency.currentMonthly }}</dd></div>
+                <div><dt>Projected monthly</dt><dd>{{ currency.projectedMonthly }}</dd></div>
+              </dl>
+              <table>
+                <thead>
+                  <tr><th>Horizon</th><th>Savings</th></tr>
+                </thead>
+                <tbody>
+                  @for (s of currency.savings; track s.months) {
+                    <tr><td>{{ s.months }} month(s)</td><td>{{ s.amount }} {{ currency.currency }}</td></tr>
+                  }
+                </tbody>
+              </table>
+            </article>
+          }
+
+          <ul class="assumptions">
+            @for (note of sim.assumptions; track note) {
+              <li>{{ note }}</li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+</section>
