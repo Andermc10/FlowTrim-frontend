@@ -11,6 +11,7 @@ import {
   ValidationProblemDetails,
 } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
+import { toUserMessage } from '../../../core/http-error.interceptor';
 
 type FormStatus = 'idle' | 'loading' | 'saving' | 'error';
 
@@ -116,7 +117,7 @@ export class SubscriptionForm implements OnInit {
       const problem = error.error as ValidationProblemDetails;
       this.fieldErrors.set(problem.errors ?? {});
     } else {
-      this.generalError.set('Something went wrong. Please try again.');
+      this.generalError.set(toUserMessage(error));
     }
     this.status.set('error');
   }
