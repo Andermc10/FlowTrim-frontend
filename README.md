@@ -11,6 +11,7 @@ renewals, and simulate cancellation savings. This repository holds the web clien
 - **Summary** — financial summary per currency (monthly equivalent, annual projection, active count).
 - **Upcoming** — upcoming charges with a server-computed countdown and colored alert windows.
 - **Simulator** — pick subscriptions to cancel and see the potential savings at 1/12/24 months.
+- **Usage** — record declared usage and view cost per use, including a safe not-calculable state.
 - Every data-driven view handles **loading / empty / success / error** states; errors go through a
   central HTTP interceptor and show an actionable message.
 
@@ -56,6 +57,7 @@ Change `apiUrl` to point the SPA at a different API, with no code changes. CORS 
 | `/` | Subscriptions list (search, edit, delete) |
 | `/new` | Create a subscription |
 | `/:id/edit` | Edit a subscription |
+| `/:id/usage` | Record usage and view cost per use |
 | `/upcoming` | Upcoming charges + countdown |
 | `/summary` | Financial summary dashboard |
 | `/simulator` | Cancellation simulator |
@@ -67,7 +69,7 @@ src/
   app/
     core/                       cross-cutting (HTTP error interceptor)
     features/
-      subscriptions/            list, form, upcoming panel, models, service
+      subscriptions/            list, form, usage, upcoming panel, models, service
       summary/                  summary dashboard, model, service
       simulator/                simulator, models, service
     app.routes.ts, app.config.ts, app.ts/html/scss

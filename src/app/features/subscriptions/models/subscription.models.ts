@@ -73,6 +73,19 @@ export interface UsageRecordResponse {
   notes: string | null;
 }
 
+export interface CostPerUseResponse {
+  subscriptionId: string;
+  currency: string;
+  from: string | null;
+  to: string | null;
+  monthsInPeriod: number;
+  totalPaid: number;
+  totalUses: number;
+  calculable: boolean;
+  costPerUse: number | null;
+  reason: string | null;
+}
+
 // Forma del cuerpo RFC 7807 que devuelve la API en un 400 (ValidationProblemDetails).
 export interface ValidationProblemDetails {
   title?: string;

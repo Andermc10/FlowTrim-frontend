@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   CreateSubscriptionRequest,
+  CostPerUseResponse,
   PagedResponse,
   RegisterUsageRequest,
   SubscriptionResponse,
@@ -58,5 +59,10 @@ export class SubscriptionService {
   /** Lista los usos de una suscripción (200 / 404). */
   listUsage(id: string): Observable<UsageRecordResponse[]> {
     return this.http.get<UsageRecordResponse[]>(`${this.baseUrl}/${id}/usage-records`);
+  }
+
+  /** Calcula el costo declarado por uso usando el periodo derivado de los registros. */
+  getCostPerUse(id: string): Observable<CostPerUseResponse> {
+    return this.http.get<CostPerUseResponse>(`${this.baseUrl}/${id}/cost-per-use`);
   }
 }

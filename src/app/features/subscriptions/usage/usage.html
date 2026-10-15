@@ -47,6 +47,32 @@
       </div>
     </form>
 
+    <section class="cost-card" aria-labelledby="costPerUseTitle">
+      <h2 id="costPerUseTitle">Cost per use</h2>
+      <p class="muted">Based on declared usage. This data is not verified automatically.</p>
+
+      @if (costPerUseLoading()) {
+        <p class="muted" role="status">Calculating…</p>
+      } @else if (costPerUseError()) {
+        <div class="banner banner--error" role="alert">
+          Could not calculate cost per use.
+          <button type="button" class="link" (click)="loadCostPerUse()">Retry</button>
+        </div>
+      } @else if (costPerUse(); as result) {
+        @if (result.calculable) {
+          <dl class="cost-details">
+            <div><dt>Period</dt><dd>{{ result.from }} to {{ result.to }}</dd></div>
+            <div><dt>Period cost</dt><dd>{{ result.totalPaid | number: '1.2-2' }} {{ result.currency }}</dd></div>
+            <div><dt>Total uses</dt><dd>{{ result.totalUses }}</dd></div>
+            <div><dt>Cost per use</dt><dd>{{ result.costPerUse | number: '1.2-2' }} {{ result.currency }}</dd></div>
+          </dl>
+        } @else {
+          <p class="not-calculable">Not enough data to compute cost per use.</p>
+          <p class="muted">{{ result.reason }}</p>
+        }
+      }
+    </section>
+
     <h2>Recent usage</h2>
     @if (records().length === 0) {
       <p class="muted">No usage recorded yet.</p>
