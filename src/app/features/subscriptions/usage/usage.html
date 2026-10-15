@@ -1,0 +1,64 @@
+<section class="usage">
+  @if (status() === 'loading') {
+    <p class="muted" role="status">Loading…</p>
+  } @else if (status() === 'notfound') {
+    <div class="banner banner--error" role="alert">Subscription not found. <a class="link" routerLink="/">Back to list</a></div>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">Could not load usage. <button type="button" class="link" (click)="load()">Retry</button></div>
+  } @else {
+    <h1>Usage — {{ subscription()?.name }}</h1>
+    <p class="muted">Usage is declared by you, not verified automatically.</p>
+
+    @if (successMessage(); as message) {
+      <div class="banner banner--success" role="status">{{ message }}</div>
+    }
+    @if (generalError(); as message) {
+      <div class="banner banner--error" role="alert">{{ message }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="usageDate">Usage date</label>
+        <input id="usageDate" type="date" formControlName="usageDate" />
+        @if (form.controls.usageDate.touched && form.controls.usageDate.invalid) {
+          <small class="error">Usage date is required.</small>
+        }
+        @for (m of errorsFor('usageDate'); track m) { <small class="error">{{ m }}</small> }
+      </div>
+
+      <div class="field">
+        <label for="usageCount">Usage count</label>
+        <input id="usageCount" type="number" min="0" step="1" formControlName="usageCount" />
+        @if (form.controls.usageCount.touched && form.controls.usageCount.invalid) {
+          <small class="error">Usage count must be zero or greater.</small>
+        }
+        @for (m of errorsFor('usageCount'); track m) { <small class="error">{{ m }}</small> }
+      </div>
+
+      <div class="field">
+        <label for="notes">Notes <span class="optional">(optional)</span></label>
+        <input id="notes" type="text" maxlength="500" formControlName="notes" />
+        @for (m of errorsFor('notes'); track m) { <small class="error">{{ m }}</small> }
+      </div>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Record usage' }}</button>
+        <a class="secondary" routerLink="/">Back</a>
+      </div>
+    </form>
+
+    <h2>Recent usage</h2>
+    @if (records().length === 0) {
+      <p class="muted">No usage recorded yet.</p>
+    } @else {
+      <table>
+        <thead><tr><th>Date</th><th>Count</th><th>Notes</th></tr></thead>
+        <tbody>
+          @for (r of records(); track r.id) {
+            <tr><td>{{ r.usageDate }}</td><td>{{ r.usageCount }}</td><td>{{ r.notes }}</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</section>

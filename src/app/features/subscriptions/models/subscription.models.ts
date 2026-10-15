@@ -58,6 +58,21 @@ export interface UpcomingChargesResponse {
   items: UpcomingChargeItem[];
 }
 
+// Uso declarado de una suscripción.
+export interface RegisterUsageRequest {
+  usageDate: string; // yyyy-MM-dd
+  usageCount: number;
+  notes?: string | null;
+}
+
+export interface UsageRecordResponse {
+  id: string;
+  subscriptionId: string;
+  usageDate: string;
+  usageCount: number;
+  notes: string | null;
+}
+
 // Forma del cuerpo RFC 7807 que devuelve la API en un 400 (ValidationProblemDetails).
 export interface ValidationProblemDetails {
   title?: string;
