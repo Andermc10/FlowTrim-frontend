@@ -82,4 +82,23 @@ describe('SubscriptionService', () => {
     expect(httpRequest.request.method).toBe('GET');
     httpRequest.flush({ referenceDate: '2026-10-14', items: [] });
   });
+
+  it('POSTs a usage record for a subscription', () => {
+    const id = '4f6c0000-0000-0000-0000-000000000000';
+    service.registerUsage(id, { usageDate: '2026-10-10', usageCount: 2, notes: null }).subscribe();
+
+    const httpRequest = httpMock.expectOne(`${environment.apiUrl}/api/subscriptions/${id}/usage-records`);
+    expect(httpRequest.request.method).toBe('POST');
+    expect(httpRequest.request.body).toEqual({ usageDate: '2026-10-10', usageCount: 2, notes: null });
+    httpRequest.flush({ id: 'u1', subscriptionId: id, usageDate: '2026-10-10', usageCount: 2, notes: null });
+  });
+
+  it('GETs usage records for a subscription', () => {
+    const id = '4f6c0000-0000-0000-0000-000000000000';
+    service.listUsage(id).subscribe();
+
+    const httpRequest = httpMock.expectOne(`${environment.apiUrl}/api/subscriptions/${id}/usage-records`);
+    expect(httpRequest.request.method).toBe('GET');
+    httpRequest.flush([]);
+  });
 });

@@ -59,6 +59,7 @@
                 <button type="button" class="link" (click)="cancelDelete()">No</button>
               } @else {
                 <a class="link" [routerLink]="['/', subscription.id, 'edit']">Edit</a>
+                <a class="link" [routerLink]="['/', subscription.id, 'usage']">Usage</a>
                 <button type="button" class="link link--danger" (click)="askDelete(subscription.id)">Delete</button>
               }
             </td>

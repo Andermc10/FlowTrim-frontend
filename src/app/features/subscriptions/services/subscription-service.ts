@@ -6,9 +6,11 @@ import { environment } from '../../../../environments/environment';
 import {
   CreateSubscriptionRequest,
   PagedResponse,
+  RegisterUsageRequest,
   SubscriptionResponse,
   UpcomingChargesResponse,
   UpdateSubscriptionRequest,
+  UsageRecordResponse,
 } from '../models/subscription.models';
 
 /** Capa HTTP tipada para suscripciones. */
@@ -46,5 +48,15 @@ export class SubscriptionService {
   /** Próximos cobros ordenados por fecha, con cuenta regresiva y ventana de alerta (servidor). */
   getUpcoming(): Observable<UpcomingChargesResponse> {
     return this.http.get<UpcomingChargesResponse>(`${this.baseUrl}/upcoming`);
+  }
+
+  /** Registra un uso declarado para una suscripción (201 / 400 / 404). */
+  registerUsage(id: string, request: RegisterUsageRequest): Observable<UsageRecordResponse> {
+    return this.http.post<UsageRecordResponse>(`${this.baseUrl}/${id}/usage-records`, request);
+  }
+
+  /** Lista los usos de una suscripción (200 / 404). */
+  listUsage(id: string): Observable<UsageRecordResponse[]> {
+    return this.http.get<UsageRecordResponse[]>(`${this.baseUrl}/${id}/usage-records`);
   }
 }
