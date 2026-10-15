@@ -73,6 +73,46 @@ button {
   }
 }
 
+.cost-card {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  background: #1e293b;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.cost-details {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  dt {
+    color: #94a3b8;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 700;
+  }
+}
+
+.not-calculable {
+  margin-bottom: 0.25rem;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
 .secondary,
 .link {
   color: #38bdf8;

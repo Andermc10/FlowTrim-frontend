@@ -101,4 +101,24 @@ describe('SubscriptionService', () => {
     expect(httpRequest.request.method).toBe('GET');
     httpRequest.flush([]);
   });
+
+  it('GETs cost per use for a subscription', () => {
+    const id = '4f6c0000-0000-0000-0000-000000000000';
+    service.getCostPerUse(id).subscribe();
+
+    const httpRequest = httpMock.expectOne(`${environment.apiUrl}/api/subscriptions/${id}/cost-per-use`);
+    expect(httpRequest.request.method).toBe('GET');
+    httpRequest.flush({
+      subscriptionId: id,
+      currency: 'COP',
+      from: '2026-10-10',
+      to: '2026-10-10',
+      monthsInPeriod: 1,
+      totalPaid: 38900,
+      totalUses: 2,
+      calculable: true,
+      costPerUse: 19450,
+      reason: null,
+    });
+  });
 });

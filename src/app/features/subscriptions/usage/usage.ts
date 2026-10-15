@@ -1,9 +1,11 @@
+import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import {
+  CostPerUseResponse,
   SubscriptionResponse,
   UsageRecordResponse,
   ValidationProblemDetails,
@@ -15,7 +17,7 @@ type UsageStatus = 'loading' | 'ready' | 'notfound' | 'error';
 
 @Component({
   selector: 'app-usage',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [DecimalPipe, ReactiveFormsModule, RouterLink],
   templateUrl: './usage.html',
   styleUrl: './usage.scss',
 })
@@ -28,6 +30,9 @@ export class Usage implements OnInit {
   protected readonly status = signal<UsageStatus>('loading');
   protected readonly subscription = signal<SubscriptionResponse | null>(null);
   protected readonly records = signal<UsageRecordResponse[]>([]);
+  protected readonly costPerUse = signal<CostPerUseResponse | null>(null);
+  protected readonly costPerUseLoading = signal(false);
+  protected readonly costPerUseError = signal(false);
   protected readonly saving = signal(false);
   protected readonly fieldErrors = signal<Record<string, string[]>>({});
   protected readonly generalError = signal<string | null>(null);
@@ -46,6 +51,8 @@ export class Usage implements OnInit {
 
   protected load(): void {
     this.status.set('loading');
+    this.costPerUse.set(null);
+    this.costPerUseError.set(false);
     this.service.get(this.id).subscribe({
       next: (subscription) => {
         this.subscription.set(subscription);
@@ -60,8 +67,24 @@ export class Usage implements OnInit {
       next: (records) => {
         this.records.set(records);
         this.status.set('ready');
+        this.loadCostPerUse();
       },
       error: () => this.status.set('error'),
+    });
+  }
+
+  protected loadCostPerUse(): void {
+    this.costPerUseLoading.set(true);
+    this.costPerUseError.set(false);
+    this.service.getCostPerUse(this.id).subscribe({
+      next: (result) => {
+        this.costPerUse.set(result);
+        this.costPerUseLoading.set(false);
+      },
+      error: () => {
+        this.costPerUseLoading.set(false);
+        this.costPerUseError.set(true);
+      },
     });
   }
 
