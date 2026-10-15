@@ -1,0 +1,35 @@
+<section class="upcoming">
+  <h1>Upcoming charges</h1>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">Loading…</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      Could not load upcoming charges.
+      <button type="button" class="link" (click)="load()">Retry</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p>No upcoming charges.</p>
+      <a class="btn" routerLink="/new">Add a subscription</a>
+    </div>
+  } @else {
+    <p class="muted">As of {{ referenceDate() }}. An expected renewal is not a confirmed charge.</p>
+
+    <ul class="rows">
+      @for (item of items(); track item.id) {
+        <li class="row">
+          <div class="row__main">
+            <span class="row__name">{{ item.name }}</span>
+            <span class="row__meta">{{ item.amount }} {{ item.currency }} · {{ item.billingCycle }}</span>
+          </div>
+          <div class="row__date">
+            <span>{{ item.nextBillingDate }}</span>
+            <span class="row__countdown">{{ countdownLabel(item.daysUntilCharge) }}</span>
+          </div>
+          <span [class]="badgeClass(item.alertWindow)">{{ item.alertWindow }}</span>
+        </li>
+      }
+    </ul>
+  }
+</section>

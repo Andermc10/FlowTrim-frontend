@@ -38,6 +38,26 @@ export interface PagedResponse<T> {
   totalCount: number;
 }
 
+// Ventana de alerta de un cobro (calculada por el servidor).
+export type AlertWindow = 'Overdue' | 'Today' | 'DueWithin3Days' | 'DueWithin7Days' | 'Later';
+
+// Un cobro próximo con su cuenta regresiva (daysUntilCharge y referenceDate vienen del servidor).
+export interface UpcomingChargeItem {
+  id: string;
+  name: string;
+  amount: number;
+  currency: string;
+  billingCycle: BillingCycle;
+  nextBillingDate: string;
+  daysUntilCharge: number;
+  alertWindow: AlertWindow;
+}
+
+export interface UpcomingChargesResponse {
+  referenceDate: string;
+  items: UpcomingChargeItem[];
+}
+
 // Forma del cuerpo RFC 7807 que devuelve la API en un 400 (ValidationProblemDetails).
 export interface ValidationProblemDetails {
   title?: string;

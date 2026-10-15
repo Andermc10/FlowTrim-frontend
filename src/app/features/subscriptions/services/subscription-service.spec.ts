@@ -74,4 +74,12 @@ describe('SubscriptionService', () => {
     expect(httpRequest.request.method).toBe('DELETE');
     httpRequest.flush(null);
   });
+
+  it('GETs upcoming charges', () => {
+    service.getUpcoming().subscribe();
+
+    const httpRequest = httpMock.expectOne(`${environment.apiUrl}/api/subscriptions/upcoming`);
+    expect(httpRequest.request.method).toBe('GET');
+    httpRequest.flush({ referenceDate: '2026-10-14', items: [] });
+  });
 });
