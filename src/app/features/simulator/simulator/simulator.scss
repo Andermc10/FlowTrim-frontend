@@ -1,0 +1,155 @@
+:host {
+  display: block;
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #e2e8f0;
+}
+
+h1 {
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+}
+
+h2 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 40rem) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.picker {
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #1e293b;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  &__name {
+    font-weight: 600;
+  }
+
+  &__meta {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    margin-left: auto;
+  }
+}
+
+.card {
+  background: #1e293b;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+
+  h3 {
+    margin: 0 0 0.5rem;
+    color: #38bdf8;
+    font-size: 0.95rem;
+  }
+
+  dl {
+    margin: 0 0 0.5rem;
+    display: grid;
+    gap: 0.25rem;
+
+    div {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    dt {
+      color: #94a3b8;
+      font-size: 0.82rem;
+    }
+
+    dd {
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th,
+    td {
+      text-align: left;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid #0f172a;
+    }
+
+    th {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+  }
+}
+
+.assumptions {
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.muted {
+  color: #94a3b8;
+}
+
+.empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: #1e293b;
+  border-radius: 0.75rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  background: #38bdf8;
+  color: #0f172a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.banner {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+
+  &--error {
+    background: #7f1d1d;
+    color: #fecaca;
+  }
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  cursor: pointer;
+  font: inherit;
+}
