@@ -1,6 +1,6 @@
-// Configuración de entorno (desarrollo). La formalización de environments por build y la URL
-// definitiva de la API se completan en HU-08; aquí basta con una base para el formulario.
+// Configuración de desarrollo. La variante de producción vive en environment.production.ts
+// y se intercambia en el build mediante fileReplacements (angular.json).
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5080',
+  apiUrl: 'http://localhost:5214',
 };
