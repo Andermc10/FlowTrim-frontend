@@ -1,0 +1,128 @@
+:host {
+  display: block;
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #e2e8f0;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+}
+
+.muted {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.rows {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #1e293b;
+  border-radius: 0.5rem;
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  &__name {
+    font-weight: 700;
+  }
+
+  &__meta {
+    color: #94a3b8;
+    font-size: 0.82rem;
+  }
+
+  &__date {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.85rem;
+  }
+
+  &__countdown {
+    color: #94a3b8;
+  }
+}
+
+.badge {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &--overdue {
+    background: #7f1d1d;
+    color: #fecaca;
+  }
+
+  &--today {
+    background: #b45309;
+    color: #fff7ed;
+  }
+
+  &--soon3 {
+    background: #92400e;
+    color: #fef3c7;
+  }
+
+  &--soon7 {
+    background: #1e40af;
+    color: #dbeafe;
+  }
+
+  &--later {
+    background: #334155;
+    color: #cbd5e1;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: #1e293b;
+  border-radius: 0.75rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  background: #38bdf8;
+  color: #0f172a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.banner {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+
+  &--error {
+    background: #7f1d1d;
+    color: #fecaca;
+  }
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  cursor: pointer;
+  font: inherit;
+}

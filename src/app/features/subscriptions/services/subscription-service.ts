@@ -7,6 +7,7 @@ import {
   CreateSubscriptionRequest,
   PagedResponse,
   SubscriptionResponse,
+  UpcomingChargesResponse,
   UpdateSubscriptionRequest,
 } from '../models/subscription.models';
 
@@ -40,5 +41,10 @@ export class SubscriptionService {
   /** Elimina una suscripción (204 / 404). */
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Próximos cobros ordenados por fecha, con cuenta regresiva y ventana de alerta (servidor). */
+  getUpcoming(): Observable<UpcomingChargesResponse> {
+    return this.http.get<UpcomingChargesResponse>(`${this.baseUrl}/upcoming`);
   }
 }
