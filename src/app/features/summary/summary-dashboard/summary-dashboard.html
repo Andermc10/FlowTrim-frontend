@@ -1,5 +1,12 @@
 <section class="dashboard">
-  <h1>Financial summary</h1>
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">Overview / signal</p>
+      <h1>Know where your money flows.</h1>
+      <p class="lede">A clear read on the recurring spend you have chosen to keep.</p>
+    </div>
+    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> Add subscription</a>
+  </div>
 
   @if (status() === 'loading') {
     <p class="muted" role="status">Loading…</p>
@@ -10,25 +17,23 @@
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
+      <span class="empty__mark" aria-hidden="true">✦</span>
       <p>No active subscriptions yet.</p>
-      <a class="btn" routerLink="/new">Add a subscription</a>
+      <a class="btn" routerLink="/app/subscriptions/new">Add a subscription</a>
     </div>
   } @else {
     <div class="cards">
       @for (currency of currencies(); track currency.currency) {
         <article class="card">
-          <h2>{{ currency.currency }}</h2>
+          <div class="card__topline"><span class="card__label">MONTHLY BURN</span><span class="currency-mark">{{ currency.currency }}</span></div>
+          <h2>{{ currency.monthlyEquivalent }} <small>{{ currency.currency }}</small></h2>
           <dl>
-            <div>
-              <dt>Monthly equivalent</dt>
-              <dd>{{ currency.monthlyEquivalent }} {{ currency.currency }}</dd>
-            </div>
             <div>
               <dt>Annual projection</dt>
               <dd>{{ currency.annualProjection }} {{ currency.currency }}</dd>
             </div>
             <div>
-              <dt>Active subscriptions</dt>
+              <dt>Active services</dt>
               <dd>{{ currency.activeCount }}</dd>
             </div>
           </dl>

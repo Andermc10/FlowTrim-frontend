@@ -1,5 +1,12 @@
 <section class="simulator">
-  <h1>Cancellation simulator</h1>
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">Simulator / trim scenarios</p>
+      <h1>What would you cut first?</h1>
+      <p class="lede">Model a decision before you make it. Nothing changes outside this screen.</p>
+    </div>
+    <span class="simulator__selection">{{ selected().size }} selected</span>
+  </div>
 
   @if (status() === 'loading') {
     <p class="muted" role="status">Loading…</p>
@@ -10,13 +17,14 @@
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
+      <span class="empty__mark" aria-hidden="true">✂</span>
       <p>No active subscriptions to simulate.</p>
-      <a class="btn" routerLink="/new">Add a subscription</a>
+      <a class="btn" routerLink="/app/subscriptions/new">Add a subscription</a>
     </div>
   } @else {
     <div class="layout">
       <div class="picker">
-        <h2>Select services to cancel</h2>
+        <div class="panel-heading"><span class="panel-index">01</span><div><h2>Select services to trim</h2><p>Choose any active service to see the difference.</p></div></div>
         <ul>
           @for (sub of subscriptions(); track sub.id) {
             <li>
@@ -31,7 +39,7 @@
       </div>
 
       <div class="results">
-        <h2>Potential savings</h2>
+        <div class="panel-heading"><span class="panel-index panel-index--success">02</span><div><h2>Potential savings</h2><p>Scenario only. No cancellation is persisted.</p></div></div>
         @if (result(); as sim) {
           @for (currency of sim.currencies; track currency.currency) {
             <article class="card">
