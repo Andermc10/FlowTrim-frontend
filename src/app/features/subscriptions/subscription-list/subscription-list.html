@@ -5,7 +5,7 @@
       <h1>{{ 'subscriptions.title' | translate }}</h1>
       <p class="lede">{{ 'subscriptions.lede' | translate }}</p>
     </div>
-    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> {{ 'nav.addSubscription' | translate }}</a>
+    <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'nav.addSubscription' | translate }}</button>
   </div>
 
   @if (status() === 'loading') {
@@ -19,7 +19,7 @@
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">◫</span>
       <p>{{ 'subscriptions.noSubscriptions' | translate }}</p>
-      <a class="btn" routerLink="/app/subscriptions/new">{{ 'subscriptions.addFirst' | translate }}</a>
+      <button class="btn" type="button" (click)="openCreate()">{{ 'subscriptions.addFirst' | translate }}</button>
     </div>
   } @else {
     <div class="list__toolbar">
@@ -34,6 +34,7 @@
       <div class="banner banner--error" role="alert">{{ message }}</div>
     }
 
+    <div class="table-viewport" tabindex="0" [attr.aria-label]="'subscriptions.title' | translate">
     <table>
       <thead>
         <tr>
@@ -63,9 +64,9 @@
                 <button type="button" class="danger" (click)="confirmDelete(subscription.id)">{{ 'subscriptions.yes' | translate }}</button>
                 <button type="button" class="link" (click)="cancelDelete()">{{ 'subscriptions.no' | translate }}</button>
               } @else {
-                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'edit']">{{ 'subscriptions.edit' | translate }}</a>
-                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'usage']">{{ 'subscriptions.usage' | translate }}</a>
-                <button type="button" class="link link--danger" (click)="askDelete(subscription.id)">{{ 'subscriptions.delete' | translate }}</button>
+                <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.edit' | translate" [attr.title]="'subscriptions.edit' | translate" (click)="openEdit(subscription.id)"><app-icon name="edit" /></button>
+                <a class="icon-button" [attr.aria-label]="'subscriptions.usage' | translate" [attr.title]="'subscriptions.usage' | translate" [routerLink]="['/app/subscriptions', subscription.id, 'usage']"><app-icon name="usage" /></a>
+                <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'subscriptions.delete' | translate" [attr.title]="'subscriptions.delete' | translate" (click)="openDelete(subscription)"><app-icon name="delete" /></button>
               }
             </td>
           </tr>
@@ -76,5 +77,39 @@
         }
       </tbody>
     </table>
+    </div>
+  }
+
+  @if (editorMode(); as mode) {
+    <app-modal
+      [title]="mode === 'create' ? ('form.create' | translate) : ('form.saveChanges' | translate)"
+      (closeRequested)="requestEditorClose()">
+      <app-subscription-form
+        [modalMode]="mode"
+        [subscriptionId]="editorId()"
+        (saved)="handleEditorSaved()"
+        (closeRequested)="requestEditorClose()"
+        (dirtyChange)="editorDirty.set($event)" />
+    </app-modal>
+  }
+
+  @if (discardConfirmation()) {
+    <app-modal [title]="'modal.discardTitle' | translate" (closeRequested)="discardConfirmation.set(false)">
+      <p class="modal-copy">{{ 'modal.discardText' | translate }}</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="discardConfirmation.set(false)">{{ 'modal.keepEditing' | translate }}</button>
+        <button type="button" class="danger-button" (click)="closeEditor()">{{ 'modal.discard' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+
+  @if (deleteTarget(); as target) {
+    <app-modal [title]="'modal.deleteTitle' | translate" (closeRequested)="closeDelete()">
+      <p class="modal-copy">{{ 'modal.deleteText' | translate }} <strong>{{ target.name }}</strong>.</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="closeDelete()">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="danger-button" (click)="confirmDeleteTarget()"><app-icon name="delete" /> {{ 'subscriptions.delete' | translate }}</button>
+      </div>
+    </app-modal>
   }
 </section>
