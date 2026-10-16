@@ -5,12 +5,14 @@ import { SubscriptionResponse } from '../../subscriptions/models/subscription.mo
 import { SubscriptionService } from '../../subscriptions/services/subscription-service';
 import { SimulationResponse } from '../simulation.models';
 import { SimulationService } from '../simulation-service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type SimulatorStatus = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-simulator',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './simulator.html',
   styleUrl: './simulator.scss',
 })
@@ -19,6 +21,7 @@ export class Simulator implements OnInit {
 
   private readonly subscriptionService = inject(SubscriptionService);
   private readonly simulationService = inject(SimulationService);
+  protected readonly i18n = inject(I18nService);
 
   protected readonly status = signal<SimulatorStatus>('loading');
   protected readonly subscriptions = signal<SubscriptionResponse[]>([]);

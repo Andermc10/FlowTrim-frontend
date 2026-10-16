@@ -3,17 +3,20 @@ import { RouterLink } from '@angular/router';
 
 import { AlertWindow, UpcomingChargeItem } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type PanelStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-upcoming-panel',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './upcoming-panel.html',
   styleUrl: './upcoming-panel.scss',
 })
 export class UpcomingPanel implements OnInit {
   private readonly service = inject(SubscriptionService);
+  private readonly i18n = inject(I18nService);
 
   protected readonly status = signal<PanelStatus>('loading');
   protected readonly items = signal<UpcomingChargeItem[]>([]);
@@ -41,12 +44,12 @@ export class UpcomingPanel implements OnInit {
   /** Texto de la cuenta regresiva a partir de los días calculados por el servidor. */
   protected countdownLabel(days: number): string {
     if (days < 0) {
-      return `${Math.abs(days)} day(s) overdue`;
+      return this.i18n.translate('upcoming.overdue', { count: Math.abs(days) });
     }
     if (days === 0) {
-      return 'Today';
+      return this.i18n.translate('upcoming.today');
     }
-    return `in ${days} day(s)`;
+    return this.i18n.translate('upcoming.inDays', { count: days });
   }
 
   /** Clase CSS del badge según la ventana de alerta. */

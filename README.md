@@ -14,6 +14,8 @@ renewals, and simulate cancellation savings. This repository holds the web clien
 - **Usage** — record declared usage and view cost per use, including a safe not-calculable state.
 - **Landing and workspace** — a product introduction at `/` and a responsive control workspace at `/app`.
 - **Themes** — persisted light and dark modes using the Carbon Signal visual system.
+- **Localization** — client-side English and Spanish interface with persisted preference.
+- **Landing motion** — CSS/SVG motion, scroll-snap feature rail and reduced-motion support without an animation dependency.
 - Every data-driven view handles **loading / empty / success / error** states; errors go through a
   central HTTP interceptor and show an actionable message.
 

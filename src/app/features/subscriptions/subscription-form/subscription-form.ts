@@ -12,12 +12,13 @@ import {
 } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
 import { toUserMessage } from '../../../core/http-error.interceptor';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type FormStatus = 'idle' | 'loading' | 'saving' | 'error';
 
 @Component({
   selector: 'app-subscription-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslatePipe],
   templateUrl: './subscription-form.html',
   styleUrl: './subscription-form.scss',
 })

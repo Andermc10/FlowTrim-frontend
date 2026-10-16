@@ -110,6 +110,7 @@
 }
 
 .theme-toggle,
+.language-toggle,
 .mobile-theme-toggle {
   border: 1px solid var(--color-border);
   background: transparent;
@@ -123,6 +124,19 @@
   align-items: center;
   width: 100%;
   margin: 0.75rem 0;
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.7rem;
+  font: inherit;
+  font-size: 0.76rem;
+  text-align: left;
+}
+
+.language-toggle {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.75rem;
   padding: 0.7rem 0.75rem;
   border-radius: 0.7rem;
   font: inherit;
@@ -152,6 +166,18 @@
 
 .rail-cta span:first-child {
   font-size: 1.1rem;
+}
+
+.rail-landing-link {
+  margin-top: 0.8rem;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.rail-landing-link:hover {
+  color: var(--color-primary);
 }
 
 .workspace-content {
@@ -197,7 +223,7 @@
     height: 1.9rem;
   }
 
-  .mobile-theme-toggle {
+.mobile-theme-toggle {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 0.65rem;
@@ -249,4 +275,14 @@
   .mobile-nav small {
     font-size: 0.62rem;
   }
+}
+
+.mobile-language-toggle {
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 800;
 }

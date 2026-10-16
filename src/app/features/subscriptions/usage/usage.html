@@ -1,19 +1,19 @@
 <section class="usage">
   @if (status() === 'loading') {
-    <p class="muted" role="status">Loading…</p>
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else if (status() === 'notfound') {
-    <div class="banner banner--error" role="alert">Subscription not found. <a class="link" routerLink="/app/subscriptions">Back to list</a></div>
+    <div class="banner banner--error" role="alert">{{ 'common.notFound' | translate }} <a class="link" routerLink="/app/subscriptions">{{ 'usage.backList' | translate }}</a></div>
   } @else if (status() === 'error') {
-    <div class="banner banner--error" role="alert">Could not load usage. <button type="button" class="link" (click)="load()">Retry</button></div>
+    <div class="banner banner--error" role="alert">{{ 'usage.loadError' | translate }} <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button></div>
   } @else {
     <div class="page-heading">
       <div>
-        <p class="section-kicker">Usage / declared signal</p>
+        <p class="section-kicker">{{ 'usage.kicker' | translate }}</p>
         <h1>{{ subscription()?.name }}</h1>
-        <p class="lede">A declared usage history can reveal whether a service still earns its place.</p>
+        <p class="lede">{{ 'usage.lede' | translate }}</p>
       </div>
     </div>
-    <p class="muted">Usage is declared by you, not verified automatically.</p>
+    <p class="muted">{{ 'usage.declared' | translate }}</p>
 
     @if (successMessage(); as message) {
       <div class="banner banner--success" role="status">{{ message }}</div>
@@ -24,67 +24,67 @@
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">
-        <label for="usageDate">Usage date</label>
+        <label for="usageDate">{{ 'usage.date' | translate }}</label>
         <input id="usageDate" type="date" formControlName="usageDate" />
         @if (form.controls.usageDate.touched && form.controls.usageDate.invalid) {
-          <small class="error">Usage date is required.</small>
+          <small class="error">{{ 'usage.dateRequired' | translate }}</small>
         }
         @for (m of errorsFor('usageDate'); track m) { <small class="error">{{ m }}</small> }
       </div>
 
       <div class="field">
-        <label for="usageCount">Usage count</label>
+        <label for="usageCount">{{ 'usage.count' | translate }}</label>
         <input id="usageCount" type="number" min="0" step="1" formControlName="usageCount" />
         @if (form.controls.usageCount.touched && form.controls.usageCount.invalid) {
-          <small class="error">Usage count must be zero or greater.</small>
+          <small class="error">{{ 'usage.countPositive' | translate }}</small>
         }
         @for (m of errorsFor('usageCount'); track m) { <small class="error">{{ m }}</small> }
       </div>
 
       <div class="field">
-        <label for="notes">Notes <span class="optional">(optional)</span></label>
+        <label for="notes">{{ 'usage.notes' | translate }} <span class="optional">{{ 'usage.notesOptional' | translate }}</span></label>
         <input id="notes" type="text" maxlength="500" formControlName="notes" />
         @for (m of errorsFor('notes'); track m) { <small class="error">{{ m }}</small> }
       </div>
 
       <div class="actions">
-        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Record usage' }}</button>
-        <a class="secondary" routerLink="/app/subscriptions">Back</a>
+        <button type="submit" [disabled]="saving()">{{ saving() ? ('usage.saving' | translate) : ('usage.record' | translate) }}</button>
+        <a class="secondary" routerLink="/app/subscriptions">{{ 'common.back' | translate }}</a>
       </div>
     </form>
 
     <section class="cost-card" aria-labelledby="costPerUseTitle">
-      <h2 id="costPerUseTitle">Cost per use</h2>
-      <p class="muted">Based on declared usage. This data is not verified automatically.</p>
+      <h2 id="costPerUseTitle">{{ 'usage.costPerUse' | translate }}</h2>
+      <p class="muted">{{ 'usage.basedOnDeclared' | translate }}</p>
 
       @if (costPerUseLoading()) {
-        <p class="muted" role="status">Calculating…</p>
+        <p class="muted" role="status">{{ 'usage.calculating' | translate }}</p>
       } @else if (costPerUseError()) {
         <div class="banner banner--error" role="alert">
-          Could not calculate cost per use.
-          <button type="button" class="link" (click)="loadCostPerUse()">Retry</button>
+          {{ 'usage.calculateError' | translate }}
+          <button type="button" class="link" (click)="loadCostPerUse()">{{ 'common.retry' | translate }}</button>
         </div>
       } @else if (costPerUse(); as result) {
         @if (result.calculable) {
           <dl class="cost-details">
-            <div><dt>Period</dt><dd>{{ result.from }} to {{ result.to }}</dd></div>
-            <div><dt>Period cost</dt><dd>{{ result.totalPaid | number: '1.2-2' }} {{ result.currency }}</dd></div>
-            <div><dt>Total uses</dt><dd>{{ result.totalUses }}</dd></div>
-            <div><dt>Cost per use</dt><dd>{{ result.costPerUse | number: '1.2-2' }} {{ result.currency }}</dd></div>
+            <div><dt>{{ 'usage.period' | translate }}</dt><dd>{{ result.from }} to {{ result.to }}</dd></div>
+            <div><dt>{{ 'usage.periodCost' | translate }}</dt><dd>{{ result.totalPaid | number: '1.2-2' }} {{ result.currency }}</dd></div>
+            <div><dt>{{ 'usage.totalUses' | translate }}</dt><dd>{{ result.totalUses }}</dd></div>
+            <div><dt>{{ 'usage.costPerUse' | translate }}</dt><dd>{{ result.costPerUse | number: '1.2-2' }} {{ result.currency }}</dd></div>
           </dl>
         } @else {
-          <p class="not-calculable">Not enough data to compute cost per use.</p>
-          <p class="muted">{{ result.reason }}</p>
+          <p class="not-calculable">{{ 'usage.notEnough' | translate }}</p>
+          <p class="muted">{{ result.reason === 'No usage in the selected period.' ? ('usage.noUsageReason' | translate) : result.reason }}</p>
         }
       }
     </section>
 
-    <h2>Recent usage</h2>
+    <h2>{{ 'usage.recent' | translate }}</h2>
     @if (records().length === 0) {
-      <p class="muted">No usage recorded yet.</p>
+      <p class="muted">{{ 'usage.noRecords' | translate }}</p>
     } @else {
       <table>
-        <thead><tr><th>Date</th><th>Count</th><th>Notes</th></tr></thead>
+        <thead><tr><th>{{ 'usage.tableDate' | translate }}</th><th>{{ 'usage.tableCount' | translate }}</th><th>{{ 'usage.tableNotes' | translate }}</th></tr></thead>
         <tbody>
           @for (r of records(); track r.id) {
             <tr><td>{{ r.usageDate }}</td><td>{{ r.usageCount }}</td><td>{{ r.notes }}</td></tr>

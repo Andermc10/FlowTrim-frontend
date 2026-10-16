@@ -2,15 +2,18 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { ThemeService } from './core/theme/theme.service';
+import { I18nService } from './core/i18n/i18n.service';
+import { TranslatePipe } from './core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss',
 })
 export class AppShell {
   private readonly theme = inject(ThemeService);
+  protected readonly i18n = inject(I18nService);
 
   protected readonly themeMode = this.theme.mode;
 
@@ -23,6 +26,12 @@ export class AppShell {
   }
 
   protected themeLabel(): string {
-    return this.themeMode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    return this.themeMode() === 'dark'
+      ? this.i18n.translate('nav.switchToLight')
+      : this.i18n.translate('nav.switchToDark');
+  }
+
+  protected toggleLanguage(): void {
+    this.i18n.toggleLanguage();
   }
 }

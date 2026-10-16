@@ -1,37 +1,37 @@
 <section class="simulator">
   <div class="page-heading">
     <div>
-      <p class="section-kicker">Simulator / trim scenarios</p>
-      <h1>What would you cut first?</h1>
-      <p class="lede">Model a decision before you make it. Nothing changes outside this screen.</p>
+      <p class="section-kicker">{{ 'simulator.kicker' | translate }}</p>
+      <h1>{{ 'simulator.title' | translate }}</h1>
+      <p class="lede">{{ 'simulator.lede' | translate }}</p>
     </div>
-    <span class="simulator__selection">{{ selected().size }} selected</span>
+    <span class="simulator__selection">{{ 'simulator.selected' | translate: { count: selected().size } }}</span>
   </div>
 
   @if (status() === 'loading') {
-    <p class="muted" role="status">Loading…</p>
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else if (status() === 'error') {
     <div class="banner banner--error" role="alert">
-      Could not load subscriptions.
-      <button type="button" class="link" (click)="loadSubscriptions()">Retry</button>
+      {{ 'subscriptions.loadError' | translate }}
+      <button type="button" class="link" (click)="loadSubscriptions()">{{ 'common.retry' | translate }}</button>
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">✂</span>
-      <p>No active subscriptions to simulate.</p>
-      <a class="btn" routerLink="/app/subscriptions/new">Add a subscription</a>
+      <p>{{ 'simulator.empty' | translate }}</p>
+      <a class="btn" routerLink="/app/subscriptions/new">{{ 'nav.addSubscription' | translate }}</a>
     </div>
   } @else {
     <div class="layout">
       <div class="picker">
-        <div class="panel-heading"><span class="panel-index">01</span><div><h2>Select services to trim</h2><p>Choose any active service to see the difference.</p></div></div>
+        <div class="panel-heading"><span class="panel-index">01</span><div><h2>{{ 'simulator.selectTitle' | translate }}</h2><p>{{ 'simulator.selectText' | translate }}</p></div></div>
         <ul>
           @for (sub of subscriptions(); track sub.id) {
             <li>
               <label>
                 <input type="checkbox" [checked]="isSelected(sub.id)" (change)="toggle(sub.id)" />
                 <span class="picker__name">{{ sub.name }}</span>
-                <span class="picker__meta">{{ sub.amount }} {{ sub.currency }} · {{ sub.billingCycle }}</span>
+                <span class="picker__meta">{{ sub.amount }} {{ sub.currency }} · {{ ('billing.' + sub.billingCycle) | translate }}</span>
               </label>
             </li>
           }
@@ -39,22 +39,22 @@
       </div>
 
       <div class="results">
-        <div class="panel-heading"><span class="panel-index panel-index--success">02</span><div><h2>Potential savings</h2><p>Scenario only. No cancellation is persisted.</p></div></div>
+        <div class="panel-heading"><span class="panel-index panel-index--success">02</span><div><h2>{{ 'simulator.resultsTitle' | translate }}</h2><p>{{ 'simulator.resultsText' | translate }}</p></div></div>
         @if (result(); as sim) {
           @for (currency of sim.currencies; track currency.currency) {
             <article class="card">
               <h3>{{ currency.currency }}</h3>
               <dl>
-                <div><dt>Current monthly</dt><dd>{{ currency.currentMonthly }}</dd></div>
-                <div><dt>Projected monthly</dt><dd>{{ currency.projectedMonthly }}</dd></div>
+                <div><dt>{{ 'simulator.currentMonthly' | translate }}</dt><dd>{{ currency.currentMonthly }}</dd></div>
+                <div><dt>{{ 'simulator.projectedMonthly' | translate }}</dt><dd>{{ currency.projectedMonthly }}</dd></div>
               </dl>
               <table>
                 <thead>
-                  <tr><th>Horizon</th><th>Savings</th></tr>
+                  <tr><th>{{ 'simulator.horizon' | translate }}</th><th>{{ 'simulator.savings' | translate }}</th></tr>
                 </thead>
                 <tbody>
                   @for (s of currency.savings; track s.months) {
-                    <tr><td>{{ s.months }} month(s)</td><td>{{ s.amount }} {{ currency.currency }}</td></tr>
+                    <tr><td>{{ 'simulator.months' | translate: { count: s.months } }}</td><td>{{ s.amount }} {{ currency.currency }}</td></tr>
                   }
                 </tbody>
               </table>
@@ -63,7 +63,7 @@
 
           <ul class="assumptions">
             @for (note of sim.assumptions; track note) {
-              <li>{{ note }}</li>
+               <li>{{ i18n.translateAssumption(note) }}</li>
             }
           </ul>
         }

@@ -1,15 +1,15 @@
 <section class="form-page">
   <div class="page-heading">
     <div>
-      <p class="section-kicker">Subscriptions / setup</p>
-      <h1>{{ isEdit() ? 'Edit a subscription.' : 'Give a recurring payment a place.' }}</h1>
-      <p class="lede">The details here power every summary, alert and scenario in FlowTrim.</p>
+      <p class="section-kicker">{{ 'form.kicker' | translate }}</p>
+      <h1>{{ isEdit() ? ('form.editTitle' | translate) : ('form.createTitle' | translate) }}</h1>
+      <p class="lede">{{ 'form.lede' | translate }}</p>
     </div>
   </div>
   <div class="card">
 
   @if (status() === 'loading') {
-    <p class="muted" role="status">Loading…</p>
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else {
     @if (generalError(); as message) {
       <div class="banner banner--error" role="alert">{{ message }}</div>
@@ -17,10 +17,10 @@
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">
-        <label for="name">Name</label>
+        <label for="name">{{ 'form.name' | translate }}</label>
         <input id="name" type="text" formControlName="name" autocomplete="off" />
         @if (form.controls.name.touched && form.controls.name.invalid) {
-          <small class="error">Name is required (max 120 characters).</small>
+          <small class="error">{{ 'form.requiredName' | translate }}</small>
         }
         @for (message of errorsFor('name'); track message) {
           <small class="error">{{ message }}</small>
@@ -28,10 +28,10 @@
       </div>
 
       <div class="field">
-        <label for="category">Category <span class="optional">(optional)</span></label>
+        <label for="category">{{ 'form.category' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
         <input id="category" type="text" formControlName="category" autocomplete="off" />
         @if (form.controls.category.touched && form.controls.category.invalid) {
-          <small class="error">Category must be at most 60 characters.</small>
+          <small class="error">{{ 'form.categoryLength' | translate }}</small>
         }
         @for (message of errorsFor('category'); track message) {
           <small class="error">{{ message }}</small>
@@ -39,10 +39,10 @@
       </div>
 
       <div class="field">
-        <label for="amount">Amount</label>
+        <label for="amount">{{ 'form.amount' | translate }}</label>
         <input id="amount" type="number" step="0.01" min="0.01" formControlName="amount" />
         @if (form.controls.amount.touched && form.controls.amount.invalid) {
-          <small class="error">Amount must be greater than zero.</small>
+          <small class="error">{{ 'form.amountPositive' | translate }}</small>
         }
         @for (message of errorsFor('amount'); track message) {
           <small class="error">{{ message }}</small>
@@ -50,10 +50,10 @@
       </div>
 
       <div class="field">
-        <label for="currency">Currency</label>
+        <label for="currency">{{ 'form.currency' | translate }}</label>
         <input id="currency" type="text" maxlength="3" formControlName="currency" />
         @if (form.controls.currency.touched && form.controls.currency.invalid) {
-          <small class="error">Currency must be a 3-letter code (e.g. COP).</small>
+          <small class="error">{{ 'form.currencyCode' | translate }}</small>
         }
         @for (message of errorsFor('currency'); track message) {
           <small class="error">{{ message }}</small>
@@ -61,10 +61,10 @@
       </div>
 
       <div class="field">
-        <label for="billingCycle">Billing cycle</label>
+        <label for="billingCycle">{{ 'form.billingCycle' | translate }}</label>
         <select id="billingCycle" formControlName="billingCycle">
           @for (cycle of billingCycles; track cycle) {
-            <option [value]="cycle">{{ cycle }}</option>
+            <option [value]="cycle">{{ ('billing.' + cycle) | translate }}</option>
           }
         </select>
         @for (message of errorsFor('billingCycle'); track message) {
@@ -73,10 +73,10 @@
       </div>
 
       <div class="field">
-        <label for="nextBillingDate">Next billing date</label>
+        <label for="nextBillingDate">{{ 'form.nextBillingDate' | translate }}</label>
         <input id="nextBillingDate" type="date" formControlName="nextBillingDate" />
         @if (form.controls.nextBillingDate.touched && form.controls.nextBillingDate.invalid) {
-          <small class="error">Next billing date is required.</small>
+          <small class="error">{{ 'form.dateRequired' | translate }}</small>
         }
         @for (message of errorsFor('nextBillingDate'); track message) {
           <small class="error">{{ message }}</small>
@@ -85,10 +85,10 @@
 
       @if (isEdit()) {
         <div class="field">
-          <label for="status">Status</label>
+          <label for="status">{{ 'form.status' | translate }}</label>
           <select id="status" formControlName="status">
-            @for (state of statuses; track state) {
-              <option [value]="state">{{ state }}</option>
+          @for (state of statuses; track state) {
+            <option [value]="state">{{ ('status.' + state) | translate }}</option>
             }
           </select>
           @for (message of errorsFor('status'); track message) {
@@ -99,9 +99,9 @@
 
       <div class="actions">
         <button type="submit" [disabled]="status() === 'saving'">
-          {{ status() === 'saving' ? 'Saving…' : (isEdit() ? 'Save changes' : 'Create subscription') }}
+          {{ status() === 'saving' ? ('form.saving' | translate) : (isEdit() ? ('form.saveChanges' | translate) : ('form.create' | translate)) }}
         </button>
-        <button type="button" class="secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="secondary" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
       </div>
     </form>
   }

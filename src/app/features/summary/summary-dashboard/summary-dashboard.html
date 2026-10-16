@@ -1,39 +1,39 @@
 <section class="dashboard">
   <div class="page-heading">
     <div>
-      <p class="section-kicker">Overview / signal</p>
-      <h1>Know where your money flows.</h1>
-      <p class="lede">A clear read on the recurring spend you have chosen to keep.</p>
+      <p class="section-kicker">{{ 'overview.kicker' | translate }}</p>
+      <h1>{{ 'overview.title' | translate }}</h1>
+      <p class="lede">{{ 'overview.lede' | translate }}</p>
     </div>
-    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> Add subscription</a>
+    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> {{ 'nav.addSubscription' | translate }}</a>
   </div>
 
   @if (status() === 'loading') {
-    <p class="muted" role="status">Loading…</p>
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else if (status() === 'error') {
     <div class="banner banner--error" role="alert">
-      Could not load the summary.
-      <button type="button" class="link" (click)="load()">Retry</button>
+      {{ 'summary.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">✦</span>
-      <p>No active subscriptions yet.</p>
-      <a class="btn" routerLink="/app/subscriptions/new">Add a subscription</a>
+      <p>{{ 'summary.empty' | translate }}</p>
+      <a class="btn" routerLink="/app/subscriptions/new">{{ 'nav.addSubscription' | translate }}</a>
     </div>
   } @else {
     <div class="cards">
       @for (currency of currencies(); track currency.currency) {
         <article class="card">
-          <div class="card__topline"><span class="card__label">MONTHLY BURN</span><span class="currency-mark">{{ currency.currency }}</span></div>
+          <div class="card__topline"><span class="card__label">{{ 'overview.monthlyBurn' | translate }}</span><span class="currency-mark">{{ currency.currency }}</span></div>
           <h2>{{ currency.monthlyEquivalent }} <small>{{ currency.currency }}</small></h2>
           <dl>
             <div>
-              <dt>Annual projection</dt>
+              <dt>{{ 'overview.annualProjection' | translate }}</dt>
               <dd>{{ currency.annualProjection }} {{ currency.currency }}</dd>
             </div>
             <div>
-              <dt>Active services</dt>
+              <dt>{{ 'overview.activeServices' | translate }}</dt>
               <dd>{{ currency.activeCount }}</dd>
             </div>
           </dl>
@@ -42,8 +42,7 @@
     </div>
 
     <p class="caveat">
-      Assumes constant prices and active services. Excludes inactive subscriptions. No currency
-      conversion — totals are shown per currency and never combined.
+      {{ 'overview.caveat' | translate }}
     </p>
   }
 </section>

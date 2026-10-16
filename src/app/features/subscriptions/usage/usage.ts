@@ -12,12 +12,13 @@ import {
 } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
 import { toUserMessage } from '../../../core/http-error.interceptor';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type UsageStatus = 'loading' | 'ready' | 'notfound' | 'error';
 
 @Component({
   selector: 'app-usage',
-  imports: [DecimalPipe, ReactiveFormsModule, RouterLink],
+  imports: [DecimalPipe, ReactiveFormsModule, RouterLink, TranslatePipe],
   templateUrl: './usage.html',
   styleUrl: './usage.scss',
 })
