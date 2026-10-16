@@ -15,10 +15,10 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the FlowTrim brand', async () => {
+  it('should render the root router outlet', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.app-header__brand')?.textContent).toContain('FlowTrim');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

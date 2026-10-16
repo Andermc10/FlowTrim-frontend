@@ -1,7 +1,11 @@
 <section class="list">
   <div class="list__head">
-    <h1>Subscriptions</h1>
-    <a class="btn" routerLink="/new">Add subscription</a>
+    <div>
+      <p class="section-kicker">Recurring spend / control</p>
+      <h1>Your subscriptions</h1>
+      <p class="lede">Keep every recurring payment visible, comparable and intentional.</p>
+    </div>
+    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> Add subscription</a>
   </div>
 
   @if (status() === 'loading') {
@@ -13,17 +17,18 @@
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
+      <span class="empty__mark" aria-hidden="true">◫</span>
       <p>No subscriptions yet.</p>
-      <a class="btn" routerLink="/new">Add your first subscription</a>
+      <a class="btn" routerLink="/app/subscriptions/new">Add your first subscription</a>
     </div>
   } @else {
-    <input
-      class="search"
-      type="search"
-      placeholder="Search by name…"
-      #q
-      (input)="search.set(q.value)"
-    />
+    <div class="list__toolbar">
+      <label class="search-field">
+        <span aria-hidden="true">⌕</span>
+        <input type="search" placeholder="Search by name..." aria-label="Search subscriptions" #q (input)="search.set(q.value)" />
+      </label>
+      <span class="list__count">{{ totalCount() }} active records in workspace</span>
+    </div>
 
     @if (deleteError(); as message) {
       <div class="banner banner--error" role="alert">{{ message }}</div>
@@ -43,23 +48,23 @@
       <tbody>
         @for (subscription of filtered(); track subscription.id) {
           <tr>
-            <td>{{ subscription.name }}</td>
-            <td>{{ subscription.amount }} {{ subscription.currency }}</td>
-            <td>{{ subscription.billingCycle }}</td>
-            <td>{{ subscription.nextBillingDate }}</td>
-            <td>
+            <td data-label="Name"><strong>{{ subscription.name }}</strong><small>{{ subscription.category || 'Uncategorized' }}</small></td>
+            <td data-label="Amount">{{ subscription.amount }} {{ subscription.currency }}</td>
+            <td data-label="Cycle">{{ subscription.billingCycle }}</td>
+            <td data-label="Next charge"><strong>{{ subscription.nextBillingDate }}</strong><small>{{ subscription.billingCycle }} renewal</small></td>
+            <td data-label="Status">
               <span class="status" [class.status--inactive]="subscription.status === 'Inactive'">
                 {{ subscription.status }}
               </span>
             </td>
-            <td class="actions-col">
+            <td class="actions-col" data-label="Actions">
               @if (confirmingId() === subscription.id) {
                 <span class="confirm">Delete?</span>
                 <button type="button" class="danger" (click)="confirmDelete(subscription.id)">Yes</button>
                 <button type="button" class="link" (click)="cancelDelete()">No</button>
               } @else {
-                <a class="link" [routerLink]="['/', subscription.id, 'edit']">Edit</a>
-                <a class="link" [routerLink]="['/', subscription.id, 'usage']">Usage</a>
+                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'edit']">Edit</a>
+                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'usage']">Usage</a>
                 <button type="button" class="link link--danger" (click)="askDelete(subscription.id)">Delete</button>
               }
             </td>

@@ -1,5 +1,12 @@
-<section class="card">
-  <h1>{{ isEdit() ? 'Edit subscription' : 'Register a subscription' }}</h1>
+<section class="form-page">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">Subscriptions / setup</p>
+      <h1>{{ isEdit() ? 'Edit a subscription.' : 'Give a recurring payment a place.' }}</h1>
+      <p class="lede">The details here power every summary, alert and scenario in FlowTrim.</p>
+    </div>
+  </div>
+  <div class="card">
 
   @if (status() === 'loading') {
     <p class="muted" role="status">Loading…</p>
@@ -98,4 +105,5 @@
       </div>
     </form>
   }
+  </div>
 </section>

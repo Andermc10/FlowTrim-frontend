@@ -12,6 +12,8 @@ renewals, and simulate cancellation savings. This repository holds the web clien
 - **Upcoming** — upcoming charges with a server-computed countdown and colored alert windows.
 - **Simulator** — pick subscriptions to cancel and see the potential savings at 1/12/24 months.
 - **Usage** — record declared usage and view cost per use, including a safe not-calculable state.
+- **Landing and workspace** — a product introduction at `/` and a responsive control workspace at `/app`.
+- **Themes** — persisted light and dark modes using the Carbon Signal visual system.
 - Every data-driven view handles **loading / empty / success / error** states; errors go through a
   central HTTP interceptor and show an actionable message.
 
@@ -54,7 +56,9 @@ Change `apiUrl` to point the SPA at a different API, with no code changes. CORS 
 
 | Path | View |
 |---|---|
-| `/` | Subscriptions list (search, edit, delete) |
+| `/` | FlowTrim landing page |
+| `/app` | Workspace overview |
+| `/app/subscriptions` | Subscription list (search, edit, delete) |
 | `/new` | Create a subscription |
 | `/:id/edit` | Edit a subscription |
 | `/:id/usage` | Record usage and view cost per use |
@@ -69,7 +73,9 @@ src/
   app/
     core/                       cross-cutting (HTTP error interceptor)
     features/
-      subscriptions/            list, form, usage, upcoming panel, models, service
+      core/theme/                persisted light/dark theme service
+      features/landing/          public landing page
+      subscriptions/             list, form, usage, upcoming panel, models, service
       summary/                  summary dashboard, model, service
       simulator/                simulator, models, service
     app.routes.ts, app.config.ts, app.ts/html/scss
@@ -84,6 +90,8 @@ public/                         static assets
 
 | | |
 |---|---|
+| Landing | ![Landing](docs/screenshots/landing.png) |
+| Workspace | ![Workspace](docs/screenshots/workspace.png) |
 | Subscriptions | ![Subscriptions](docs/screenshots/subscriptions.png) |
 | Summary | ![Summary](docs/screenshots/summary.png) |
 | Upcoming | ![Upcoming](docs/screenshots/upcoming.png) |
@@ -93,7 +101,7 @@ public/                         static assets
 
 - **Manual data only**; no bank integration or automatic charge detection.
 - **No authentication / multi-user** yet (planned, post-MVP).
-- Styling is a dark MVP theme; the final design system (and Tailwind/charts) is pending.
+- The visual system is implemented with SCSS, CSS custom properties and inline SVG; Tailwind and chart libraries remain optional future decisions.
 - Full in-browser integration needs the backend running with CORS (HU-08).
 
 ## Notes

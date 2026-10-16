@@ -2,11 +2,17 @@
   @if (status() === 'loading') {
     <p class="muted" role="status">Loading…</p>
   } @else if (status() === 'notfound') {
-    <div class="banner banner--error" role="alert">Subscription not found. <a class="link" routerLink="/">Back to list</a></div>
+    <div class="banner banner--error" role="alert">Subscription not found. <a class="link" routerLink="/app/subscriptions">Back to list</a></div>
   } @else if (status() === 'error') {
     <div class="banner banner--error" role="alert">Could not load usage. <button type="button" class="link" (click)="load()">Retry</button></div>
   } @else {
-    <h1>Usage — {{ subscription()?.name }}</h1>
+    <div class="page-heading">
+      <div>
+        <p class="section-kicker">Usage / declared signal</p>
+        <h1>{{ subscription()?.name }}</h1>
+        <p class="lede">A declared usage history can reveal whether a service still earns its place.</p>
+      </div>
+    </div>
     <p class="muted">Usage is declared by you, not verified automatically.</p>
 
     @if (successMessage(); as message) {
@@ -43,7 +49,7 @@
 
       <div class="actions">
         <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Record usage' }}</button>
-        <a class="secondary" routerLink="/">Back</a>
+        <a class="secondary" routerLink="/app/subscriptions">Back</a>
       </div>
     </form>
 

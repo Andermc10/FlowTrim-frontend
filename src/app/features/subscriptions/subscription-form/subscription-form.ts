@@ -101,12 +101,12 @@ export class SubscriptionForm implements OnInit {
     if (editingId) {
       const request: UpdateSubscriptionRequest = { ...base, status: value.status };
       this.service.update(editingId, request).subscribe({
-        next: () => this.router.navigate(['']),
+        next: () => this.router.navigate(['/app/subscriptions']),
         error: (error: HttpErrorResponse) => this.handleError(error),
       });
     } else {
       this.service.create(base).subscribe({
-        next: () => this.router.navigate(['']),
+        next: () => this.router.navigate(['/app/subscriptions']),
         error: (error: HttpErrorResponse) => this.handleError(error),
       });
     }
@@ -127,6 +127,6 @@ export class SubscriptionForm implements OnInit {
   }
 
   protected cancel(): void {
-    this.router.navigate(['']);
+    this.router.navigate(['/app/subscriptions']);
   }
 }

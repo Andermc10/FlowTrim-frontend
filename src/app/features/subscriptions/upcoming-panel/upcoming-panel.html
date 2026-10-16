@@ -1,5 +1,12 @@
 <section class="upcoming">
-  <h1>Upcoming charges</h1>
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">Upcoming / watchlist</p>
+      <h1>See the next cut before it happens.</h1>
+      <p class="lede">Expected renewals, ordered by urgency. No surprise language, no false certainty.</p>
+    </div>
+    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> Add subscription</a>
+  </div>
 
   @if (status() === 'loading') {
     <p class="muted" role="status">Loading…</p>
@@ -10,8 +17,9 @@
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
+      <span class="empty__mark" aria-hidden="true">↗</span>
       <p>No upcoming charges.</p>
-      <a class="btn" routerLink="/new">Add a subscription</a>
+      <a class="btn" routerLink="/app/subscriptions/new">Add a subscription</a>
     </div>
   } @else {
     <p class="muted">As of {{ referenceDate() }}. An expected renewal is not a confirmed charge.</p>
