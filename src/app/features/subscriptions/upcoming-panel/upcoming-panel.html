@@ -1,41 +1,41 @@
 <section class="upcoming">
   <div class="page-heading">
     <div>
-      <p class="section-kicker">Upcoming / watchlist</p>
-      <h1>See the next cut before it happens.</h1>
-      <p class="lede">Expected renewals, ordered by urgency. No surprise language, no false certainty.</p>
+      <p class="section-kicker">{{ 'upcoming.kicker' | translate }}</p>
+      <h1>{{ 'upcoming.title' | translate }}</h1>
+      <p class="lede">{{ 'upcoming.lede' | translate }}</p>
     </div>
-    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> Add subscription</a>
+    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> {{ 'nav.addSubscription' | translate }}</a>
   </div>
 
   @if (status() === 'loading') {
-    <p class="muted" role="status">Loading…</p>
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else if (status() === 'error') {
     <div class="banner banner--error" role="alert">
-      Could not load upcoming charges.
-      <button type="button" class="link" (click)="load()">Retry</button>
+      {{ 'upcoming.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">↗</span>
-      <p>No upcoming charges.</p>
-      <a class="btn" routerLink="/app/subscriptions/new">Add a subscription</a>
+      <p>{{ 'upcoming.empty' | translate }}</p>
+      <a class="btn" routerLink="/app/subscriptions/new">{{ 'upcoming.add' | translate }}</a>
     </div>
   } @else {
-    <p class="muted">As of {{ referenceDate() }}. An expected renewal is not a confirmed charge.</p>
+    <p class="muted">{{ 'upcoming.asOf' | translate }} {{ referenceDate() }}. {{ 'upcoming.disclaimer' | translate }}</p>
 
     <ul class="rows">
       @for (item of items(); track item.id) {
         <li class="row">
           <div class="row__main">
             <span class="row__name">{{ item.name }}</span>
-            <span class="row__meta">{{ item.amount }} {{ item.currency }} · {{ item.billingCycle }}</span>
+            <span class="row__meta">{{ item.amount }} {{ item.currency }} · {{ ('billing.' + item.billingCycle) | translate }}</span>
           </div>
           <div class="row__date">
             <span>{{ item.nextBillingDate }}</span>
             <span class="row__countdown">{{ countdownLabel(item.daysUntilCharge) }}</span>
           </div>
-          <span [class]="badgeClass(item.alertWindow)">{{ item.alertWindow }}</span>
+           <span [class]="badgeClass(item.alertWindow)">{{ ('alert.' + item.alertWindow) | translate }}</span>
         </li>
       }
     </ul>

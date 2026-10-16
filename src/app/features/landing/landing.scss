@@ -96,6 +96,20 @@
   color: var(--color-primary);
 }
 
+.landing-language-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.landing-language-toggle:hover {
+  color: var(--color-primary);
+}
+
 .landing-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(28rem, 1.1fr);
@@ -103,6 +117,7 @@
   align-items: center;
   min-height: 42rem;
   padding: 5rem 0 6rem;
+  animation: landing-rise 700ms ease both;
 }
 
 .eyebrow,
@@ -231,6 +246,7 @@
   background: var(--color-surface-glass);
   box-shadow: 0 1.5rem 4rem var(--color-shadow);
   backdrop-filter: blur(16px);
+  animation: preview-float 8s ease-in-out infinite;
 }
 
 .preview-card--main {
@@ -316,6 +332,7 @@
   width: 10rem;
   padding: 1rem;
   transform: rotate(5deg);
+  animation-delay: -2.5s;
 }
 
 .preview-card--side strong {
@@ -341,6 +358,129 @@
   align-items: center;
   padding: 0.85rem 1rem;
   transform: rotate(-4deg);
+  animation-delay: -5s;
+}
+
+.signal-rail {
+  width: min(100% - 3rem, 78rem);
+  margin: 0 auto;
+  padding: 2rem 0 5rem;
+}
+
+.signal-rail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.signal-rail__header > span {
+  color: var(--color-muted);
+  font-size: 0.7rem;
+}
+
+.signal-rail__header b {
+  color: var(--color-primary);
+  font-size: 1rem;
+}
+
+.signal-rail__track {
+  display: grid;
+  grid-auto-columns: minmax(17rem, 23rem);
+  grid-auto-flow: column;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 1.5rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--color-primary-soft-strong) transparent;
+}
+
+.signal-card {
+  position: relative;
+  min-height: 16rem;
+  overflow: hidden;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  scroll-snap-align: start;
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.signal-card:hover,
+.signal-card:focus-within {
+  border-color: var(--signal-color);
+  transform: translateY(-0.35rem);
+}
+
+.signal-card::after {
+  position: absolute;
+  right: -3rem;
+  bottom: -4rem;
+  width: 11rem;
+  height: 11rem;
+  border: 1px solid color-mix(in srgb, var(--signal-color) 35%, transparent);
+  border-radius: 50%;
+  content: '';
+}
+
+.signal-card--teal { --signal-color: var(--color-primary); }
+.signal-card--green { --signal-color: var(--color-success); }
+.signal-card--amber { --signal-color: var(--color-warning); }
+
+.signal-card__index {
+  color: var(--signal-color);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.signal-card__glyph {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: 2.5rem 0 1.2rem;
+  border-radius: 0.8rem;
+  color: #061014;
+  background: var(--signal-color);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.signal-card h2 {
+  max-width: 10ch;
+  margin: 0 0 0.6rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.06em;
+}
+
+.signal-card p {
+  max-width: 18rem;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.signal-card__line {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--signal-color), transparent);
+}
+
+@keyframes landing-rise {
+  from { opacity: 0; transform: translateY(1.4rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes preview-float {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -0.45rem; }
 }
 
 .cut-mark {
@@ -516,7 +656,8 @@
   .landing-hero,
   .landing-proof,
   .landing-principles,
-  .landing-footer {
+  .landing-footer,
+  .signal-rail {
     width: min(100% - 2rem, 78rem);
   }
 
@@ -561,5 +702,15 @@
   .landing-footer {
     display: grid;
     gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero,
+  .preview-card,
+  .signal-card,
+  .button {
+    animation: none;
+    transition: none;
   }
 }

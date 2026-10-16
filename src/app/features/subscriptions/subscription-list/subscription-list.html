@@ -1,33 +1,33 @@
 <section class="list">
   <div class="list__head">
     <div>
-      <p class="section-kicker">Recurring spend / control</p>
-      <h1>Your subscriptions</h1>
-      <p class="lede">Keep every recurring payment visible, comparable and intentional.</p>
+      <p class="section-kicker">{{ 'subscriptions.kicker' | translate }}</p>
+      <h1>{{ 'subscriptions.title' | translate }}</h1>
+      <p class="lede">{{ 'subscriptions.lede' | translate }}</p>
     </div>
-    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> Add subscription</a>
+    <a class="btn" routerLink="/app/subscriptions/new"><span aria-hidden="true">+</span> {{ 'nav.addSubscription' | translate }}</a>
   </div>
 
   @if (status() === 'loading') {
-    <p class="muted" role="status">Loading…</p>
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else if (status() === 'error') {
     <div class="banner banner--error" role="alert">
-      Could not load subscriptions.
-      <button type="button" class="link" (click)="load()">Retry</button>
+      {{ 'subscriptions.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
     </div>
   } @else if (isEmpty()) {
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">◫</span>
-      <p>No subscriptions yet.</p>
-      <a class="btn" routerLink="/app/subscriptions/new">Add your first subscription</a>
+      <p>{{ 'subscriptions.noSubscriptions' | translate }}</p>
+      <a class="btn" routerLink="/app/subscriptions/new">{{ 'subscriptions.addFirst' | translate }}</a>
     </div>
   } @else {
     <div class="list__toolbar">
       <label class="search-field">
         <span aria-hidden="true">⌕</span>
-        <input type="search" placeholder="Search by name..." aria-label="Search subscriptions" #q (input)="search.set(q.value)" />
+        <input type="search" [placeholder]="'subscriptions.search' | translate" [attr.aria-label]="'subscriptions.search' | translate" #q (input)="search.set(q.value)" />
       </label>
-      <span class="list__count">{{ totalCount() }} active records in workspace</span>
+      <span class="list__count">{{ totalCount() }} {{ 'subscriptions.records' | translate }}</span>
     </div>
 
     @if (deleteError(); as message) {
@@ -37,41 +37,41 @@
     <table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Amount</th>
-          <th>Cycle</th>
-          <th>Next charge</th>
-          <th>Status</th>
-          <th class="actions-col">Actions</th>
+          <th>{{ 'subscriptions.name' | translate }}</th>
+          <th>{{ 'subscriptions.amount' | translate }}</th>
+          <th>{{ 'subscriptions.cycle' | translate }}</th>
+          <th>{{ 'subscriptions.nextCharge' | translate }}</th>
+          <th>{{ 'subscriptions.status' | translate }}</th>
+          <th class="actions-col">{{ 'subscriptions.actions' | translate }}</th>
         </tr>
       </thead>
       <tbody>
         @for (subscription of filtered(); track subscription.id) {
           <tr>
-            <td data-label="Name"><strong>{{ subscription.name }}</strong><small>{{ subscription.category || 'Uncategorized' }}</small></td>
-            <td data-label="Amount">{{ subscription.amount }} {{ subscription.currency }}</td>
-            <td data-label="Cycle">{{ subscription.billingCycle }}</td>
-            <td data-label="Next charge"><strong>{{ subscription.nextBillingDate }}</strong><small>{{ subscription.billingCycle }} renewal</small></td>
-            <td data-label="Status">
+            <td [attr.data-label]="'subscriptions.name' | translate"><strong>{{ subscription.name }}</strong><small>{{ subscription.category || ('subscriptions.uncategorized' | translate) }}</small></td>
+            <td [attr.data-label]="'subscriptions.amount' | translate">{{ subscription.amount }} {{ subscription.currency }}</td>
+            <td [attr.data-label]="'subscriptions.cycle' | translate">{{ ('billing.' + subscription.billingCycle) | translate }}</td>
+            <td [attr.data-label]="'subscriptions.nextCharge' | translate"><strong>{{ subscription.nextBillingDate }}</strong><small>{{ ('billing.' + subscription.billingCycle) | translate }} {{ 'subscriptions.renewal' | translate }}</small></td>
+            <td [attr.data-label]="'subscriptions.status' | translate">
               <span class="status" [class.status--inactive]="subscription.status === 'Inactive'">
-                {{ subscription.status }}
+                {{ ('status.' + subscription.status) | translate }}
               </span>
             </td>
-            <td class="actions-col" data-label="Actions">
+            <td class="actions-col" [attr.data-label]="'subscriptions.actions' | translate">
               @if (confirmingId() === subscription.id) {
-                <span class="confirm">Delete?</span>
-                <button type="button" class="danger" (click)="confirmDelete(subscription.id)">Yes</button>
-                <button type="button" class="link" (click)="cancelDelete()">No</button>
+                <span class="confirm">{{ 'subscriptions.deleteQuestion' | translate }}</span>
+                <button type="button" class="danger" (click)="confirmDelete(subscription.id)">{{ 'subscriptions.yes' | translate }}</button>
+                <button type="button" class="link" (click)="cancelDelete()">{{ 'subscriptions.no' | translate }}</button>
               } @else {
-                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'edit']">Edit</a>
-                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'usage']">Usage</a>
-                <button type="button" class="link link--danger" (click)="askDelete(subscription.id)">Delete</button>
+                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'edit']">{{ 'subscriptions.edit' | translate }}</a>
+                <a class="link" [routerLink]="['/app/subscriptions', subscription.id, 'usage']">{{ 'subscriptions.usage' | translate }}</a>
+                <button type="button" class="link link--danger" (click)="askDelete(subscription.id)">{{ 'subscriptions.delete' | translate }}</button>
               }
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="6" class="muted">No subscriptions match "{{ search() }}".</td>
+            <td colspan="6" class="muted">{{ 'subscriptions.noMatch' | translate }}</td>
           </tr>
         }
       </tbody>

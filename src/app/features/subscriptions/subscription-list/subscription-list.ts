@@ -3,12 +3,13 @@ import { RouterLink } from '@angular/router';
 
 import { SubscriptionResponse } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type ListStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-subscription-list',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './subscription-list.html',
   styleUrl: './subscription-list.scss',
 })

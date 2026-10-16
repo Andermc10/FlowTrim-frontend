@@ -1,6 +1,6 @@
 <div class="app-shell">
-  <aside class="workspace-rail" aria-label="Workspace navigation">
-    <a class="brand" routerLink="/app" aria-label="FlowTrim workspace overview">
+  <aside class="workspace-rail" [attr.aria-label]="'nav.controlWorkspace' | translate">
+    <a class="brand" routerLink="/" aria-label="FlowTrim home">
       <span class="brand__mark" aria-hidden="true">
         <svg viewBox="0 0 32 32" role="img">
           <path d="M7 8.5h10.5c4.7 0 7.5 2.3 7.5 6.2 0 3.8-2.8 6.1-7.5 6.1H12" />
@@ -10,24 +10,24 @@
       <span class="brand__name">Flow<span>Trim</span></span>
     </a>
 
-    <div class="rail-label">Control workspace</div>
+    <div class="rail-label">{{ 'nav.controlWorkspace' | translate }}</div>
 
     <nav class="rail-nav">
       <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
         <span class="nav-icon" aria-hidden="true">⌂</span>
-        <span>Overview</span>
+        <span>{{ 'nav.overview' | translate }}</span>
       </a>
       <a routerLink="/app/subscriptions" routerLinkActive="is-active">
         <span class="nav-icon" aria-hidden="true">◫</span>
-        <span>Subscriptions</span>
+        <span>{{ 'nav.subscriptions' | translate }}</span>
       </a>
       <a routerLink="/app/upcoming" routerLinkActive="is-active">
         <span class="nav-icon" aria-hidden="true">↗</span>
-        <span>Upcoming</span>
+        <span>{{ 'nav.upcoming' | translate }}</span>
       </a>
       <a routerLink="/app/simulator" routerLinkActive="is-active">
         <span class="nav-icon" aria-hidden="true">✂</span>
-        <span>Simulator</span>
+        <span>{{ 'nav.simulator' | translate }}</span>
       </a>
     </nav>
 
@@ -36,25 +36,31 @@
     <div class="workspace-status">
       <span class="status-dot" aria-hidden="true"></span>
       <div>
-        <strong>Local workspace</strong>
-        <span>API connected</span>
+        <strong>{{ 'nav.localWorkspace' | translate }}</strong>
+        <span>{{ 'nav.apiConnected' | translate }}</span>
       </div>
     </div>
 
     <button class="theme-toggle" type="button" (click)="toggleTheme()" [attr.aria-label]="themeLabel()">
       <span aria-hidden="true">{{ themeIcon() }}</span>
-      <span>{{ themeMode() }} mode</span>
+      <span>{{ themeMode() === 'dark' ? ('nav.darkMode' | translate) : ('nav.lightMode' | translate) }}</span>
+    </button>
+
+    <button class="language-toggle" type="button" (click)="toggleLanguage()" [attr.aria-label]="i18n.languageLabel()">
+      <span aria-hidden="true">文</span>
+      <span>{{ i18n.languageName() }}</span>
     </button>
 
     <a class="rail-cta" routerLink="/app/subscriptions/new">
       <span aria-hidden="true">+</span>
-      <span>Add subscription</span>
+      <span>{{ 'nav.addSubscription' | translate }}</span>
     </a>
+    <a class="rail-landing-link" routerLink="/">← {{ 'nav.backToLanding' | translate }}</a>
   </aside>
 
   <div class="workspace-content">
     <header class="mobile-header">
-      <a class="brand brand--compact" routerLink="/app" aria-label="FlowTrim workspace overview">
+      <a class="brand brand--compact" routerLink="/" aria-label="FlowTrim home">
         <span class="brand__mark" aria-hidden="true">
           <svg viewBox="0 0 32 32"><path d="M7 8.5h10.5c4.7 0 7.5 2.3 7.5 6.2 0 3.8-2.8 6.1-7.5 6.1H12" /><path d="M7 23.5h7.2M12 20.8l4.5 4.5M12 20.8l4.5-4.5" /></svg>
         </span>
@@ -63,6 +69,9 @@
       <button class="mobile-theme-toggle" type="button" (click)="toggleTheme()" [attr.aria-label]="themeLabel()">
         {{ themeIcon() }}
       </button>
+      <button class="mobile-language-toggle" type="button" (click)="toggleLanguage()" [attr.aria-label]="i18n.languageLabel()">
+        {{ i18n.languageName() }}
+      </button>
     </header>
 
     <main class="workspace-main">
@@ -70,18 +79,18 @@
       <router-outlet />
     </main>
 
-    <nav class="mobile-nav" aria-label="Mobile workspace navigation">
+    <nav class="mobile-nav" [attr.aria-label]="'nav.controlWorkspace' | translate">
       <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
-        <span aria-hidden="true">⌂</span><small>Overview</small>
+        <span aria-hidden="true">⌂</span><small>{{ 'nav.overview' | translate }}</small>
       </a>
       <a routerLink="/app/subscriptions" routerLinkActive="is-active">
-        <span aria-hidden="true">◫</span><small>Subscriptions</small>
+        <span aria-hidden="true">◫</span><small>{{ 'nav.subscriptions' | translate }}</small>
       </a>
       <a routerLink="/app/upcoming" routerLinkActive="is-active">
-        <span aria-hidden="true">↗</span><small>Upcoming</small>
+        <span aria-hidden="true">↗</span><small>{{ 'nav.upcoming' | translate }}</small>
       </a>
       <a routerLink="/app/simulator" routerLinkActive="is-active">
-        <span aria-hidden="true">✂</span><small>Simulator</small>
+        <span aria-hidden="true">✂</span><small>{{ 'nav.simulator' | translate }}</small>
       </a>
     </nav>
   </div>

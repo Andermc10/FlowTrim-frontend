@@ -3,12 +3,13 @@ import { RouterLink } from '@angular/router';
 
 import { CurrencySummary } from '../summary.models';
 import { SummaryService } from '../summary-service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type DashboardStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-summary-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './summary-dashboard.html',
   styleUrl: './summary-dashboard.scss',
 })
