@@ -78,6 +78,28 @@
     </div>
   </section>
 
+  <section class="landing-story" aria-labelledby="storyTitle">
+    <p class="section-kicker" id="storyTitle">{{ 'landing.storyKicker' | translate }}</p>
+    <div class="story-grid">
+      <article class="story-card story-card--objective">
+        <span class="story-card__index">01 / OBJECTIVE</span>
+        <h2>{{ 'landing.objectiveTitle' | translate }}</h2>
+        <p>{{ 'landing.objectiveText' | translate }}</p>
+      </article>
+      <article class="story-card story-card--problem">
+        <span class="story-card__index">02 / PROBLEM</span>
+        <h2>{{ 'landing.problemTitle' | translate }}</h2>
+        <p>{{ 'landing.problemText' | translate }}</p>
+      </article>
+      <article class="story-card story-card--solution">
+        <span class="story-card__index">03 / SOLUTION</span>
+        <h2>{{ 'landing.solutionTitle' | translate }}</h2>
+        <p>{{ 'landing.solutionText' | translate }}</p>
+        <a routerLink="/app">{{ 'landing.storyCta' | translate }} <span aria-hidden="true">↗</span></a>
+      </article>
+    </div>
+  </section>
+
   <section class="landing-proof" id="how-it-works">
     <p class="section-kicker">{{ 'landing.sectionKicker' | translate }}</p>
     <div class="proof-grid">

@@ -86,13 +86,23 @@
   color: var(--color-muted);
 }
 
+.table-viewport {
+  max-height: min(62dvh, 38rem);
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  outline: none;
+}
+
+.table-viewport:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: 0.9rem;
   background: var(--color-surface);
 }
 
@@ -104,6 +114,10 @@ td {
 }
 
 th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface);
   color: var(--color-muted);
   font-size: 0.64rem;
   font-weight: 800;
@@ -164,6 +178,70 @@ td small {
   padding: 0 0.35rem;
 }
 
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: 0.25rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.icon-button:hover,
+.icon-button:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.icon-button--danger {
+  color: var(--color-danger);
+}
+
+.icon-button--danger:hover,
+.icon-button--danger:focus-visible {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+.modal-copy {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.modal-actions .danger-button {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: #fff;
+}
+
 .link--danger,
 .confirm {
   color: var(--color-danger);
@@ -197,6 +275,12 @@ td small {
 
   .search-field {
     width: 100%;
+  }
+
+  .table-viewport {
+    max-height: none;
+    overflow: visible;
+    border: 0;
   }
 
   table,

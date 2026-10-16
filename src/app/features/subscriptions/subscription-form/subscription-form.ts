@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -28,6 +28,12 @@ export class SubscriptionForm implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
+  @Input() modalMode: 'create' | 'edit' | null = null;
+  @Input() subscriptionId: string | null = null;
+  @Output() readonly saved = new EventEmitter<void>();
+  @Output() readonly closeRequested = new EventEmitter<void>();
+  @Output() readonly dirtyChange = new EventEmitter<boolean>();
+
   protected readonly status = signal<FormStatus>('idle');
   protected readonly fieldErrors = signal<Record<string, string[]>>({});
   protected readonly generalError = signal<string | null>(null);
@@ -48,7 +54,8 @@ export class SubscriptionForm implements OnInit {
   });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    this.form.valueChanges.subscribe(() => this.dirtyChange.emit(this.form.dirty));
+    const id = this.subscriptionId ?? this.route.snapshot.paramMap.get('id');
     if (id) {
       this.editingId.set(id);
       this.load(id);
@@ -68,6 +75,8 @@ export class SubscriptionForm implements OnInit {
           nextBillingDate: subscription.nextBillingDate,
           status: subscription.status,
         });
+        this.form.markAsPristine();
+        this.dirtyChange.emit(false);
         this.status.set('idle');
       },
       error: () => {
@@ -102,12 +111,12 @@ export class SubscriptionForm implements OnInit {
     if (editingId) {
       const request: UpdateSubscriptionRequest = { ...base, status: value.status };
       this.service.update(editingId, request).subscribe({
-        next: () => this.router.navigate(['/app/subscriptions']),
+        next: () => this.finishSave(),
         error: (error: HttpErrorResponse) => this.handleError(error),
       });
     } else {
       this.service.create(base).subscribe({
-        next: () => this.router.navigate(['/app/subscriptions']),
+        next: () => this.finishSave(),
         error: (error: HttpErrorResponse) => this.handleError(error),
       });
     }
@@ -128,6 +137,18 @@ export class SubscriptionForm implements OnInit {
   }
 
   protected cancel(): void {
+    if (this.modalMode) {
+      this.closeRequested.emit();
+      return;
+    }
+    this.router.navigate(['/app/subscriptions']);
+  }
+
+  private finishSave(): void {
+    if (this.modalMode) {
+      this.saved.emit();
+      return;
+    }
     this.router.navigate(['/app/subscriptions']);
   }
 }

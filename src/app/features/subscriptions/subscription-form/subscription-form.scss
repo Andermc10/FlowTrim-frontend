@@ -7,6 +7,10 @@
   margin: 0 auto;
 }
 
+.form-page--modal {
+  width: 100%;
+}
+
 .card {
   max-width: 44rem;
   padding: clamp(1.2rem, 4vw, 2rem);
@@ -14,6 +18,15 @@
   border-radius: 1rem;
   background: var(--color-surface);
   box-shadow: 0 1.5rem 4rem var(--color-shadow);
+}
+
+.form-page--modal .card {
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 form {

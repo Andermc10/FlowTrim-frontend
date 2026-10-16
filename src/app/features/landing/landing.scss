@@ -473,6 +473,69 @@
   background: linear-gradient(90deg, var(--signal-color), transparent);
 }
 
+.landing-story {
+  width: min(100% - 3rem, 78rem);
+  margin: 0 auto;
+  padding: 2rem 0 5rem;
+}
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.story-card {
+  min-height: 17rem;
+  padding: 1.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.story-card:hover,
+.story-card:focus-within {
+  border-color: var(--story-color);
+  transform: translateY(-0.35rem);
+}
+
+.story-card--objective { --story-color: var(--color-primary); }
+.story-card--problem { --story-color: var(--color-warning); }
+.story-card--solution { --story-color: var(--color-success); }
+
+.story-card__index {
+  color: var(--story-color);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.story-card h2 {
+  max-width: 10ch;
+  margin: 4rem 0 0.8rem;
+  font-size: 1.65rem;
+  letter-spacing: -0.07em;
+}
+
+.story-card p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.story-card a {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+  color: var(--story-color);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 @keyframes landing-rise {
   from { opacity: 0; transform: translateY(1.4rem); }
   to { opacity: 1; transform: translateY(0); }
@@ -657,7 +720,8 @@
   .landing-proof,
   .landing-principles,
   .landing-footer,
-  .signal-rail {
+  .signal-rail,
+  .landing-story {
     width: min(100% - 2rem, 78rem);
   }
 
@@ -684,7 +748,8 @@
   }
 
   .proof-grid,
-  .landing-principles {
+  .landing-principles,
+  .story-grid {
     grid-template-columns: 1fr;
   }
 

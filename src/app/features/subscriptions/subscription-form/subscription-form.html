@@ -1,4 +1,5 @@
-<section class="form-page">
+<section class="form-page" [class.form-page--modal]="modalMode !== null">
+  @if (modalMode === null) {
   <div class="page-heading">
     <div>
       <p class="section-kicker">{{ 'form.kicker' | translate }}</p>
@@ -6,6 +7,7 @@
       <p class="lede">{{ 'form.lede' | translate }}</p>
     </div>
   </div>
+  }
   <div class="card">
 
   @if (status() === 'loading') {
@@ -98,10 +100,10 @@
       }
 
       <div class="actions">
+        <button type="button" class="secondary" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
         <button type="submit" [disabled]="status() === 'saving'">
           {{ status() === 'saving' ? ('form.saving' | translate) : (isEdit() ? ('form.saveChanges' | translate) : ('form.create' | translate)) }}
         </button>
-        <button type="button" class="secondary" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
       </div>
     </form>
   }
