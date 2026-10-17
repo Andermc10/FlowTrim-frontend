@@ -3,9 +3,12 @@
     <a class="auth-brand" routerLink="/">Flow<span>Trim</span></a>
     <p class="auth-kicker">{{ 'auth.kicker' | translate }}</p>
     <h1 id="login-title">{{ 'auth.loginTitle' | translate }}</h1>
+    @if (sessionExpired) {
+      <p class="auth-notice" role="status">{{ 'auth.sessionExpired' | translate }}</p>
+    }
     <p class="auth-copy">{{ 'auth.loginText' | translate }}</p>
-    <button class="auth-primary" type="button" (click)="startLogin()">
-      {{ 'auth.continue' | translate }}
+    <button class="auth-primary" type="button" [disabled]="starting()" (click)="startLogin()">
+      {{ (starting() ? 'auth.starting' : 'auth.continue') | translate }}
     </button>
     @if (error(); as message) {
       <p class="auth-error" role="alert">{{ message }}</p>

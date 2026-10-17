@@ -55,22 +55,40 @@ The API base URL is per-environment and swapped at build time via `angular.json`
 Change `apiUrl` to point the SPA at a different API, with no code changes. CORS for the dev origin
 (`http://localhost:4200`) is configured on the backend.
 
-## OIDC/JWT configuration
+## Authentication (Auth0)
 
-The SPA does not implement password storage. Configure one OIDC provider in each environment:
+The SPA never handles passwords. It signs in with **Auth0** using Authorization Code + PKCE.
+
+Auth0 setup — **Applications → Single Page Application**:
+
+| Setting | Local value |
+|---|---|
+| Allowed Callback URLs | `http://localhost:4200/auth/callback` |
+| Allowed Logout URLs | `http://localhost:4200/` |
+| Allowed Web Origins | `http://localhost:4200` |
+
+Then set the public values in `src/environments/environment*.ts` (they are visible in the browser by
+design and are not secrets):
 
 ```ts
 auth: {
-  authority: 'https://your-issuer.example.com',
-  clientId: 'your-public-spa-client-id',
-  audience: 'flowtrim-api',
+  authority: 'https://<tenant>.<region>.auth0.com',
+  clientId: '<spa-client-id>',
+  audience: 'https://api.flowtrim.dev', // same as the API's Authentication:Audience
   scope: 'openid profile email',
 }
 ```
 
-The authorization-code flow uses PKCE. Access tokens are held in `sessionStorage` only, attached to
-FlowTrim API requests by the auth interceptor and never sent to the identity provider as an API bearer
-header. Refresh tokens are intentionally not stored in this MVP.
+Behavior:
+
+- `/app/**` is protected by a guard; without a valid token it redirects to `/auth/login?returnUrl=…`.
+- The interceptor attaches the bearer token only to `<apiUrl>/api/…` requests (exact prefix match),
+  never to the identity provider.
+- If the API answers `401`, the session is cleared and the login page shows a "session expired" notice.
+- Sign-out clears the local session and ends the Auth0 session when the provider exposes
+  `end_session_endpoint`.
+- Access tokens live in `sessionStorage` only; refresh tokens are intentionally not used.
+- `returnUrl` only accepts internal routes (open-redirect protection).
 
 ## Routes
 
@@ -123,8 +141,8 @@ public/                         static assets
 ## Known limitations
 
 - **Manual data only**; no bank integration or automatic charge detection.
-- **Provider setup required** — authentication flow and protected routes are implemented, but each
-  deployment must configure an OIDC Authority, public Client ID and API Audience.
+- **Auth0 tenant required** — the workspace needs the Auth0 SPA values above; without them the login
+  page shows a configuration error.
 - The visual system is implemented with SCSS, CSS custom properties and inline SVG; Tailwind and chart libraries remain optional future decisions.
 - Full in-browser integration needs the backend running with CORS (HU-08).
 
