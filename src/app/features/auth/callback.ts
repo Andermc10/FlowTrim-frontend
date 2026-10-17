@@ -1,16 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-auth-callback',
-  imports: [TranslatePipe],
+  imports: [RouterLink, TranslatePipe],
   template: `
     <main class="auth-callback" aria-live="polite">
       @if (error(); as message) {
-        <p role="alert">{{ message }}</p>
+        <div class="auth-callback-error">
+          <p role="alert">{{ message }}</p>
+          <a routerLink="/auth/login">{{ 'auth.backToLogin' | translate }}</a>
+        </div>
       } @else {
         <p>{{ 'auth.finishing' | translate }}</p>
       }

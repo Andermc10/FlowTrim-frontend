@@ -4,10 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { toSafeReturnUrl } from './auth-urls';
 
 interface OpenIdConfiguration {
   authorization_endpoint: string;
   token_endpoint: string;
+  end_session_endpoint?: string;
 }
 
 interface TokenResponse {
@@ -40,7 +42,7 @@ export class AuthService {
 
     sessionStorage.setItem(authorizationStateKey, state);
     sessionStorage.setItem(codeVerifierKey, verifier);
-    sessionStorage.setItem(returnUrlKey, this.safeReturnUrl(returnUrl));
+    sessionStorage.setItem(returnUrlKey, toSafeReturnUrl(returnUrl));
 
     const authorizationUrl = new URL(discovery.authorization_endpoint);
     authorizationUrl.search = new URLSearchParams({
@@ -89,7 +91,7 @@ export class AuthService {
       throw new Error('The identity provider did not return an access token.');
     }
 
-    const returnUrl = this.safeReturnUrl(sessionStorage.getItem(returnUrlKey) ?? '/app');
+    const returnUrl = toSafeReturnUrl(sessionStorage.getItem(returnUrlKey));
     const expiresAt = Date.now() + (response.expires_in ?? 300) * 1000;
     sessionStorage.setItem(accessTokenKey, response.access_token);
     sessionStorage.setItem(tokenExpiresAtKey, String(expiresAt));
@@ -120,14 +122,51 @@ export class AuthService {
     this.accessTokenState.set(null);
   }
 
+  /** Sesión vencida o revocada (la API respondió 401): limpia el token y ofrece volver a autenticarse. */
+  expireSession(currentUrl: string): void {
+    this.clearSession();
+    void this.router.navigate(['/auth/login'], {
+      queryParams: { returnUrl: toSafeReturnUrl(currentUrl), reason: 'expired' },
+    });
+  }
+
+  /**
+   * Cierra la sesión local y, si el proveedor publica `end_session_endpoint`, también la del proveedor;
+   * así el siguiente inicio de sesión no reutiliza en silencio la cuenta anterior.
+   */
   async logout(): Promise<void> {
     this.clearSession();
-    await this.router.navigateByUrl('/');
+
+    const endSessionEndpoint = await this.findEndSessionEndpoint();
+    if (!endSessionEndpoint) {
+      await this.router.navigateByUrl('/');
+      return;
+    }
+
+    const logoutUrl = new URL(endSessionEndpoint);
+    logoutUrl.search = new URLSearchParams({
+      client_id: environment.auth.clientId,
+      post_logout_redirect_uri: `${window.location.origin}/`,
+    }).toString();
+    window.location.assign(logoutUrl.toString());
   }
 
   private async loadDiscovery(): Promise<OpenIdConfiguration> {
     const authority = environment.auth.authority.replace(/\/$/, '');
     return firstValueFrom(this.http.get<OpenIdConfiguration>(`${authority}/.well-known/openid-configuration`));
+  }
+
+  private async findEndSessionEndpoint(): Promise<string | null> {
+    if (!environment.auth.authority) {
+      return null;
+    }
+
+    try {
+      return (await this.loadDiscovery()).end_session_endpoint ?? null;
+    } catch {
+      // Sin discovery solo se puede cerrar la sesión local, que ya se limpió.
+      return null;
+    }
   }
 
   private ensureProviderConfiguration(): void {
@@ -138,10 +177,6 @@ export class AuthService {
 
   private redirectUri(): string {
     return `${window.location.origin}/auth/callback`;
-  }
-
-  private safeReturnUrl(value: string): string {
-    return value.startsWith('/') && !value.startsWith('//') ? value : '/app';
   }
 
   private readValidAccessToken(): string | null {
