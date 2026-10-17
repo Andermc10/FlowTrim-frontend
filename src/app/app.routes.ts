@@ -9,12 +9,18 @@ import { Usage } from './features/subscriptions/usage/usage';
 import { UpcomingPanel } from './features/subscriptions/upcoming-panel/upcoming-panel';
 import { SummaryDashboard } from './features/summary/summary-dashboard/summary-dashboard';
 import { Simulator } from './features/simulator/simulator/simulator';
+import { Login } from './features/auth/login';
+import { AuthCallback } from './features/auth/callback';
+import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: Landing },
+  { path: 'auth/login', component: Login },
+  { path: 'auth/callback', component: AuthCallback },
   {
     path: 'app',
     component: AppShell,
+    canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', component: SummaryDashboard },
       { path: 'subscriptions', component: SubscriptionList },
