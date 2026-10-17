@@ -3,4 +3,10 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:5214',
+  auth: {
+    authority: '',
+    clientId: '',
+    audience: '',
+    scope: 'openid profile email',
+  },
 };

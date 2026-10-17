@@ -15,6 +15,7 @@ renewals, and simulate cancellation savings. This repository holds the web clien
 - **Landing and workspace** — a product introduction at `/` and a responsive control workspace at `/app`.
 - **Themes** — persisted light and dark modes using the Carbon Signal visual system.
 - **Localization** — client-side English and Spanish interface with persisted preference.
+- **Secure access** — OIDC Authorization Code + PKCE handoff, session-scoped access token and protected workspace routes.
 - **Landing motion** — CSS/SVG motion, scroll-snap feature rail and reduced-motion support without an animation dependency.
 - Every data-driven view handles **loading / empty / success / error** states; errors go through a
   central HTTP interceptor and show an actionable message.
@@ -54,11 +55,30 @@ The API base URL is per-environment and swapped at build time via `angular.json`
 Change `apiUrl` to point the SPA at a different API, with no code changes. CORS for the dev origin
 (`http://localhost:4200`) is configured on the backend.
 
+## OIDC/JWT configuration
+
+The SPA does not implement password storage. Configure one OIDC provider in each environment:
+
+```ts
+auth: {
+  authority: 'https://your-issuer.example.com',
+  clientId: 'your-public-spa-client-id',
+  audience: 'flowtrim-api',
+  scope: 'openid profile email',
+}
+```
+
+The authorization-code flow uses PKCE. Access tokens are held in `sessionStorage` only, attached to
+FlowTrim API requests by the auth interceptor and never sent to the identity provider as an API bearer
+header. Refresh tokens are intentionally not stored in this MVP.
+
 ## Routes
 
 | Path | View |
 |---|---|
 | `/` | FlowTrim landing page |
+| `/auth/login` | OIDC login handoff |
+| `/auth/callback` | PKCE callback and token exchange |
 | `/app` | Workspace overview |
 | `/app/subscriptions` | Subscription list (search, edit, delete) |
 | `/new` | Create a subscription |
@@ -73,8 +93,9 @@ Change `apiUrl` to point the SPA at a different API, with no code changes. CORS 
 ```
 src/
   app/
-    core/                       cross-cutting (HTTP error interceptor)
+    core/                       cross-cutting (auth and HTTP interceptors, route guard)
     features/
+      auth/                     login and OIDC callback
       core/theme/                persisted light/dark theme service
       features/landing/          public landing page
       subscriptions/             list, form, usage, upcoming panel, models, service
@@ -102,7 +123,8 @@ public/                         static assets
 ## Known limitations
 
 - **Manual data only**; no bank integration or automatic charge detection.
-- **No authentication / multi-user** yet (planned, post-MVP).
+- **Provider setup required** — authentication flow and protected routes are implemented, but each
+  deployment must configure an OIDC Authority, public Client ID and API Audience.
 - The visual system is implemented with SCSS, CSS custom properties and inline SVG; Tailwind and chart libraries remain optional future decisions.
 - Full in-browser integration needs the backend running with CORS (HU-08).
 

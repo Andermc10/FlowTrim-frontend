@@ -51,6 +51,11 @@
       <span>{{ i18n.languageName() }}</span>
     </button>
 
+    <button class="language-toggle" type="button" (click)="signOut()">
+      <span aria-hidden="true">↪</span>
+      <span>{{ 'auth.signOut' | translate }}</span>
+    </button>
+
     <a class="rail-cta" routerLink="/app/subscriptions/new">
       <span aria-hidden="true">+</span>
       <span>{{ 'nav.addSubscription' | translate }}</span>

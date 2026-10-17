@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ThemeService } from './core/theme/theme.service';
 import { I18nService } from './core/i18n/i18n.service';
 import { TranslatePipe } from './core/i18n/translate.pipe';
+import { AuthService } from './core/auth/auth.service';
 
 @Component({
   selector: 'app-shell',
@@ -13,6 +14,7 @@ import { TranslatePipe } from './core/i18n/translate.pipe';
 })
 export class AppShell {
   private readonly theme = inject(ThemeService);
+  private readonly auth = inject(AuthService);
   protected readonly i18n = inject(I18nService);
 
   protected readonly themeMode = this.theme.mode;
@@ -33,5 +35,9 @@ export class AppShell {
 
   protected toggleLanguage(): void {
     this.i18n.toggleLanguage();
+  }
+
+  protected async signOut(): Promise<void> {
+    await this.auth.logout();
   }
 }
