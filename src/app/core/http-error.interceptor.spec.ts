@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -39,5 +39,25 @@ describe('httpErrorInterceptor', () => {
     expect(toUserMessage(new HttpErrorResponse({ status: 0 }))).toContain('Cannot reach the server');
     expect(toUserMessage(new HttpErrorResponse({ status: 404 }))).toContain('not found');
     expect(toUserMessage(new HttpErrorResponse({ status: 500 }))).toContain('Something went wrong');
+  });
+
+  it('appends the correlation reference to unexpected failures', () => {
+    const headers = new HttpHeaders({ 'X-Correlation-ID': 'abc123' });
+
+    expect(toUserMessage(new HttpErrorResponse({ status: 500, headers })))
+      .toBe('Something went wrong. Please try again. Reference: abc123');
+    expect(toUserMessage(new HttpErrorResponse({ status: 503, error: { correlationId: 'from-body' } })))
+      .toContain('Reference: from-body');
+  });
+
+  it('does not add a reference to validation or not-found messages', () => {
+    const headers = new HttpHeaders({ 'X-Correlation-ID': 'abc123' });
+
+    expect(toUserMessage(new HttpErrorResponse({ status: 400, headers }))).not.toContain('Reference');
+    expect(toUserMessage(new HttpErrorResponse({ status: 404, headers }))).not.toContain('Reference');
+  });
+
+  it('omits the reference when the response carries none', () => {
+    expect(toUserMessage(new HttpErrorResponse({ status: 500 }))).not.toContain('Reference');
   });
 });
