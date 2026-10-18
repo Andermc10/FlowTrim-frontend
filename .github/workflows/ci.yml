@@ -1,0 +1,45 @@
+# CI del frontend (HU-38): instala desde el lockfile, ejecuta las pruebas unitarias y el build de producción.
+# No usa secretos: las pruebas corren en jsdom y los valores de Auth0 del entorno de desarrollo son públicos.
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Mínimo privilegio: el job solo necesita leer el código.
+permissions:
+  contents: read
+
+# Un push nuevo a la misma rama cancela la ejecución anterior.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: test-and-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm ci respeta package-lock.json y el .npmrc del repo (legacy-peer-deps, ver TD-001).
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test -- --watch=false
+
+      - name: Production build
+        run: npm run build
