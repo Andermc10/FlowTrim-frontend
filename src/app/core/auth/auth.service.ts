@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -75,17 +75,7 @@ export class AuthService {
     }
 
     const discovery = await this.loadDiscovery();
-    const response = await firstValueFrom(this.http.post<TokenResponse>(
-      discovery.token_endpoint,
-      new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: environment.auth.clientId,
-        code,
-        redirect_uri: this.redirectUri(),
-        code_verifier: verifier,
-      }).toString(),
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
-    ));
+    const response = await this.exchangeCode(discovery.token_endpoint, code, verifier);
 
     if (!response.access_token) {
       throw new Error('The identity provider did not return an access token.');
@@ -154,6 +144,34 @@ export class AuthService {
   private async loadDiscovery(): Promise<OpenIdConfiguration> {
     const authority = environment.auth.authority.replace(/\/$/, '');
     return firstValueFrom(this.http.get<OpenIdConfiguration>(`${authority}/.well-known/openid-configuration`));
+  }
+
+  /**
+   * Intercambia el authorization code por el access token. Si el proveedor lo rechaza, se expone su
+   * motivo estándar OAuth (`error` / `error_description`), que no contiene secretos, para poder
+   * diagnosticar la configuración del tenant.
+   */
+  private async exchangeCode(tokenEndpoint: string, code: string, verifier: string): Promise<TokenResponse> {
+    try {
+      return await firstValueFrom(this.http.post<TokenResponse>(
+        tokenEndpoint,
+        new URLSearchParams({
+          grant_type: 'authorization_code',
+          client_id: environment.auth.clientId,
+          code,
+          redirect_uri: this.redirectUri(),
+          code_verifier: verifier,
+        }).toString(),
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+      ));
+    } catch (error) {
+      if (error instanceof HttpErrorResponse) {
+        const reason = error.error?.error_description ?? error.error?.error ?? `HTTP ${error.status}`;
+        throw new Error(`The identity provider rejected the sign-in (${reason}).`);
+      }
+
+      throw error;
+    }
   }
 
   private async findEndSessionEndpoint(): Promise<string | null> {
