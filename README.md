@@ -67,7 +67,9 @@ Auth0 setup — **Applications → Single Page Application**:
 | Allowed Logout URLs | `http://localhost:4200/` |
 | Allowed Web Origins | `http://localhost:4200` |
 
-Then set the public values in `src/environments/environment*.ts` (they are visible in the browser by
+`environment.ts` (development) is preconfigured with the public values of the FlowTrim dev tenant
+(`dev-flowtrim.us.auth0.com`). For another tenant or for production, set the public values in
+`src/environments/environment*.ts` (they are visible in the browser by
 design and are not secrets):
 
 ```ts
