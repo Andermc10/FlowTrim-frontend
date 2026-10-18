@@ -73,8 +73,10 @@ Auth0 setup — **Applications → Single Page Application**:
 | Allowed Logout URLs | `http://localhost:4200/` |
 | Allowed Web Origins | `http://localhost:4200` |
 
-`environment.ts` (development) is preconfigured with the public values of the FlowTrim dev tenant
-(`dev-flowtrim.us.auth0.com`). For another tenant or for production, set the public values in
+Both `environment.ts` (development) and `environment.production.ts` use the public values of the
+FlowTrim Auth0 tenant (`dev-flowtrim.us.auth0.com`); a separate production tenant is not needed at
+portfolio scale. When the app is deployed (HU-40), register the production callback, logout URL and web
+origin in the Auth0 SPA settings. For another tenant, set the public values in
 `src/environments/environment*.ts` (they are visible in the browser by
 design and are not secrets):
 
