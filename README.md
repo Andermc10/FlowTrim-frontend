@@ -1,5 +1,7 @@
 # FlowTrim-frontend
 
+[![Frontend CI](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml)
+
 Angular single-page application for **FlowTrim** — a deterministic, transparent engine to track
 recurring subscriptions, compute monthly-equivalent and annual spending, warn about upcoming
 renewals, and simulate cancellation savings. This repository holds the web client; the API lives in
@@ -39,6 +41,10 @@ npm start            # dev server at http://localhost:4200 (ng serve)
 npm run build        # production build into dist/
 npm test             # unit tests (Vitest)
 ```
+
+**Continuous integration:** `.github/workflows/ci.yml` runs `npm ci`, the unit tests and the production
+build on every pull request to `main` and every push to `main`. It needs no secrets. `main` is protected:
+a pull request cannot be merged while the `test-and-build` check is failing.
 
 The backend must be running for live data — start it on the `http` profile (`http://localhost:5214`)
 and bring up its PostgreSQL container. See the backend README.
