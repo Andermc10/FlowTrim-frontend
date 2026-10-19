@@ -35,6 +35,11 @@ export const routes: Routes = [
         path: 'analytics',
         loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then((m) => m.AnalyticsPage),
       },
+      // Carga diferida: Insights solo se descarga al abrirlo.
+      {
+        path: 'insights',
+        loadComponent: () => import('./features/insights/insights-page/insights-page').then((m) => m.InsightsPage),
+      },
       {
         path: 'report',
         loadComponent: () => import('./features/reports/report-page/report-page').then((m) => m.ReportPage),

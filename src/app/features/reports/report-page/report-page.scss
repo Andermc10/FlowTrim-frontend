@@ -14,12 +14,6 @@
   align-self: start;
 }
 
-.btn--ghost {
-  border: 1px solid var(--color-border-strong);
-  background: transparent;
-  color: var(--color-text);
-}
-
 // La hoja del reporte es siempre clara (documento): redefine los tokens del tema para ella y sus gráficos,
 // que leen los colores desde su propio elemento.
 .sheet {

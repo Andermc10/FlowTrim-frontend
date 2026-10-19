@@ -22,3 +22,15 @@ export function monthLabel(month: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, { month: 'short', year: '2-digit', timeZone: 'UTC' })
     .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
 }
+
+/** Fecha `yyyy-MM-dd` en formato local (p. ej. "Oct 21, 2026" / "21 oct 2026"), sin desfase por zona horaria. */
+export function dateLabel(date: string, locale: string): string {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+/** Número sin moneda (p. ej. usos declarados) con los separadores del idioma. */
+export function numberLabel(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
+}

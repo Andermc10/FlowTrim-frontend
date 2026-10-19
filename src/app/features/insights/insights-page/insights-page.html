@@ -1,0 +1,132 @@
+<section class="insights">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'insights.kicker' | translate }}</p>
+      <h1>{{ 'insights.title' | translate }}</h1>
+      <p class="lede">{{ 'insights.lede' | translate }}</p>
+    </div>
+  </div>
+
+  <p class="notice">{{ 'insights.notice' | translate }}</p>
+
+  <form class="ask" (submit)="onSubmit($event)">
+    <label for="insights-question">{{ 'insights.questionLabel' | translate }}</label>
+    <textarea
+      id="insights-question"
+      rows="3"
+      [attr.maxlength]="maxLength"
+      [formControl]="question"
+      [placeholder]="'insights.placeholder' | translate"
+      aria-describedby="insights-counter"
+      (keydown.enter)="onEnter($event)"
+    ></textarea>
+    <div class="ask__footer">
+      <span id="insights-counter" class="ask__counter">{{ length() }} / {{ maxLength }}</span>
+      @if (pending()) {
+        <button type="button" class="btn btn--ghost" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+      }
+      <button type="submit" class="btn" [disabled]="!canSubmit()">{{ 'insights.ask' | translate }}</button>
+    </div>
+  </form>
+
+  <div class="suggestions" role="group" [attr.aria-label]="'insights.suggestionsLabel' | translate">
+    @for (suggestion of suggestions; track suggestion) {
+      <button type="button" class="chip" [disabled]="pending() || waitSeconds() > 0" (click)="askSuggestion(suggestion)">
+        {{ ('insights.suggestion.' + suggestion) | translate }}
+      </button>
+    }
+  </div>
+
+  <section class="result" aria-live="polite" [attr.aria-busy]="pending()">
+    @if (pending()) {
+      <div class="card card--loading" role="status">
+        <p class="asked">{{ asked() }}</p>
+        <p class="muted"><span class="spinner" aria-hidden="true"></span>{{ 'insights.loading' | translate }}</p>
+      </div>
+    } @else if (error(); as failure) {
+      <div class="banner banner--error" role="alert">
+        <p>{{ failure.key | translate: { seconds: waitSeconds() } }}</p>
+        @if (failure.reference) {
+          <p class="reference">{{ 'insights.reference' | translate: { id: failure.reference } }}</p>
+        }
+      </div>
+    } @else if (result(); as answer) {
+      <article class="card">
+        <p class="asked">{{ asked() }}</p>
+
+        @switch (answer.status) {
+          @case ('unsupported') {
+            <p class="answer">{{ 'insights.unsupported' | translate }}</p>
+          }
+          @case ('no_data') {
+            <!-- Sin herramientas aceptadas el backend envía un mensaje fijo en inglés: se muestra su traducción. -->
+            <p class="answer">{{ answer.toolsUsed.length === 0 ? ('insights.noEvidence' | translate) : answer.answer }}</p>
+            <p class="hint">
+              {{ 'insights.noDataHint' | translate }}
+              <a routerLink="/app/subscriptions">{{ 'nav.subscriptions' | translate }}</a>
+            </p>
+          }
+          @default {
+            <p class="answer">{{ answer.answer }}</p>
+            @if (answer.figures.length > 0) {
+              <h2>{{ 'insights.figures' | translate }}</h2>
+              <ul class="figures">
+                @for (figure of answer.figures; track $index) {
+                  <li>
+                    <span class="figure__title">{{ figureTitle(figure) }}</span>
+                    @if (figureDetail(figure); as detail) {
+                      <span class="figure__detail">{{ detail }}</span>
+                    }
+                    <strong class="figure__value">
+                      @if (figure.currency) {
+                        {{ figure.value | money: figure.currency }}
+                      } @else {
+                        {{ countLabel(figure.value) }}
+                      }
+                    </strong>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
+
+        @if (answer.assumptions.length > 0) {
+          <h2>{{ 'insights.assumptions' | translate }}</h2>
+          <ul class="assumptions">
+            @for (assumption of answer.assumptions; track assumption.key + assumption.text) {
+              <li>{{ assumptionText(assumption.key, assumption.text) }}</li>
+            }
+          </ul>
+        }
+
+        @if (answer.sources.length > 0) {
+          <h2>{{ 'insights.sources' | translate }}</h2>
+          <ul class="sources">
+            @for (source of answer.sources; track source) {
+              <li>
+                @if (sourceRoute(source); as route) {
+                  <a class="chip" [routerLink]="route">{{ sourceLabel(source) }}</a>
+                } @else {
+                  <span class="chip chip--static">{{ sourceLabel(source) }}</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+
+        @if (answer.toolsUsed.length > 0) {
+          <details class="tools">
+            <summary>{{ 'insights.howAnswered' | translate }}</summary>
+            <p>{{ 'insights.howAnsweredText' | translate }}</p>
+            <ul>
+              @for (tool of answer.toolsUsed; track tool) {
+                <li><code>{{ tool }}</code></li>
+              }
+            </ul>
+          </details>
+        }
+      </article>
+    }
+  </section>
+</section>
