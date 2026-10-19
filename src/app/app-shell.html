@@ -84,6 +84,8 @@
       <router-outlet />
     </main>
 
+    <app-toast-host />
+
     <nav class="mobile-nav" [attr.aria-label]="'nav.controlWorkspace' | translate">
       <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
         <span aria-hidden="true">⌂</span><small>{{ 'nav.overview' | translate }}</small>
