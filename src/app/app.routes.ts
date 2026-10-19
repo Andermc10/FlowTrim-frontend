@@ -30,6 +30,11 @@ export const routes: Routes = [
       { path: 'upcoming', component: UpcomingPanel },
       { path: 'summary', component: SummaryDashboard },
       { path: 'simulator', component: Simulator },
+      // Carga diferida: Chart.js solo se descarga al abrir la analítica (mantiene el bundle inicial < 500 kB).
+      {
+        path: 'analytics',
+        loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then((m) => m.AnalyticsPage),
+      },
     ],
   },
   { path: 'new', redirectTo: 'app/subscriptions/new', pathMatch: 'full' },
