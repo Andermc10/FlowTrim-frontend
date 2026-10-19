@@ -1,0 +1,112 @@
+<section class="report">
+  <div class="page-heading report__toolbar">
+    <div>
+      <p class="section-kicker">{{ 'report.kicker' | translate }}</p>
+      <h1>{{ 'report.title' | translate }}</h1>
+      <p class="lede">{{ 'report.lede' | translate }}</p>
+    </div>
+    <div class="report__actions">
+      <button type="button" class="btn btn--ghost" (click)="exportCsv()" [disabled]="exporting() || status() !== 'ready'">
+        {{ (exporting() ? 'report.exporting' : 'report.exportCsv') | translate }}
+      </button>
+      <button type="button" class="btn" (click)="print()" [disabled]="status() !== 'ready' || isEmpty()">
+        {{ 'report.print' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'report.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <span class="empty__mark" aria-hidden="true">▤</span>
+      <p>{{ 'report.empty' | translate }}</p>
+      <a class="btn" routerLink="/app/subscriptions/new">{{ 'nav.addSubscription' | translate }}</a>
+    </div>
+  } @else {
+    <article class="sheet" [attr.aria-label]="'report.title' | translate">
+      <header class="sheet__header">
+        <div class="sheet__brand">Flow<span>Trim</span></div>
+        <div>
+          <h2>{{ 'report.documentTitle' | translate }}</h2>
+          <p>{{ 'report.generated' | translate: { date: generatedLabel() } }}</p>
+        </div>
+      </header>
+
+      <section class="sheet__section">
+        <h3>{{ 'report.summary' | translate }}</h3>
+        <table>
+          <thead><tr><th scope="col">{{ 'report.currency' | translate }}</th><th scope="col">{{ 'report.monthly' | translate }}</th><th scope="col">{{ 'report.annual' | translate }}</th><th scope="col">{{ 'report.active' | translate }}</th></tr></thead>
+          <tbody>
+            @for (row of summary(); track row.currency) {
+              <tr><th scope="row">{{ row.currency }}</th><td>{{ money(row.monthlyEquivalent, row.currency) }}</td><td>{{ money(row.annualProjection, row.currency) }}</td><td>{{ row.activeCount }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      @for (chart of chartData(); track chart.currency) {
+        <section class="sheet__section sheet__charts">
+          <h3>{{ 'report.charts' | translate: { currency: chart.currency } }}</h3>
+          <div class="sheet__chart-grid">
+            <figure>
+              <figcaption>{{ 'analytics.byCategory' | translate }}</figcaption>
+              <app-chart class="sheet__chart" kind="doughnut" [labels]="chart.categoryLabels" [values]="chart.categoryValues"
+                [formatValue]="chart.format" [ariaLabel]="'analytics.byCategory' | translate" />
+            </figure>
+            <figure>
+              <figcaption>{{ 'analytics.expected' | translate }}</figcaption>
+              <app-chart class="sheet__chart" kind="bar" [labels]="chart.monthLabels" [values]="chart.monthValues"
+                [formatValue]="chart.format" [ariaLabel]="'analytics.expected' | translate" />
+            </figure>
+          </div>
+        </section>
+      }
+
+      <section class="sheet__section">
+        <h3>{{ 'report.subscriptions' | translate: { count: subscriptions().length } }}</h3>
+        <table>
+          <thead><tr><th scope="col">{{ 'report.name' | translate }}</th><th scope="col">{{ 'report.category' | translate }}</th><th scope="col">{{ 'report.amount' | translate }}</th><th scope="col">{{ 'report.cycle' | translate }}</th><th scope="col">{{ 'report.nextCharge' | translate }}</th><th scope="col">{{ 'report.status' | translate }}</th></tr></thead>
+          <tbody>
+            @for (row of subscriptions(); track row.id) {
+              <tr [class.is-inactive]="row.status === 'Inactive'">
+                <th scope="row">{{ row.name }}</th><td>{{ row.category ?? '—' }}</td><td>{{ money(row.amount, row.currency) }}</td>
+                <td>{{ (row.billingCycle === 'Yearly' ? 'report.yearly' : 'report.monthlyCycle') | translate }}</td><td>{{ row.nextBillingDate }}</td>
+                <td>{{ (row.status === 'Active' ? 'report.statusActive' : 'report.statusInactive') | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      @if (upcoming().length > 0) {
+        <section class="sheet__section">
+          <h3>{{ 'report.upcoming' | translate }}</h3>
+          <table>
+            <thead><tr><th scope="col">{{ 'report.name' | translate }}</th><th scope="col">{{ 'report.nextCharge' | translate }}</th><th scope="col">{{ 'report.amount' | translate }}</th><th scope="col">{{ 'report.days' | translate }}</th></tr></thead>
+            <tbody>
+              @for (row of upcoming(); track row.id) {
+                <tr><th scope="row">{{ row.name }}</th><td>{{ row.nextBillingDate }}</td><td>{{ money(row.amount, row.currency) }}</td><td>{{ row.daysUntilCharge }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </section>
+      }
+
+      <footer class="sheet__section sheet__assumptions">
+        <h3>{{ 'report.assumptions' | translate }}</h3>
+        <ul>
+          <li>{{ 'report.assumption.data' | translate }}</li>
+          <li>{{ 'report.assumption.expected' | translate }}</li>
+          <li>{{ 'report.assumption.prices' | translate }}</li>
+          <li>{{ 'report.assumption.currency' | translate }}</li>
+        </ul>
+      </footer>
+    </article>
+  }
+</section>

@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { localeFor, monthLabel, moneyFormatter } from '../../../core/format/money';
 import { FlowTrimChart } from '../../../core/ui/chart/chart';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
@@ -33,18 +34,9 @@ export class AnalyticsPage implements OnInit {
     return currencies.find((c) => c.currency === this.selectedCurrency()) ?? currencies.at(0) ?? null;
   });
 
-  private readonly locale = computed(() => (this.i18n.language() === 'es' ? 'es-CO' : 'en-US'));
+  private readonly locale = computed(() => localeFor(this.i18n.language()));
 
-  protected readonly money = computed(() => {
-    const currency = this.current()?.currency ?? 'COP';
-    const formatter = new Intl.NumberFormat(this.locale(), {
-      style: 'currency',
-      currency,
-      // COP no usa centavos en la práctica; el resto de monedas sí.
-      maximumFractionDigits: currency === 'COP' ? 0 : 2,
-    });
-    return (value: number) => formatter.format(value);
-  });
+  protected readonly money = computed(() => moneyFormatter(this.current()?.currency ?? 'COP', this.locale()));
 
   protected readonly categoryLabels = computed(() => this.current()?.byCategory.map((c) => this.categoryName(c.category)) ?? []);
   protected readonly categoryValues = computed(() => this.current()?.byCategory.map((c) => c.monthlyEquivalent) ?? []);
@@ -88,8 +80,6 @@ export class AnalyticsPage implements OnInit {
   }
 
   protected monthName(month: string): string {
-    const [year, monthNumber] = month.split('-').map(Number);
-    return new Intl.DateTimeFormat(this.locale(), { month: 'short', year: '2-digit', timeZone: 'UTC' })
-      .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
+    return monthLabel(month, this.locale());
   }
 }

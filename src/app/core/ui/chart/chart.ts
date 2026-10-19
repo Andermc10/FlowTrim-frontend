@@ -31,6 +31,7 @@ export type ChartKind = 'doughnut' | 'bar' | 'horizontal-bar';
 /** Lo mínimo que el componente necesita de una instancia de Chart.js (permite dobles en pruebas). */
 export interface ChartHandle {
   destroy(): void;
+  resize?(): void;
 }
 
 export type ChartFactory = (canvas: HTMLCanvasElement, config: ChartConfiguration) => ChartHandle;
@@ -60,6 +61,11 @@ const paletteVariables = [
 @Component({
   selector: 'app-chart',
   template: `<canvas #canvas role="img" [attr.aria-label]="ariaLabel()"></canvas>`,
+  // Al imprimir cambia el ancho disponible: Chart.js recomienda redimensionar en beforeprint/afterprint.
+  host: {
+    '(window:beforeprint)': 'resizeChart()',
+    '(window:afterprint)': 'resizeChart()',
+  },
   styles: `
     :host { position: relative; display: block; width: 100%; min-height: 15rem; }
     canvas { position: absolute; inset: 0; }
@@ -67,6 +73,7 @@ const paletteVariables = [
 })
 export class FlowTrimChart implements OnDestroy {
   private readonly factory = inject(CHART_FACTORY);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly theme = inject(ThemeService);
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
 
@@ -93,8 +100,14 @@ export class FlowTrimChart implements OnDestroy {
     this.chart?.destroy();
   }
 
+  protected resizeChart(): void {
+    this.chart?.resize?.();
+  }
+
   private buildConfig(_theme: string): ChartConfiguration {
-    const css = getComputedStyle(document.documentElement);
+    // Se leen las variables desde el propio elemento: heredan del tema global, pero un contenedor puede
+    // redefinirlas (p. ej. la hoja clara del reporte imprimible).
+    const css = getComputedStyle(this.host.nativeElement);
     const color = (name: string) => css.getPropertyValue(name).trim() || '#1fc1ce';
     const palette = paletteVariables.map(color);
     const text = color('--color-text');
@@ -143,6 +156,8 @@ export class FlowTrimChart implements OnDestroy {
         maintainAspectRatio: false,
         animation: reducedMotion ? false : undefined,
         indexAxis: horizontal ? 'y' : 'x',
+        // Margen a la derecha para que la última etiqueta inclinada del eje no quede cortada.
+        layout: { padding: { right: 12 } },
         plugins: { legend: { display: false }, tooltip },
         scales: horizontal ? { x: valueAxis, y: categoryAxis } : { x: categoryAxis, y: valueAxis },
       },

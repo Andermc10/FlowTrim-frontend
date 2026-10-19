@@ -1,0 +1,199 @@
+:host {
+  display: block;
+}
+
+.report {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.report__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-self: start;
+}
+
+.btn--ghost {
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+}
+
+// La hoja del reporte es siempre clara (documento): redefine los tokens del tema para ella y sus gráficos,
+// que leen los colores desde su propio elemento.
+.sheet {
+  --color-text: #102023;
+  --color-muted: #52666b;
+  --color-border: #d6e2e0;
+  --color-border-strong: #a8c1be;
+  --color-surface: #ffffff;
+  --color-primary: #087f89;
+  --color-primary-bright: #0b9ba6;
+  --color-success: #008f61;
+  --color-warning: #a86400;
+  --color-danger: #c63d47;
+
+  display: grid;
+  gap: 1.6rem;
+  max-width: 60rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border-radius: 0.9rem;
+  background: #ffffff;
+  box-shadow: 0 20px 50px var(--color-shadow, rgba(0, 0, 0, 0.3));
+  color: var(--color-text);
+}
+
+.sheet__header {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: end;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-primary);
+
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+}
+
+.sheet__brand {
+  font-size: 1.35rem;
+  font-weight: 900;
+
+  span {
+    color: var(--color-primary);
+  }
+}
+
+.sheet__section {
+  display: grid;
+  gap: 0.6rem;
+
+  h3 {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+.sheet__chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+
+  figure {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+  }
+
+  figcaption {
+    color: var(--color-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+}
+
+.sheet__chart {
+  height: 15rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th,
+  td {
+    padding: 0.45rem 0.55rem;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead th {
+    background: #f1f6f5;
+    color: var(--color-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  tr.is-inactive {
+    color: var(--color-muted);
+  }
+}
+
+.sheet__assumptions ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.empty {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  padding: 2.5rem 1rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .sheet__chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet__header {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+
+// Impresión / PDF: solo la hoja, sin sombra ni bordes, y sin partir tablas ni gráficos entre páginas.
+@media print {
+  .report {
+    gap: 0;
+  }
+
+  .report__toolbar {
+    display: none;
+  }
+
+  .sheet {
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .sheet__section,
+  figure,
+  tr {
+    break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  .sheet__chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

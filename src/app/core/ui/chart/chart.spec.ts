@@ -77,16 +77,19 @@ describe('FlowTrimChart', () => {
   });
 
   it('uses a horizontal index axis and highlights the requested bars', () => {
-    // jsdom no carga styles.scss: se definen los tokens de color que el gráfico lee del tema.
-    document.documentElement.style.setProperty('--color-primary', '#1fc1ce');
-    document.documentElement.style.setProperty('--color-warning', '#ffb547');
     const fixture = TestBed.createComponent(Host);
     fixture.componentInstance.kind.set('horizontal-bar');
+    fixture.detectChanges();
+    TestBed.tick();
+    // jsdom no carga styles.scss ni hereda variables CSS: se definen sobre el propio gráfico, que lee de sí mismo.
+    const chart = fixture.nativeElement.querySelector('app-chart') as HTMLElement;
+    chart.style.setProperty('--color-primary', '#1fc1ce');
+    chart.style.setProperty('--color-warning', '#ffb547');
     fixture.componentInstance.highlight.set([1]);
     fixture.detectChanges();
     TestBed.tick();
 
-    const config = created[0] as ChartConfiguration<'bar'>;
+    const config = created.at(-1) as ChartConfiguration<'bar'>;
     expect(config.type).toBe('bar');
     expect(config.options?.indexAxis).toBe('y');
     const colors = config.data.datasets[0].backgroundColor as string[];
