@@ -31,7 +31,7 @@
               <label>
                 <input type="checkbox" [checked]="isSelected(sub.id)" (change)="toggle(sub.id)" />
                 <span class="picker__name">{{ sub.name }}</span>
-                <span class="picker__meta">{{ sub.amount }} {{ sub.currency }} · {{ ('billing.' + sub.billingCycle) | translate }}</span>
+                <span class="picker__meta">{{ sub.amount | money: sub.currency }} · {{ ('billing.' + sub.billingCycle) | translate }}</span>
               </label>
             </li>
           }
@@ -45,8 +45,8 @@
             <article class="card">
               <h3>{{ currency.currency }}</h3>
               <dl>
-                <div><dt>{{ 'simulator.currentMonthly' | translate }}</dt><dd>{{ currency.currentMonthly }}</dd></div>
-                <div><dt>{{ 'simulator.projectedMonthly' | translate }}</dt><dd>{{ currency.projectedMonthly }}</dd></div>
+                <div><dt>{{ 'simulator.currentMonthly' | translate }}</dt><dd>{{ currency.currentMonthly | money: currency.currency }}</dd></div>
+                <div><dt>{{ 'simulator.projectedMonthly' | translate }}</dt><dd>{{ currency.projectedMonthly | money: currency.currency }}</dd></div>
               </dl>
               <table>
                 <thead>
@@ -54,7 +54,7 @@
                 </thead>
                 <tbody>
                   @for (s of currency.savings; track s.months) {
-                    <tr><td>{{ 'simulator.months' | translate: { count: s.months } }}</td><td>{{ s.amount }} {{ currency.currency }}</td></tr>
+                    <tr><td>{{ 'simulator.months' | translate: { count: s.months } }}</td><td>{{ s.amount | money: currency.currency }}</td></tr>
                   }
                 </tbody>
               </table>

@@ -29,7 +29,7 @@
         <li class="row">
           <div class="row__main">
             <span class="row__name">{{ item.name }}</span>
-            <span class="row__meta">{{ item.amount }} {{ item.currency }} · {{ ('billing.' + item.billingCycle) | translate }}</span>
+            <span class="row__meta">{{ item.amount | money: item.currency }} · {{ ('billing.' + item.billingCycle) | translate }}</span>
           </div>
           <div class="row__date">
             <span>{{ item.nextBillingDate }}</span>

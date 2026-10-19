@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,12 +13,13 @@ import { SubscriptionService } from '../services/subscription-service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { MoneyPipe } from '../../../core/format/money.pipe';
 
 type UsageStatus = 'loading' | 'ready' | 'notfound' | 'error';
 
 @Component({
   selector: 'app-usage',
-  imports: [DecimalPipe, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, MoneyPipe],
   templateUrl: './usage.html',
   styleUrl: './usage.scss',
 })
