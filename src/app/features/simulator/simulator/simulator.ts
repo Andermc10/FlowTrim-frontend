@@ -7,12 +7,13 @@ import { SimulationResponse } from '../simulation.models';
 import { SimulationService } from '../simulation-service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { MoneyPipe } from '../../../core/format/money.pipe';
 
 type SimulatorStatus = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-simulator',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, MoneyPipe],
   templateUrl: './simulator.html',
   styleUrl: './simulator.scss',
 })

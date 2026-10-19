@@ -62,9 +62,9 @@
         @if (result.calculable) {
           <dl class="cost-details">
             <div><dt>{{ 'usage.period' | translate }}</dt><dd>{{ result.from }} to {{ result.to }}</dd></div>
-            <div><dt>{{ 'usage.periodCost' | translate }}</dt><dd>{{ result.totalPaid | number: '1.2-2' }} {{ result.currency }}</dd></div>
+            <div><dt>{{ 'usage.periodCost' | translate }}</dt><dd>{{ result.totalPaid | money: result.currency }}</dd></div>
             <div><dt>{{ 'usage.totalUses' | translate }}</dt><dd>{{ result.totalUses }}</dd></div>
-            <div><dt>{{ 'usage.costPerUse' | translate }}</dt><dd>{{ result.costPerUse | number: '1.2-2' }} {{ result.currency }}</dd></div>
+            <div><dt>{{ 'usage.costPerUse' | translate }}</dt><dd>{{ result.costPerUse | money: result.currency }}</dd></div>
           </dl>
         } @else {
           <p class="not-calculable">{{ 'usage.notEnough' | translate }}</p>

@@ -26,11 +26,11 @@
       @for (currency of currencies(); track currency.currency) {
         <article class="card">
           <div class="card__topline"><span class="card__label">{{ 'overview.monthlyBurn' | translate }}</span><span class="currency-mark">{{ currency.currency }}</span></div>
-          <h2>{{ currency.monthlyEquivalent }} <small>{{ currency.currency }}</small></h2>
+          <h2>{{ currency.monthlyEquivalent | money: currency.currency }}</h2>
           <dl>
             <div>
               <dt>{{ 'overview.annualProjection' | translate }}</dt>
-              <dd>{{ currency.annualProjection }} {{ currency.currency }}</dd>
+              <dd>{{ currency.annualProjection | money: currency.currency }}</dd>
             </div>
             <div>
               <dt>{{ 'overview.activeServices' | translate }}</dt>

@@ -5,12 +5,13 @@ import { AlertWindow, UpcomingChargeItem } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { MoneyPipe } from '../../../core/format/money.pipe';
 
 type PanelStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-upcoming-panel',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, MoneyPipe],
   templateUrl: './upcoming-panel.html',
   styleUrl: './upcoming-panel.scss',
 })

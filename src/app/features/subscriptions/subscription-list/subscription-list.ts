@@ -10,12 +10,13 @@ import { Icon } from '../../../core/ui/icon/icon';
 import { Modal } from '../../../core/ui/modal/modal';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { SubscriptionForm } from '../subscription-form/subscription-form';
+import { MoneyPipe } from '../../../core/format/money.pipe';
 
 type ListStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-subscription-list',
-  imports: [RouterLink, TranslatePipe, Icon, Modal, SubscriptionForm],
+  imports: [RouterLink, TranslatePipe, Icon, Modal, SubscriptionForm, MoneyPipe],
   templateUrl: './subscription-list.html',
   styleUrl: './subscription-list.scss',
 })

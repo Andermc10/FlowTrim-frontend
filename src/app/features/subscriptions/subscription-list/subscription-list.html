@@ -47,7 +47,7 @@
         @for (subscription of filtered(); track subscription.id) {
           <tr>
             <td [attr.data-label]="'subscriptions.name' | translate"><strong>{{ subscription.name }}</strong><small>{{ subscription.category || ('subscriptions.uncategorized' | translate) }}</small></td>
-            <td [attr.data-label]="'subscriptions.amount' | translate">{{ subscription.amount }} {{ subscription.currency }}</td>
+            <td [attr.data-label]="'subscriptions.amount' | translate">{{ subscription.amount | money: subscription.currency }}</td>
             <td [attr.data-label]="'subscriptions.cycle' | translate">{{ ('billing.' + subscription.billingCycle) | translate }}</td>
             <td [attr.data-label]="'subscriptions.nextCharge' | translate"><strong>{{ subscription.nextBillingDate }}</strong><small>{{ ('billing.' + subscription.billingCycle) | translate }} {{ 'subscriptions.renewal' | translate }}</small></td>
             <td [attr.data-label]="'subscriptions.status' | translate">
