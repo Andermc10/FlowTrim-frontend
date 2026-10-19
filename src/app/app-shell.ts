@@ -5,10 +5,11 @@ import { ThemeService } from './core/theme/theme.service';
 import { I18nService } from './core/i18n/i18n.service';
 import { TranslatePipe } from './core/i18n/translate.pipe';
 import { AuthService } from './core/auth/auth.service';
+import { ToastHost } from './core/ui/toast/toast-host';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, ToastHost, TranslatePipe],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss',
 })

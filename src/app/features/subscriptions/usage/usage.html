@@ -15,12 +15,6 @@
     </div>
     <p class="muted">{{ 'usage.declared' | translate }}</p>
 
-    @if (successMessage(); as message) {
-      <div class="banner banner--success" role="status">{{ message }}</div>
-    }
-    @if (generalError(); as message) {
-      <div class="banner banner--error" role="alert">{{ message }}</div>
-    }
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">

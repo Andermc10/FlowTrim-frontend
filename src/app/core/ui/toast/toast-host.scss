@@ -1,0 +1,45 @@
+// El host es un popover: se anulan los estilos por defecto del navegador para posicionarlo arriba a la derecha.
+:host {
+  position: fixed;
+  inset: 1.1rem 1.1rem auto auto;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  pointer-events: none;
+}
+
+.toast-stack {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: end;
+}
+
+.toast-more {
+  margin: 0;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-glass);
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+}
+
+// En móvil los toasts van arriba al centro, a todo el ancho.
+@media (max-width: 640px) {
+  :host {
+    inset: 0.75rem 0.75rem auto 0.75rem;
+  }
+
+  .toast-stack {
+    justify-items: stretch;
+  }
+}

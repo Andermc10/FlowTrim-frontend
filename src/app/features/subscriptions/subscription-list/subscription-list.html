@@ -30,9 +30,6 @@
       <span class="list__count">{{ totalCount() }} {{ 'subscriptions.records' | translate }}</span>
     </div>
 
-    @if (deleteError(); as message) {
-      <div class="banner banner--error" role="alert">{{ message }}</div>
-    }
 
     <div class="table-viewport" tabindex="0" [attr.aria-label]="'subscriptions.title' | translate">
     <table>

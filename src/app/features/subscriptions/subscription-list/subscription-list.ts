@@ -1,9 +1,11 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { SubscriptionResponse } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { ToastService } from '../../../core/ui/toast/toast.service';
 import { Icon } from '../../../core/ui/icon/icon';
 import { Modal } from '../../../core/ui/modal/modal';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
@@ -20,13 +22,13 @@ type ListStatus = 'loading' | 'success' | 'error';
 export class SubscriptionList implements OnInit {
   private readonly service = inject(SubscriptionService);
   protected readonly i18n = inject(I18nService);
+  private readonly toast = inject(ToastService);
 
   protected readonly status = signal<ListStatus>('loading');
   protected readonly all = signal<SubscriptionResponse[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly search = signal('');
   protected readonly confirmingId = signal<string | null>(null);
-  protected readonly deleteError = signal<string | null>(null);
   protected readonly editorMode = signal<'create' | 'edit' | null>(null);
   protected readonly editorId = signal<string | null>(null);
   protected readonly editorDirty = signal(false);
@@ -48,7 +50,6 @@ export class SubscriptionList implements OnInit {
 
   protected load(): void {
     this.status.set('loading');
-    this.deleteError.set(null);
     this.service.list(1, 100).subscribe({
       next: (page) => {
         this.all.set(page.items);
@@ -60,7 +61,6 @@ export class SubscriptionList implements OnInit {
   }
 
   protected askDelete(id: string): void {
-    this.deleteError.set(null);
     this.confirmingId.set(id);
   }
 
@@ -69,12 +69,14 @@ export class SubscriptionList implements OnInit {
   }
 
   protected confirmDelete(id: string): void {
+    const name = this.all().find((item) => item.id === id)?.name ?? '';
     this.service.delete(id).subscribe({
       next: () => {
         this.confirmingId.set(null);
+        this.toast.success(this.i18n.translate('toast.subscriptionDeleted', { name }));
         this.load();
       },
-      error: () => this.deleteError.set('Could not delete the subscription. Please try again.'),
+      error: (error: HttpErrorResponse) => this.toast.httpError(error),
     });
   }
 
@@ -126,10 +128,11 @@ export class SubscriptionList implements OnInit {
     this.service.delete(target.id).subscribe({
       next: () => {
         this.closeDelete();
+        this.toast.success(this.i18n.translate('toast.subscriptionDeleted', { name: target.name }));
         this.load();
       },
-      error: () => {
-        this.deleteError.set(this.i18n.translate('subscriptions.deleteError'));
+      error: (error: HttpErrorResponse) => {
+        this.toast.httpError(error);
         this.closeDelete();
       },
     });

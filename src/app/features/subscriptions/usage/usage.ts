@@ -11,7 +11,8 @@ import {
   ValidationProblemDetails,
 } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
-import { toUserMessage } from '../../../core/http-error.interceptor';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { ToastService } from '../../../core/ui/toast/toast.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 type UsageStatus = 'loading' | 'ready' | 'notfound' | 'error';
@@ -26,6 +27,8 @@ export class Usage implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(SubscriptionService);
   private readonly route = inject(ActivatedRoute);
+  private readonly toast = inject(ToastService);
+  private readonly i18n = inject(I18nService);
 
   private id = '';
   protected readonly status = signal<UsageStatus>('loading');
@@ -36,8 +39,6 @@ export class Usage implements OnInit {
   protected readonly costPerUseError = signal(false);
   protected readonly saving = signal(false);
   protected readonly fieldErrors = signal<Record<string, string[]>>({});
-  protected readonly generalError = signal<string | null>(null);
-  protected readonly successMessage = signal<string | null>(null);
 
   protected readonly form = this.fb.group({
     usageDate: this.fb.nonNullable.control('', [Validators.required]),
@@ -90,8 +91,6 @@ export class Usage implements OnInit {
   }
 
   protected submit(): void {
-    this.generalError.set(null);
-    this.successMessage.set(null);
     this.fieldErrors.set({});
 
     if (this.form.invalid) {
@@ -110,7 +109,7 @@ export class Usage implements OnInit {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.successMessage.set('Usage recorded.');
+          this.toast.success(this.i18n.translate('toast.usageRecorded', { name: this.subscription()?.name ?? '' }));
           this.form.reset();
           this.loadRecords();
         },
@@ -119,7 +118,7 @@ export class Usage implements OnInit {
           if (error.status === 400 && error.error) {
             this.fieldErrors.set((error.error as ValidationProblemDetails).errors ?? {});
           } else {
-            this.generalError.set(toUserMessage(error));
+            this.toast.httpError(error);
           }
         },
       });

@@ -1,0 +1,45 @@
+<span class="toast__glow" aria-hidden="true"></span>
+
+<span class="toast__icon" aria-hidden="true">
+  <span class="toast__pulse"></span>
+  <svg viewBox="0 0 24 24">
+    @switch (toast().variant) {
+      @case ('success') { <path class="toast__stroke" pathLength="1" d="m6 12.5 4 4 8-9" /> }
+      @case ('error') { <path class="toast__stroke" pathLength="1" d="M7 7l10 10M17 7 7 17" /> }
+      @case ('warning') {
+        <path class="toast__stroke" pathLength="1" d="M12 6v8" />
+        <path class="toast__stroke toast__stroke--dot" pathLength="1" d="M12 18h.01" />
+      }
+      @case ('info') {
+        <path class="toast__stroke toast__stroke--dot" pathLength="1" d="M12 7h.01" />
+        <path class="toast__stroke" pathLength="1" d="M12 11v7" />
+      }
+    }
+  </svg>
+</span>
+
+<div class="toast__body">
+  <strong class="toast__title">{{ toast().title }}</strong>
+  <p class="toast__message">{{ toast().message }}</p>
+
+  @if (toast().reference; as reference) {
+    <button class="toast__reference" type="button" (click)="copyReference()"
+      [attr.aria-label]="'toast.copyReference' | translate">
+      <span class="toast__reference-label">{{ 'toast.reference' | translate }}</span>
+      <code>{{ reference }}</code>
+      <span class="toast__reference-state">{{ (copied() ? 'toast.copied' : 'toast.copy') | translate }}</span>
+    </button>
+  }
+
+  @if (toast().action; as action) {
+    <a class="toast__action" [routerLink]="action.route" (click)="close()">{{ action.label }} →</a>
+  }
+</div>
+
+<button class="toast__close" type="button" (click)="close()" [attr.aria-label]="'toast.dismiss' | translate">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+</button>
+
+@if (toast().duration !== null) {
+  <span class="toast__progress" aria-hidden="true"></span>
+}
