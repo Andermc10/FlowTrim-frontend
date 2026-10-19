@@ -37,7 +37,9 @@ export class ThemeService {
       // Usa la preferencia del sistema cuando localStorage no está disponible.
     }
 
-    return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches
+    // matchMedia puede no existir (pruebas con jsdom, entornos sin DOM completo): se usa oscuro por defecto.
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-color-scheme: light)').matches
       ? 'light'
       : 'dark';
   }
