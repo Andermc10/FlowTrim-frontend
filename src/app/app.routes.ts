@@ -35,6 +35,10 @@ export const routes: Routes = [
         path: 'analytics',
         loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then((m) => m.AnalyticsPage),
       },
+      {
+        path: 'report',
+        loadComponent: () => import('./features/reports/report-page/report-page').then((m) => m.ReportPage),
+      },
     ],
   },
   { path: 'new', redirectTo: 'app/subscriptions/new', pathMatch: 'full' },
