@@ -1,0 +1,97 @@
+<section class="analytics">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'analytics.kicker' | translate }}</p>
+      <h1>{{ 'analytics.title' | translate }}</h1>
+      <p class="lede">{{ 'analytics.lede' | translate }}</p>
+    </div>
+    @if (currencies().length > 1) {
+      <div class="currency-switch" role="group" [attr.aria-label]="'analytics.currency' | translate">
+        @for (item of currencies(); track item.currency) {
+          <button type="button" [class.is-active]="item.currency === current()?.currency"
+            [attr.aria-pressed]="item.currency === current()?.currency" (click)="selectCurrency(item.currency)">
+            {{ item.currency }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="skeleton-grid" role="status" [attr.aria-label]="'common.loading' | translate">
+      <span class="skeleton"></span><span class="skeleton"></span><span class="skeleton skeleton--wide"></span>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'analytics.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <span class="empty__mark" aria-hidden="true">◔</span>
+      <p>{{ 'analytics.empty' | translate }}</p>
+      <a class="btn" routerLink="/app/subscriptions/new">{{ 'nav.addSubscription' | translate }}</a>
+    </div>
+  } @else if (current(); as data) {
+    <p class="total">
+      <span>{{ 'analytics.monthlyTotal' | translate }}</span>
+      <strong>{{ money()(data.monthlyTotal) }}</strong>
+    </p>
+
+    <div class="grid">
+      <article class="panel">
+        <h2>{{ 'analytics.byCategory' | translate }}</h2>
+        <app-chart class="chart chart--doughnut" kind="doughnut" [labels]="categoryLabels()" [values]="categoryValues()"
+          [formatValue]="money()" [ariaLabel]="'analytics.byCategory' | translate" />
+        <details>
+          <summary>{{ 'analytics.showData' | translate }}</summary>
+          <table>
+            <thead><tr><th scope="col">{{ 'analytics.category' | translate }}</th><th scope="col">{{ 'analytics.monthly' | translate }}</th><th scope="col">%</th><th scope="col">{{ 'analytics.count' | translate }}</th></tr></thead>
+            <tbody>
+              @for (row of data.byCategory; track row.category) {
+                <tr><th scope="row">{{ categoryName(row.category) }}</th><td>{{ money()(row.monthlyEquivalent) }}</td><td>{{ row.share }}</td><td>{{ row.count }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </details>
+      </article>
+
+      <article class="panel">
+        <h2>{{ 'analytics.top' | translate }}</h2>
+        <app-chart class="chart" kind="horizontal-bar" [labels]="topLabels()" [values]="topValues()"
+          [formatValue]="money()" [ariaLabel]="'analytics.top' | translate" />
+        <details>
+          <summary>{{ 'analytics.showData' | translate }}</summary>
+          <table>
+            <thead><tr><th scope="col">{{ 'analytics.subscription' | translate }}</th><th scope="col">{{ 'analytics.monthly' | translate }}</th></tr></thead>
+            <tbody>
+              @for (row of data.topSubscriptions; track row.id) {
+                <tr><th scope="row">{{ row.name }}</th><td>{{ money()(row.monthlyEquivalent) }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </details>
+      </article>
+
+      <article class="panel panel--wide">
+        <h2>{{ 'analytics.expected' | translate }}</h2>
+        <p class="caption">{{ 'analytics.expectedCaption' | translate }}</p>
+        <app-chart class="chart" kind="bar" [labels]="monthLabels()" [values]="monthValues()" [highlight]="peakMonths()"
+          [formatValue]="money()" [ariaLabel]="'analytics.expected' | translate" />
+        <details>
+          <summary>{{ 'analytics.showData' | translate }}</summary>
+          <table>
+            <thead><tr><th scope="col">{{ 'analytics.month' | translate }}</th><th scope="col">{{ 'analytics.expectedAmount' | translate }}</th><th scope="col">{{ 'analytics.charges' | translate }}</th></tr></thead>
+            <tbody>
+              @for (row of data.expectedCharges; track row.month) {
+                <tr><th scope="row">{{ monthName(row.month) }}</th><td>{{ money()(row.amount) }}</td><td>{{ row.count }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </details>
+      </article>
+    </div>
+
+    <p class="caveat">{{ 'analytics.caveat' | translate }}</p>
+  }
+</section>
