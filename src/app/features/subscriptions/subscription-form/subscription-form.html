@@ -13,6 +13,7 @@
   @if (status() === 'loading') {
     <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
   } @else {
+
     @if (generalError(); as message) {
       <div class="banner banner--error" role="alert">{{ message }}</div>
     }
