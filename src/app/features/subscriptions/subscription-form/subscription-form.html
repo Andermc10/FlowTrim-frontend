@@ -12,11 +12,12 @@
 
   @if (status() === 'loading') {
     <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (loadError(); as key) {
+    <div class="banner banner--error" role="alert">{{ key | translate }}</div>
+    <div class="actions">
+      <button type="button" class="secondary" (click)="cancel()">{{ 'common.back' | translate }}</button>
+    </div>
   } @else {
-
-    @if (generalError(); as message) {
-      <div class="banner banner--error" role="alert">{{ message }}</div>
-    }
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">
