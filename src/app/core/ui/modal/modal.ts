@@ -1,13 +1,19 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
+import { TranslatePipe } from '../../i18n/translate.pipe';
+
+// Contador para ids únicos: el título nombra al diálogo para los lectores de pantalla (aria-labelledby).
+let nextModalId = 0;
+
 @Component({
   selector: 'app-modal',
+  imports: [TranslatePipe],
   template: `
-    <dialog #dialog class="modal" (cancel)="handleCancel($event)" (click)="handleBackdropClick($event)">
+    <dialog #dialog class="modal" [attr.aria-labelledby]="titleId" (cancel)="handleCancel($event)" (click)="handleBackdropClick($event)">
       <div class="modal__panel" (click)="$event.stopPropagation()">
         <header class="modal__header">
-          <h2>{{ title }}</h2>
-          <button class="modal__close" type="button" aria-label="Close dialog" (click)="requestClose()">×</button>
+          <h2 [id]="titleId">{{ title }}</h2>
+          <button class="modal__close" type="button" [attr.aria-label]="'modal.close' | translate" (click)="requestClose()">×</button>
         </header>
         <div class="modal__body"><ng-content /></div>
       </div>
@@ -26,6 +32,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, View
 })
 export class Modal implements AfterViewInit {
   @Input() title = '';
+  protected readonly titleId = `modal-title-${nextModalId++}`;
   @Output() closeRequested = new EventEmitter<void>();
   @ViewChild('dialog', { static: true }) private readonly dialog!: ElementRef<HTMLDialogElement>;
 
