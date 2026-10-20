@@ -39,8 +39,8 @@ export class SubscriptionForm implements OnInit {
 
   protected readonly status = signal<FormStatus>('idle');
   protected readonly fieldErrors = signal<Record<string, string[]>>({});
-  // Solo para el error al cargar la suscripción a editar (estado de datos, se queda en la vista).
-  protected readonly generalError = signal<string | null>(null);
+  // Clave del error al cargar la suscripción a editar: reemplaza al formulario (no hay nada que editar).
+  protected readonly loadError = signal<string | null>(null);
   protected readonly editingId = signal<string | null>(null);
   protected readonly isEdit = computed(() => this.editingId() !== null);
 
@@ -83,15 +83,14 @@ export class SubscriptionForm implements OnInit {
         this.dirtyChange.emit(false);
         this.status.set('idle');
       },
-      error: () => {
-        this.generalError.set('Could not load the subscription.');
+      error: (error: HttpErrorResponse) => {
+        this.loadError.set(error.status === 404 ? 'common.notFound' : 'form.loadError');
         this.status.set('error');
       },
     });
   }
 
   protected submit(): void {
-    this.generalError.set(null);
     this.fieldErrors.set({});
 
     if (this.form.invalid) {
