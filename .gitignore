@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Resultados del flujo de navegador (HU-48): reportes, trazas y capturas locales
+/e2e/results
