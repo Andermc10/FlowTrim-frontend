@@ -5,7 +5,10 @@
       <h1>{{ 'subscriptions.title' | translate }}</h1>
       <p class="lede">{{ 'subscriptions.lede' | translate }}</p>
     </div>
-    <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'nav.addSubscription' | translate }}</button>
+    <div class="list__actions">
+      <a class="btn btn--ghost" routerLink="/app/subscriptions/import">{{ 'imports.open' | translate }}</a>
+      <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'nav.addSubscription' | translate }}</button>
+    </div>
   </div>
 
   @if (status() === 'loading') {
@@ -19,7 +22,10 @@
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">◫</span>
       <p>{{ 'subscriptions.noSubscriptions' | translate }}</p>
-      <button class="btn" type="button" (click)="openCreate()">{{ 'subscriptions.addFirst' | translate }}</button>
+      <div class="empty__actions">
+        <button class="btn" type="button" (click)="openCreate()">{{ 'subscriptions.addFirst' | translate }}</button>
+        <a class="btn btn--ghost" routerLink="/app/subscriptions/import">{{ 'imports.open' | translate }}</a>
+      </div>
     </div>
   } @else {
     <div class="list__toolbar">
@@ -32,7 +38,7 @@
 
 
     <div class="table-viewport" tabindex="0" [attr.aria-label]="'subscriptions.title' | translate">
-    <table>
+    <table class="data-table">
       <thead>
         <tr>
           <th>{{ 'subscriptions.name' | translate }}</th>

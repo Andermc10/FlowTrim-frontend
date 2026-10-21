@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { I18nService } from './i18n.service';
+import { I18nService, translations } from './i18n.service';
 
 describe('I18nService', () => {
   beforeEach(() => {
@@ -29,5 +29,13 @@ describe('I18nService', () => {
     const service = TestBed.inject(I18nService);
 
     expect(service.translate('missing.key')).toBe('missing.key');
+  });
+
+  it('has the same keys in English and Spanish', () => {
+    const english = Object.keys(translations.en).sort();
+    const spanish = Object.keys(translations.es).sort();
+
+    expect(english.filter((key) => !spanish.includes(key))).toEqual([]);
+    expect(spanish.filter((key) => !english.includes(key))).toEqual([]);
   });
 });

@@ -1,0 +1,161 @@
+<section class="import">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'imports.kicker' | translate }}</p>
+      <h1>{{ 'imports.title' | translate }}</h1>
+      <p class="lede">{{ 'imports.lede' | translate }}</p>
+    </div>
+    <a class="btn btn--ghost" routerLink="/app/subscriptions">{{ 'imports.backToList' | translate }}</a>
+  </div>
+
+  <p class="notice">{{ 'imports.notice' | translate }}</p>
+
+  <div class="panel picker">
+    <div class="picker__main">
+      <label class="btn" for="import-file" [class.is-disabled]="isBusy()">{{ 'imports.chooseFile' | translate }}</label>
+      <!-- Input nativo: teclado, lector de pantalla y selector del sistema sin código extra. -->
+      <input
+        #picker
+        id="import-file"
+        class="visually-hidden"
+        type="file"
+        accept=".csv,text/csv"
+        aria-describedby="import-file-hint"
+        [disabled]="isBusy()"
+        (change)="onFileSelected($event)"
+      />
+      <span class="picker__name" aria-live="polite">{{ fileName() ?? ('imports.noFile' | translate) }}</span>
+    </div>
+    <p id="import-file-hint" class="hint">{{ 'imports.fileHint' | translate }}</p>
+    <details class="format">
+      <summary>{{ 'imports.formatTitle' | translate }}</summary>
+      <p>{{ 'imports.formatRequired' | translate }} <code>name, amount, currency, billing_cycle, next_billing_date</code></p>
+      <p>{{ 'imports.formatOptional' | translate }} <code>category, status</code></p>
+      <p>{{ 'imports.formatRules' | translate }}</p>
+      <button type="button" class="btn btn--ghost" (click)="downloadTemplate()">{{ 'imports.downloadTemplate' | translate }}</button>
+    </details>
+  </div>
+
+  <section class="result" aria-live="polite" [attr.aria-busy]="isBusy()">
+    @switch (state().kind) {
+      @case ('previewing') {
+        <p class="muted" role="status"><span class="spinner" aria-hidden="true"></span>{{ 'imports.checking' | translate }}</p>
+      }
+      @case ('confirming') {
+        <p class="muted" role="status"><span class="spinner" aria-hidden="true"></span>{{ 'imports.creating' | translate }}</p>
+      }
+    }
+
+    @if (state(); as current) {
+      @if (current.kind === 'fileError') {
+        <div class="banner banner--error" role="alert">
+          <p>{{ fileErrorMessage(current.code, current.detail) }}</p>
+          <button type="button" class="link" (click)="chooseFile()">{{ 'imports.chooseAnother' | translate }}</button>
+        </div>
+      } @else if (current.kind === 'serverError') {
+        <div class="banner banner--error" role="alert">
+          <p>{{ (current.network ? 'imports.error.network' : 'imports.error.generic') | translate }}</p>
+          @if (current.reference) {
+            <p class="reference">{{ 'imports.reference' | translate: { id: current.reference } }}</p>
+          }
+          <div class="banner__actions">
+            <button type="button" class="link" (click)="retry()">{{ 'common.retry' | translate }}</button>
+            <button type="button" class="link" (click)="chooseFile()">{{ 'imports.chooseAnother' | translate }}</button>
+          </div>
+        </div>
+      } @else if (current.kind === 'done') {
+        <div class="panel done">
+          <h2>{{ 'imports.doneTitle' | translate }}</h2>
+          <ul class="counts">
+            <li><strong>{{ current.result.created }}</strong> {{ 'imports.count.created' | translate }}</li>
+            <li><strong>{{ current.result.invalid }}</strong> {{ 'imports.count.skippedInvalid' | translate }}</li>
+            <li><strong>{{ current.result.duplicate }}</strong> {{ 'imports.count.skippedDuplicate' | translate }}</li>
+          </ul>
+          @if (current.result.created !== current.expected) {
+            <p class="hint">{{ 'imports.changedSincePreview' | translate: { expected: current.expected } }}</p>
+          }
+          <div class="actions">
+            <a class="btn" routerLink="/app/subscriptions">{{ 'imports.viewSubscriptions' | translate }}</a>
+            <button type="button" class="btn btn--ghost" (click)="reset()">{{ 'imports.importAnother' | translate }}</button>
+          </div>
+        </div>
+      } @else if (current.kind === 'preview' || current.kind === 'confirming') {
+        <div class="panel">
+          <h2>{{ 'imports.previewTitle' | translate }}</h2>
+          <ul class="counts">
+            <li><strong>{{ current.preview.summary.total }}</strong> {{ 'imports.count.total' | translate }}</li>
+            <li class="counts--valid"><strong>{{ current.preview.summary.valid }}</strong> {{ 'imports.count.valid' | translate }}</li>
+            <li class="counts--invalid"><strong>{{ current.preview.summary.invalid }}</strong> {{ 'imports.count.invalid' | translate }}</li>
+            <li class="counts--duplicate"><strong>{{ current.preview.summary.duplicate }}</strong> {{ 'imports.count.duplicate' | translate }}</li>
+          </ul>
+          @if (current.preview.ignoredColumns.length > 0) {
+            <p class="hint">{{ 'imports.ignoredColumns' | translate: { columns: current.preview.ignoredColumns.join(', ') } }}</p>
+          }
+
+          <div class="table-viewport" tabindex="0" [attr.aria-label]="'imports.previewTitle' | translate">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ 'imports.column.row' | translate }}</th>
+                  <th scope="col">{{ 'imports.column.status' | translate }}</th>
+                  <th scope="col">{{ 'subscriptions.name' | translate }}</th>
+                  <th scope="col">{{ 'subscriptions.amount' | translate }}</th>
+                  <th scope="col">{{ 'subscriptions.cycle' | translate }}</th>
+                  <th scope="col">{{ 'subscriptions.nextCharge' | translate }}</th>
+                  <th scope="col">{{ 'imports.column.detail' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of current.preview.rows; track row.rowNumber) {
+                  <tr>
+                    <td class="row-number" [attr.data-label]="'imports.column.row' | translate">{{ row.rowNumber }}</td>
+                    <td [attr.data-label]="'imports.column.status' | translate">
+                      <span [class]="'row-status row-status--' + row.status">{{ ('imports.status.' + row.status) | translate }}</span>
+                    </td>
+                    @if (row.values; as values) {
+                      <td class="cell-wrap" [attr.data-label]="'subscriptions.name' | translate">
+                        <strong>{{ values.name }}</strong>
+                        <small>{{ values.category ? values.category + ' · ' : '' }}{{ ('status.' + values.status) | translate }}</small>
+                      </td>
+                      <td [attr.data-label]="'subscriptions.amount' | translate">{{ values.amount | money: values.currency }}</td>
+                      <td [attr.data-label]="'subscriptions.cycle' | translate">{{ ('billing.' + values.billingCycle) | translate }}</td>
+                      <td [attr.data-label]="'subscriptions.nextCharge' | translate">{{ values.nextBillingDate }}</td>
+                      <td class="cell-wrap" [attr.data-label]="'imports.column.detail' | translate">
+                        @if (row.status === 'duplicate') {
+                          {{ duplicateReason(row) }}
+                        } @else {
+                          {{ 'imports.willBeCreated' | translate }}
+                        }
+                      </td>
+                    } @else {
+                      <!-- Una fila inválida no tiene valores normalizados: sus errores ocupan las columnas de datos. -->
+                      <td class="cell-wrap" colspan="5" [attr.data-label]="'imports.column.detail' | translate">
+                        <ul class="row-errors">
+                          @for (error of row.errors; track $index) {
+                            <li><code>{{ error.field }}</code> {{ rowErrorMessage(error) }}</li>
+                          }
+                        </ul>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn" [disabled]="current.kind === 'confirming' || current.preview.summary.valid === 0" (click)="confirm()">
+              {{ 'imports.create' | translate: { count: current.preview.summary.valid } }}
+            </button>
+            <button type="button" class="btn btn--ghost" [disabled]="current.kind === 'confirming'" (click)="chooseFile()">
+              {{ 'imports.chooseAnother' | translate }}
+            </button>
+          </div>
+          @if (current.preview.summary.valid === 0) {
+            <p class="hint">{{ 'imports.nothingToCreate' | translate }}</p>
+          }
+        </div>
+      }
+    }
+  </section>
+</section>

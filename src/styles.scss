@@ -218,6 +218,185 @@ select:focus-visible {
   text-decoration: none;
 }
 
+.banner p {
+  margin: 0;
+}
+
+// Referencia de soporte (HU-41) dentro de un banner de error.
+.banner .reference {
+  margin-top: 0.35rem;
+  font-size: 0.74rem;
+  opacity: 0.85;
+}
+
+// Aviso de alcance o privacidad bajo el encabezado (Insights, importación).
+.notice {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-primary-soft-strong);
+  border-radius: 0.7rem;
+  background: var(--color-primary-soft);
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-right: 0.5rem;
+  border: 2px solid var(--color-primary-soft-strong);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  vertical-align: -0.1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+// Oculto a la vista pero accesible para el teclado y los lectores de pantalla.
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// Tabla con scroll propio (HU-30) y encabezado fijo; en móvil cada fila pasa a ser una tarjeta con las etiquetas
+// de `data-label`. La comparten la lista de suscripciones y la vista previa de importación.
+.table-viewport {
+  max-height: min(62dvh, 38rem);
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  outline: none;
+}
+
+.table-viewport:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  background: var(--color-surface);
+
+  th,
+  td {
+    padding: 1rem 1.05rem;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  td {
+    color: var(--color-text);
+    font-size: 0.82rem;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  tbody tr:hover {
+    background: var(--color-surface-soft);
+  }
+
+  td strong,
+  td small {
+    display: block;
+  }
+
+  td strong {
+    font-size: 0.84rem;
+  }
+
+  td small {
+    margin-top: 0.25rem;
+    color: var(--color-muted);
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .table-viewport {
+    max-height: none;
+    overflow: visible;
+    border: 0;
+  }
+
+  .data-table {
+    &,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+    }
+
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    tbody tr {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0.85rem;
+      border-bottom: 0;
+    }
+
+    td::before {
+      color: var(--color-muted);
+      content: attr(data-label);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  }
+}
+
 @media (max-width: 620px) {
   .page-heading {
     display: grid;

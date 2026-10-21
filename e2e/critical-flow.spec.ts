@@ -107,14 +107,48 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await signOut(page);
   });
 
-  await test.step('account A signs in again, gets the charge alert and deletes its data', async () => {
+  await test.step('account A signs in again and gets the charge alert', async () => {
     await signIn(page, 'A');
     await expect(page.locator('app-toast-item').filter({ hasText: '1 charge needs attention' })).toBeVisible();
+  });
 
+  await test.step('account A imports a CSV: preview first, then only the valid rows are created', async () => {
     await page.goto('/app/subscriptions');
-    await page.getByRole('row', { name: /Netflix/ }).getByRole('button', { name: 'Delete' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Delete subscription?' });
-    await dialog.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('link', { name: 'Import CSV' }).click();
+    await expect(page).toHaveURL(/\/app\/subscriptions\/import$/);
+
+    // Fechas lejanas: no cambian la alerta de cobros del paso anterior.
+    const csv =
+      'name,amount,currency,billing_cycle,next_billing_date,status\n' +
+      `Gym,90000,COP,Monthly,${nextBillingDate(20)},Active\n` +
+      `netflix,38900,COP,Monthly,${nextBillingDate(20)},Active\n` +
+      `Cloud Storage,120,USD,Yearly,${nextBillingDate(40)},Inactive\n`;
+    await page.getByLabel('Choose CSV file').setInputFiles({ name: 'subscriptions.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) });
+
+    const rows = page.locator('tbody tr');
+    await expect(rows).toHaveCount(3);
+    await expect(rows.nth(1)).toContainText('Duplicate');
+    await expect(rows.nth(1)).toContainText('Already in your subscriptions');
+    await page.screenshot({ path: `${checkpoints}/04-import-preview.png`, fullPage: true });
+
+    await page.getByRole('button', { name: 'Create subscriptions (2)' }).click();
+    await expect(page.locator('.done')).toContainText('Import finished');
+    await expect(page.locator('.done .counts li').first()).toHaveText(/2\s+created/);
+
+    await page.getByRole('link', { name: 'View subscriptions' }).click();
+    await expect(page.getByRole('row', { name: /Gym/ })).toBeVisible();
+    await expect(page.getByRole('row', { name: /Cloud Storage/ })).toContainText('Inactive');
+    await expect(page.getByRole('row', { name: /Netflix/i })).toHaveCount(1);
+  });
+
+  await test.step('account A deletes its data', async () => {
+    await page.goto('/app/subscriptions');
+    for (const name of ['Netflix', 'Gym', 'Cloud Storage']) {
+      await page.getByRole('row', { name: new RegExp(name) }).getByRole('button', { name: 'Delete' }).click();
+      const dialog = page.getByRole('dialog', { name: 'Delete subscription?' });
+      await dialog.getByRole('button', { name: 'Delete' }).click();
+      await expect(page.getByRole('row', { name: new RegExp(name) })).toHaveCount(0);
+    }
     await expect(page.getByText('No subscriptions yet.')).toBeVisible();
   });
 

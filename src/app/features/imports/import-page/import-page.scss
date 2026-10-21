@@ -1,0 +1,206 @@
+:host {
+  display: block;
+}
+
+.import {
+  display: grid;
+  gap: 1rem;
+  max-width: 64rem;
+}
+
+.page-heading {
+  margin-bottom: 0.5rem;
+}
+
+.panel {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.picker__main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+
+  label {
+    cursor: pointer;
+  }
+
+  label.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  // El input real está oculto: su foco se muestra en la etiqueta que hace de botón.
+  &:has(input:focus-visible) label {
+    box-shadow: 0 0 0 3px var(--color-primary-soft-strong);
+  }
+}
+
+.picker__name {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.hint,
+.muted {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.format {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+
+  summary {
+    color: var(--color-text);
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  code {
+    overflow-wrap: anywhere;
+  }
+}
+
+.result {
+  display: grid;
+  gap: 1rem;
+}
+
+.banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.banner .link {
+  padding: 0;
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.6rem;
+    background: var(--color-surface-soft);
+    color: var(--color-muted);
+    font-size: 0.76rem;
+  }
+
+  strong {
+    margin-right: 0.25rem;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.counts--valid strong {
+  color: var(--color-success);
+}
+
+.counts--invalid strong {
+  color: var(--color-danger);
+}
+
+.counts--duplicate strong {
+  color: var(--color-warning);
+}
+
+.row-number {
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+// El estado siempre lleva texto; el color solo lo refuerza.
+.row-status {
+  display: inline-flex;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.row-status--valid {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.row-status--invalid {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+}
+
+.row-status--duplicate {
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
+  color: var(--color-warning);
+}
+
+.row-errors {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-danger);
+  font-size: 0.76rem;
+
+  code {
+    margin-right: 0.35rem;
+    color: var(--color-text);
+  }
+}
+
+// Montos, ciclos y fechas no se parten; el nombre y el detalle sí, para textos largos del archivo.
+.data-table td {
+  white-space: nowrap;
+}
+
+.data-table td.cell-wrap {
+  min-width: 10rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+// En la vista de tarjetas, los textos largos van bajo su etiqueta en vez de al lado (la etiqueta no se aplasta).
+@media (max-width: 720px) {
+  .data-table td.cell-wrap {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}

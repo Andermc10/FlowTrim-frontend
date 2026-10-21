@@ -25,6 +25,17 @@
   white-space: nowrap;
 }
 
+.list__actions,
+.empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.empty__actions {
+  justify-content: center;
+}
+
 .list__toolbar {
   display: flex;
   align-items: center;
@@ -84,73 +95,6 @@
 .empty p {
   margin: 0 0 1.2rem;
   color: var(--color-muted);
-}
-
-.table-viewport {
-  max-height: min(62dvh, 38rem);
-  overflow: auto;
-  border: 1px solid var(--color-border);
-  border-radius: 0.9rem;
-  outline: none;
-}
-
-.table-viewport:focus-visible {
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
-}
-
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  overflow: hidden;
-  background: var(--color-surface);
-}
-
-th,
-td {
-  padding: 1rem 1.05rem;
-  border-bottom: 1px solid var(--color-border);
-  text-align: left;
-}
-
-th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--color-surface);
-  color: var(--color-muted);
-  font-size: 0.64rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-td {
-  color: var(--color-text);
-  font-size: 0.82rem;
-}
-
-tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-tbody tr:hover {
-  background: var(--color-surface-soft);
-}
-
-td strong,
-td small {
-  display: block;
-}
-
-td strong {
-  font-size: 0.84rem;
-}
-
-td small {
-  margin-top: 0.25rem;
-  color: var(--color-muted);
-  font-size: 0.68rem;
 }
 
 .actions-col {
@@ -275,55 +219,6 @@ td small {
 
   .search-field {
     width: 100%;
-  }
-
-  .table-viewport {
-    max-height: none;
-    overflow: visible;
-    border: 0;
-  }
-
-  table,
-  thead,
-  tbody,
-  tr,
-  th,
-  td {
-    display: block;
-  }
-
-  thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-
-  tbody tr {
-    padding: 0.3rem 0;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  tbody tr:last-child {
-    border-bottom: 0;
-  }
-
-  td {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.55rem 0.85rem;
-    border-bottom: 0;
-  }
-
-  td::before {
-    color: var(--color-muted);
-    content: attr(data-label);
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .actions-col {

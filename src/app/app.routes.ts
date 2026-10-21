@@ -25,6 +25,11 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', component: SummaryDashboard },
       { path: 'subscriptions', component: SubscriptionList },
       { path: 'subscriptions/new', component: SubscriptionForm },
+      // Carga diferida: la importación CSV (HU-46) solo se descarga al abrirla.
+      {
+        path: 'subscriptions/import',
+        loadComponent: () => import('./features/imports/import-page/import-page').then((m) => m.ImportPage),
+      },
       { path: 'subscriptions/:id/edit', component: SubscriptionForm },
       { path: 'subscriptions/:id/usage', component: Usage },
       { path: 'upcoming', component: UpcomingPanel },

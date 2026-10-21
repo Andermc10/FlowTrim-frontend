@@ -13,7 +13,8 @@ import { SubscriptionResponse, UpcomingChargeItem } from '../../subscriptions/mo
 import { SubscriptionService } from '../../subscriptions/services/subscription-service';
 import { SummaryService } from '../../summary/summary-service';
 import { CurrencySummary } from '../../summary/summary.models';
-import { ReportsService, saveFile } from '../reports-service';
+import { saveFile } from '../../../core/files/save-file';
+import { ReportsService } from '../reports-service';
 
 type ReportStatus = 'loading' | 'ready' | 'error';
 
