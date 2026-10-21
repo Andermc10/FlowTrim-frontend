@@ -31,13 +31,3 @@ export function fileNameFrom(contentDisposition: string | null): string | null {
   const match = contentDisposition?.match(/filename="?([^";]+)"?/i);
   return match ? match[1] : null;
 }
-
-/** Guarda un Blob como archivo descargado mediante un enlace temporal. */
-export function saveFile(file: DownloadedFile): void {
-  const url = URL.createObjectURL(file.blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = file.fileName;
-  link.click();
-  URL.revokeObjectURL(url);
-}
