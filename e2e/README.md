@@ -1,7 +1,8 @@
 # Critical browser flow (HU-48)
 
 One command replays the real user journey in Chromium: sign in, create a subscription, ask FlowTrim Insights, check
-the evidence, and prove that a second account cannot see the first account's data.
+the evidence, prove that a second account cannot see the first account's data, and import a CSV file (preview, then
+confirm only the valid rows).
 
 ```bash
 npm run e2e
@@ -31,7 +32,7 @@ No AI key, Auth0 account or real data is needed.
 ## Data
 
 Each run uses new synthetic subjects (`e2e|account-a-<runId>`, `e2e|account-b-<runId>`), so runs never collide and the
-database needs no reset. The flow deletes the subscription it creates. If a run fails halfway, its rows stay under an
+database needs no reset. The flow deletes the subscriptions it creates. If a run fails halfway, its rows stay under an
 `e2e|` owner and are invisible to every other account; remove them with (`<user>` and `<database>` are
 `POSTGRES_USER` and `POSTGRES_DB` from the backend `.env`):
 
@@ -42,7 +43,7 @@ docker exec flowtrim-postgres psql -U <user> -d <database> -c "DELETE FROM subsc
 ## Results
 
 - `e2e/results/report/` — HTML report (`npx playwright show-report e2e/results/report`).
-- `e2e/results/checkpoints/` — screenshots of the overview, the Insights answer and Account B's empty list.
+- `e2e/results/checkpoints/` — screenshots of the overview, the Insights answer, Account B's empty list and the import preview.
 - On failure: screenshot and trace under `e2e/results/test-output/` (`npx playwright show-trace <trace.zip>`).
 
 `e2e/results/` is ignored by Git.
