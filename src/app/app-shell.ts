@@ -6,6 +6,7 @@ import { I18nService } from './core/i18n/i18n.service';
 import { TranslatePipe } from './core/i18n/translate.pipe';
 import { AuthService } from './core/auth/auth.service';
 import { BackToTop } from './core/ui/back-to-top/back-to-top';
+import { SoundService } from './core/ui/sound/sound.service';
 import { ToastHost } from './core/ui/toast/toast-host';
 import { UpcomingAlertService } from './features/subscriptions/services/upcoming-alert-service';
 
@@ -19,6 +20,7 @@ export class AppShell implements OnInit {
   private readonly theme = inject(ThemeService);
   private readonly auth = inject(AuthService);
   private readonly upcomingAlerts = inject(UpcomingAlertService);
+  protected readonly sound = inject(SoundService);
   protected readonly i18n = inject(I18nService);
 
   protected readonly themeMode = this.theme.mode;
@@ -41,6 +43,11 @@ export class AppShell implements OnInit {
     return this.themeMode() === 'dark'
       ? this.i18n.translate('nav.switchToLight')
       : this.i18n.translate('nav.switchToDark');
+  }
+
+  /** Sonido de las alertas de cobro: apagado por defecto (HU-62). */
+  protected toggleSound(): void {
+    this.sound.setEnabled(!this.sound.enabled());
   }
 
   protected toggleLanguage(): void {

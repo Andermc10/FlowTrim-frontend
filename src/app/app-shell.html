@@ -59,6 +59,11 @@
       <span>{{ i18n.languageName() }}</span>
     </button>
 
+    <button class="language-toggle" type="button" [attr.aria-pressed]="sound.enabled()" (click)="toggleSound()">
+      <span aria-hidden="true">♪</span>
+      <span>{{ (sound.enabled() ? 'nav.soundOn' : 'nav.soundOff') | translate }}</span>
+    </button>
+
     <button class="language-toggle" type="button" [disabled]="signingOut()" [attr.aria-busy]="signingOut()" (click)="signOut()">
       <span aria-hidden="true">↪</span>
       <span>{{ (signingOut() ? 'auth.signingOut' : 'auth.signOut') | translate }}</span>
@@ -85,6 +90,17 @@
         </button>
         <button class="mobile-language-toggle" type="button" (click)="toggleLanguage()" [attr.aria-label]="i18n.languageLabel()">
           {{ i18n.languageName() }}
+        </button>
+        <button
+          class="mobile-theme-toggle"
+          type="button"
+          [class.is-on]="sound.enabled()"
+          [attr.aria-pressed]="sound.enabled()"
+          [attr.aria-label]="'nav.alertSound' | translate"
+          [attr.title]="'nav.alertSound' | translate"
+          (click)="toggleSound()"
+        >
+          ♪
         </button>
         <!-- En móvil el riel está oculto: sin este botón no había forma de cerrar sesión (HU-61). -->
         <button
