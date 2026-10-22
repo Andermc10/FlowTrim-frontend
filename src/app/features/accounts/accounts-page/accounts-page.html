@@ -1,0 +1,140 @@
+<section class="accounts">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'accounts.kicker' | translate }}</p>
+      <h1>{{ 'accounts.title' | translate }}</h1>
+      <p class="lede">{{ 'accounts.lede' | translate }}</p>
+    </div>
+    @if (status() === 'success' && accounts().length > 0) {
+      <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'accounts.add' | translate }}</button>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'accounts.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (accounts().length === 0) {
+    <div class="empty">
+      <span class="empty__mark" aria-hidden="true">◧</span>
+      <p>{{ 'accounts.empty' | translate }}</p>
+      <button class="btn" type="button" (click)="openCreate()">{{ 'accounts.addFirst' | translate }}</button>
+    </div>
+  } @else {
+    @if (totals().length > 0) {
+      <div class="totals" role="list" [attr.aria-label]="'accounts.totals' | translate">
+        @for (total of totals(); track total.currency) {
+          <article class="total" role="listitem">
+            <div class="total__topline">
+              <span class="total__label">{{ 'accounts.inAccounts' | translate }}</span>
+              <span class="currency-mark">{{ total.currency }}</span>
+            </div>
+            <strong class="total__value">{{ total.inAccounts | money: total.currency }}</strong>
+            @if (total.hasCreditCards) {
+              <p class="total__cards">
+                {{ 'accounts.creditCards' | translate }}:
+                <strong>{{ total.creditCards | money: total.currency }}</strong>
+              </p>
+            }
+          </article>
+        }
+      </div>
+      <p class="caveat">{{ 'accounts.caveat' | translate }}</p>
+    }
+
+    @if (active().length > 0) {
+      <ul class="account-grid" [attr.aria-label]="'accounts.title' | translate">
+        @for (account of active(); track account.id) {
+          <ng-container *ngTemplateOutlet="accountCard; context: { $implicit: account }" />
+        }
+      </ul>
+    } @else {
+      <p class="muted">{{ 'accounts.allArchived' | translate }}</p>
+    }
+
+    @if (archived().length > 0) {
+      <details class="archived">
+        <summary>{{ 'accounts.archived' | translate }} ({{ archived().length }})</summary>
+        <ul class="account-grid">
+          @for (account of archived(); track account.id) {
+            <ng-container *ngTemplateOutlet="accountCard; context: { $implicit: account }" />
+          }
+        </ul>
+      </details>
+    }
+  }
+
+  <ng-template #accountCard let-account>
+    <li class="account" [class.account--archived]="account.isArchived">
+      <div class="account__head">
+        <span class="account__icon" aria-hidden="true"><app-icon [name]="typeIcon(account.type)" /></span>
+        <div>
+          <h2>{{ account.name }}</h2>
+          <small>{{ ('accounts.type.' + account.type) | translate }} · {{ account.currency }}</small>
+        </div>
+      </div>
+      <p class="account__balance">
+        <span class="account__balance-label">{{ (isOwed(account) ? 'accounts.owed' : 'accounts.balance') | translate }}</span>
+        <strong [class.is-negative]="account.balance < 0 && !isOwed(account)">
+          {{ (isOwed(account) ? -account.balance : account.balance) | money: account.currency }}
+        </strong>
+      </p>
+      <p class="account__opening">{{ 'accounts.openingBalance' | translate }}: {{ account.openingBalance | money: account.currency }}</p>
+      <div class="account__actions">
+        @if (!account.isArchived) {
+          <button type="button" class="icon-button" [attr.aria-label]="('accounts.edit' | translate) + ': ' + account.name" [attr.title]="'accounts.edit' | translate" (click)="openEdit(account)"><app-icon name="edit" /></button>
+          <button type="button" class="icon-button" [disabled]="busyId() === account.id" [attr.aria-label]="('accounts.archive' | translate) + ': ' + account.name" [attr.title]="'accounts.archive' | translate" (click)="setArchived(account, true)"><app-icon name="archive" /></button>
+        } @else {
+          <button type="button" class="icon-button" [disabled]="busyId() === account.id" [attr.aria-label]="('accounts.restore' | translate) + ': ' + account.name" [attr.title]="'accounts.restore' | translate" (click)="setArchived(account, false)"><app-icon name="restore" /></button>
+        }
+        <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="('accounts.delete' | translate) + ': ' + account.name" [attr.title]="'accounts.delete' | translate" (click)="openDelete(account)"><app-icon name="delete" /></button>
+      </div>
+    </li>
+  </ng-template>
+
+  @if (editorOpen()) {
+    <app-modal [title]="(editing() ? 'accounts.editTitle' : 'accounts.createTitle') | translate" (closeRequested)="requestEditorClose()">
+      <app-account-form
+        [account]="editing()"
+        (saved)="handleSaved()"
+        (closeRequested)="requestEditorClose()"
+        (dirtyChange)="editorDirty.set($event)" />
+    </app-modal>
+  }
+
+  @if (discardConfirmation()) {
+    <app-modal [title]="'modal.discardTitle' | translate" (closeRequested)="discardConfirmation.set(false)">
+      <p class="modal-copy">{{ 'modal.discardText' | translate }}</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="discardConfirmation.set(false)">{{ 'modal.keepEditing' | translate }}</button>
+        <button type="button" class="danger-button" (click)="closeEditor()">{{ 'modal.discard' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+
+  @if (deleteTarget(); as target) {
+    @if (target.hasTransactions) {
+      <!-- Con movimientos no se puede borrar (EP-12 D5): se ofrece archivar, que conserva el historial. -->
+      <app-modal [title]="'accounts.cannotDeleteTitle' | translate" (closeRequested)="closeDelete()">
+        <p class="modal-copy">{{ 'accounts.cannotDeleteText' | translate: { name: target.name } }}</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary" (click)="closeDelete()">{{ 'common.cancel' | translate }}</button>
+          @if (!target.isArchived) {
+            <button type="button" class="primary-button" [disabled]="busyId() === target.id" (click)="setArchived(target, true)"><app-icon name="archive" /> {{ 'accounts.archive' | translate }}</button>
+          }
+        </div>
+      </app-modal>
+    } @else {
+      <app-modal [title]="'modal.deleteTitle' | translate" (closeRequested)="closeDelete()">
+        <p class="modal-copy">{{ 'modal.deleteText' | translate }} <strong>{{ target.name }}</strong>.</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary" (click)="closeDelete()">{{ 'common.cancel' | translate }}</button>
+          <button type="button" class="danger-button" [disabled]="busyId() === target.id" (click)="confirmDelete()"><app-icon name="delete" /> {{ 'accounts.delete' | translate }}</button>
+        </div>
+      </app-modal>
+    }
+  }
+</section>
