@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
 import { routes } from '../../app.routes';
 import { authGuard } from '../../core/auth/auth.guard';
-import { importTemplateCsv, maxImportFileBytes, preCheckFile } from './import-file';
+import { buildImportTemplate, maxImportFileBytes, preCheckFile } from './import-file';
 import { ImportsService } from './imports-service';
 
 const baseUrl = `${environment.apiUrl}/api/subscription-imports`;
@@ -56,7 +56,13 @@ describe('preCheckFile', () => {
   });
 
   it('uses the export header in the template', () => {
-    expect(importTemplateCsv.split('\r\n')[0]).toBe('name,amount,currency,billing_cycle,next_billing_date,category,status');
+    const lines = buildImportTemplate('2026-10-28').split('\r\n');
+
+    // sep=, para Excel, la cabecera del export y cuatro ejemplos con fechas desde hoy (nunca pasadas).
+    expect(lines[0]).toBe('sep=,');
+    expect(lines[1]).toBe('name,amount,currency,billing_cycle,next_billing_date,category,status');
+    expect(lines.slice(2, 6).map((line) => line.split(',')[4])).toEqual(['2026-11-07', '2026-12-27', '2026-10-31', '2026-11-17']);
+    expect(lines[6]).toBe('');
   });
 });
 

@@ -279,7 +279,7 @@ describe('ImportPage', () => {
 
     const blob = created.mock.calls[0][0] as Blob;
     const text = await blob.text();
-    expect(text.split('\r\n')[0]).toBe('name,amount,currency,billing_cycle,next_billing_date,category,status');
+    expect(text.split('\r\n').slice(0, 2)).toEqual(['sep=,', 'name,amount,currency,billing_cycle,next_billing_date,category,status']);
     expect(text).toContain('Example Streaming');
     expect(clicked).toHaveBeenCalled();
     vi.restoreAllMocks();
