@@ -60,6 +60,11 @@ export class SubscriptionService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  /** Marca el cobro actual como pagado: la próxima fecha avanza un ciclo (200 / 400 inactiva / 404). */
+  markPaid(id: string): Observable<SubscriptionResponse> {
+    return this.http.post<SubscriptionResponse>(`${this.baseUrl}/${id}/mark-paid`, {});
+  }
+
   /** Próximos cobros ordenados por fecha, con cuenta regresiva y ventana de alerta (servidor). */
   getUpcoming(): Observable<UpcomingChargesResponse> {
     return this.http.get<UpcomingChargesResponse>(`${this.baseUrl}/upcoming`);

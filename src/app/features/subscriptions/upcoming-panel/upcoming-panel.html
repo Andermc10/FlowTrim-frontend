@@ -35,7 +35,14 @@
             <span>{{ item.nextBillingDate }}</span>
             <span class="row__countdown">{{ countdownLabel(item.daysUntilCharge) }}</span>
           </div>
-           <span [class]="badgeClass(item.alertWindow)">{{ ('alert.' + item.alertWindow) | translate }}</span>
+          <div class="row__end">
+            <span [class]="badgeClass(item.alertWindow)">{{ ('alert.' + item.alertWindow) | translate }}</span>
+            @if (canMarkPaid(item)) {
+              <button type="button" class="btn btn--ghost row__paid" [disabled]="payingId() === item.id" (click)="markPaid(item)">
+                <app-icon name="paid" /> {{ 'subscriptions.markPaid' | translate }}
+              </button>
+            }
+          </div>
         </li>
       }
     </ul>
