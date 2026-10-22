@@ -206,6 +206,8 @@
   .app-shell {
     display: block;
     padding-bottom: 4.8rem;
+    // El botón "volver arriba" (HU-63) queda sobre la navegación inferior fija.
+    --back-to-top-bottom: 5.6rem;
   }
 
   .workspace-rail {
