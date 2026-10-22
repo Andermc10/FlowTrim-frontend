@@ -14,12 +14,27 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MoneyPipe } from '../../../core/format/money.pipe';
+import { productToday } from '../../../core/format/product-calendar';
+import { FieldError } from '../../../core/forms/field-error';
+import { ErrorMessages, FormValidators, visibleErrorKey } from '../../../core/forms/form-validators';
 
 type UsageStatus = 'loading' | 'ready' | 'notfound' | 'error';
 
+type UsageField = 'usageDate' | 'usageCount' | 'notes';
+
+/** Límite del dominio (UsageRecord.NotesMaxLength en la API). */
+export const notesMaxLength = 500;
+
+// Mensaje de cada regla, en el orden en que se muestran (HU-55).
+const fieldMessages: Record<UsageField, ErrorMessages> = {
+  usageDate: [['required', 'usage.dateRequired'], ['notAfter', 'usage.dateFuture']],
+  usageCount: [['required', 'usage.countRequired'], ['min', 'usage.countPositive'], ['integer', 'usage.countInteger']],
+  notes: [['maxlength', 'usage.notesLength']],
+};
+
 @Component({
   selector: 'app-usage',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, MoneyPipe],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, MoneyPipe, FieldError],
   templateUrl: './usage.html',
   styleUrl: './usage.scss',
 })
@@ -40,10 +55,14 @@ export class Usage implements OnInit {
   protected readonly saving = signal(false);
   protected readonly fieldErrors = signal<Record<string, string[]>>({});
 
+  /** Hoy en el calendario del producto: un uso declarado no puede ser posterior (HU-56). */
+  protected readonly today = productToday();
+  protected readonly notesMaxLength = notesMaxLength;
+
   protected readonly form = this.fb.group({
-    usageDate: this.fb.nonNullable.control('', [Validators.required]),
-    usageCount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
-    notes: this.fb.nonNullable.control('', [Validators.maxLength(500)]),
+    usageDate: this.fb.nonNullable.control('', [Validators.required, FormValidators.notAfter(() => this.today)]),
+    usageCount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0), FormValidators.integer]),
+    notes: this.fb.nonNullable.control('', [Validators.maxLength(notesMaxLength)]),
   });
 
   ngOnInit(): void {
@@ -129,5 +148,14 @@ export class Usage implements OnInit {
 
   protected errorsFor(field: string): string[] {
     return this.fieldErrors()[field] ?? [];
+  }
+
+  /** Mensaje de validación en vivo del campo, o null si no hay que mostrar ninguno (HU-55). */
+  protected errorKey(field: UsageField): string | null {
+    return visibleErrorKey(this.form.controls[field], fieldMessages[field]);
+  }
+
+  protected isInvalid(field: UsageField): boolean {
+    return this.errorKey(field) !== null || this.errorsFor(field).length > 0;
   }
 }

@@ -19,26 +19,50 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">
         <label for="usageDate">{{ 'usage.date' | translate }}</label>
-        <input id="usageDate" type="date" formControlName="usageDate" />
-        @if (form.controls.usageDate.touched && form.controls.usageDate.invalid) {
-          <small class="error">{{ 'usage.dateRequired' | translate }}</small>
-        }
-        @for (m of errorsFor('usageDate'); track m) { <small class="error">{{ m }}</small> }
+        <input
+          id="usageDate"
+          type="date"
+          formControlName="usageDate"
+          [max]="today"
+          [attr.aria-invalid]="isInvalid('usageDate')"
+          aria-describedby="usageDate-error"
+        />
+        <app-field-error id="usageDate-error" [messageKey]="errorKey('usageDate')" [serverMessages]="errorsFor('usageDate')" />
       </div>
 
       <div class="field">
         <label for="usageCount">{{ 'usage.count' | translate }}</label>
-        <input id="usageCount" type="number" min="0" step="1" formControlName="usageCount" />
-        @if (form.controls.usageCount.touched && form.controls.usageCount.invalid) {
-          <small class="error">{{ 'usage.countPositive' | translate }}</small>
-        }
-        @for (m of errorsFor('usageCount'); track m) { <small class="error">{{ m }}</small> }
+        <input
+          id="usageCount"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          step="1"
+          formControlName="usageCount"
+          [placeholder]="'usage.placeholder.count' | translate"
+          [attr.aria-invalid]="isInvalid('usageCount')"
+          aria-describedby="usageCount-error"
+        />
+        <app-field-error id="usageCount-error" [messageKey]="errorKey('usageCount')" [serverMessages]="errorsFor('usageCount')" />
       </div>
 
       <div class="field">
         <label for="notes">{{ 'usage.notes' | translate }} <span class="optional">{{ 'usage.notesOptional' | translate }}</span></label>
-        <input id="notes" type="text" maxlength="500" formControlName="notes" />
-        @for (m of errorsFor('notes'); track m) { <small class="error">{{ m }}</small> }
+        <input
+          id="notes"
+          type="text"
+          formControlName="notes"
+          [attr.maxlength]="notesMaxLength"
+          [placeholder]="'usage.placeholder.notes' | translate"
+          [attr.aria-invalid]="isInvalid('notes')"
+          aria-describedby="notes-error"
+        />
+        @if (form.controls.notes.value.length >= notesMaxLength * 0.8) {
+          <span class="field__counter" [class.field__counter--limit]="form.controls.notes.value.length >= notesMaxLength">
+            {{ form.controls.notes.value.length }} / {{ notesMaxLength }}
+          </span>
+        }
+        <app-field-error id="notes-error" [messageKey]="errorKey('notes')" [serverMessages]="errorsFor('notes')" />
       </div>
 
       <div class="actions">
