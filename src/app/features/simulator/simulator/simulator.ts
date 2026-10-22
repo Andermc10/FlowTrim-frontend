@@ -1,5 +1,6 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { SubscriptionResponse } from '../../subscriptions/models/subscription.models';
 import { SubscriptionService } from '../../subscriptions/services/subscription-service';
@@ -32,16 +33,23 @@ export class Simulator implements OnInit {
     () => this.status() === 'ready' && this.subscriptions().length === 0,
   );
 
+  // Simulación en curso: al cambiar la selección se cancela para que una respuesta lenta no pise a la nueva.
+  private simulation?: Subscription;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.simulation?.unsubscribe());
+  }
+
   ngOnInit(): void {
     this.loadSubscriptions();
   }
 
   protected loadSubscriptions(): void {
     this.status.set('loading');
-    this.subscriptionService.list(1, 100).subscribe({
-      next: (page) => {
+    this.subscriptionService.listAll().subscribe({
+      next: (subscriptions) => {
         // El simulador solo opera sobre suscripciones activas.
-        this.subscriptions.set(page.items.filter((s) => s.status === 'Active'));
+        this.subscriptions.set(subscriptions.filter((s) => s.status === 'Active'));
         this.status.set('ready');
         this.simulate();
       },
@@ -65,7 +73,8 @@ export class Simulator implements OnInit {
   }
 
   private simulate(): void {
-    this.simulationService
+    this.simulation?.unsubscribe();
+    this.simulation = this.simulationService
       .simulate({ subscriptionIds: [...this.selected()], horizons: Simulator.Horizons })
       .subscribe({
         next: (response) => this.result.set(response),
