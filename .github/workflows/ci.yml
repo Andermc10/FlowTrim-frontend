@@ -34,7 +34,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      # npm ci respeta package-lock.json y el .npmrc del repo (legacy-peer-deps, ver TD-001).
+      # npm ci instala exactamente lo que fija package-lock.json (sin legacy-peer-deps desde TD-001).
       - name: Install dependencies
         run: npm ci
 

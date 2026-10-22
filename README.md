@@ -158,6 +158,5 @@ public/                         static assets
 
 ## Notes
 
-- `.npmrc` sets `legacy-peer-deps=true` as a temporary workaround for an npm 10.9.2 bug resolving
-  Vitest's peer graph. See [`docs/TECH-DEBT.md`](docs/TECH-DEBT.md) (TD-001, TD-002).
+- Deferred technical items are tracked in [`docs/TECH-DEBT.md`](docs/TECH-DEBT.md).
 - Planning, user stories and specs live in the `FlowTrim-tracker` repository.
