@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-export type IconName = 'close' | 'delete' | 'edit' | 'plus' | 'usage';
+export type IconName = 'close' | 'delete' | 'edit' | 'paid' | 'plus' | 'usage';
 
 @Component({
   selector: 'app-icon',
@@ -18,6 +18,9 @@ export type IconName = 'close' | 'delete' | 'edit' | 'plus' | 'usage';
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="m4 16.5-.7 3.7 3.7-.7L18.7 7.8a2.1 2.1 0 0 0-3-3L4 16.5ZM14.5 6.5l3 3" />
         </svg>
+      }
+      @case ('paid') {
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12.3l2.7 2.7L16.2 9.4" /></svg>
       }
       @case ('plus') {
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>

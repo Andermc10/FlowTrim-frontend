@@ -62,6 +62,9 @@
               </span>
             </td>
             <td class="actions-col" [attr.data-label]="'subscriptions.actions' | translate">
+              @if (subscription.status === 'Active') {
+                <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.markPaid' | translate" [attr.title]="'subscriptions.markPaid' | translate" [disabled]="payingId() === subscription.id" (click)="markPaid(subscription)"><app-icon name="paid" /></button>
+              }
               <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.edit' | translate" [attr.title]="'subscriptions.edit' | translate" (click)="openEdit(subscription.id)"><app-icon name="edit" /></button>
               <a class="icon-button" [attr.aria-label]="'subscriptions.usage' | translate" [attr.title]="'subscriptions.usage' | translate" [routerLink]="['/app/subscriptions', subscription.id, 'usage']"><app-icon name="usage" /></a>
               <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'subscriptions.delete' | translate" [attr.title]="'subscriptions.delete' | translate" (click)="openDelete(subscription)"><app-icon name="delete" /></button>

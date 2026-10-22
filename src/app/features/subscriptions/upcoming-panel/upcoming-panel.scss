@@ -76,6 +76,24 @@
   font-size: 0.78rem;
 }
 
+.row__end {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.row__paid {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.7rem;
+
+  app-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
 .badge {
   padding: 0.35rem 0.55rem;
   border: 1px solid currentColor;
@@ -128,8 +146,8 @@
     justify-items: end;
   }
 
-  .row .badge {
+  .row__end {
     grid-column: 1 / -1;
-    justify-self: start;
+    justify-content: space-between;
   }
 }
