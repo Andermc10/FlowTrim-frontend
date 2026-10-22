@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { Page, expect, test } from '@playwright/test';
 
 import { BrowserHealth } from './support/browser-health';
@@ -46,7 +47,16 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.goto('/app/subscriptions');
     await page.getByRole('button', { name: 'Add your first subscription' }).click();
     await page.getByLabel('Name').fill('Netflix');
+
+    // EP-11: los errores aparecen al salir del campo, sin pulsar Guardar, y desaparecen al corregir.
+    await page.getByLabel('Amount').fill('-5');
+    await page.getByLabel('Amount').blur();
+    await expect(page.getByText('Amount must be greater than zero.')).toBeVisible();
     await page.getByLabel('Amount').fill('38900');
+    await expect(page.getByText('Amount must be greater than zero.')).toHaveCount(0);
+    await page.getByLabel('Next billing date').fill(nextBillingDate(-1));
+    await expect(page.getByText('Next billing date cannot be in the past.')).toBeVisible();
+
     await page.getByLabel('Currency').fill('COP');
     await page.getByLabel('Next billing date').fill(nextBillingDate(3));
     await page.getByRole('button', { name: 'Create subscription' }).click();
@@ -139,6 +149,43 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(page.getByRole('row', { name: /Gym/ })).toBeVisible();
     await expect(page.getByRole('row', { name: /Cloud Storage/ })).toContainText('Inactive');
     await expect(page.getByRole('row', { name: /Netflix/i })).toHaveCount(1);
+  });
+
+  await test.step('the downloaded template previews as valid', async () => {
+    await page.goto('/app/subscriptions/import');
+    await page.getByText('File format').click();
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Download template' }).click(),
+    ]);
+    // Playwright guarda la descarga sin extensión: se sube su contenido con el nombre sugerido por la app.
+    expect(download.suggestedFilename()).toBe('flowtrim-import-template.csv');
+    await page.getByLabel('Choose CSV file').setInputFiles({
+      name: download.suggestedFilename(),
+      mimeType: 'text/csv',
+      buffer: await readFile(await download.path()),
+    });
+
+    // La plantilla trae sep=, y fechas calculadas desde hoy: sus cuatro ejemplos son válidos (no se confirma).
+    const rows = page.locator('tbody tr');
+    await expect(rows).toHaveCount(4);
+    await expect(page.locator('tbody .row-status--valid')).toHaveCount(4);
+  });
+
+  await test.step('account A marks the due charge as paid and reads the report tab', async () => {
+    await page.goto('/app/upcoming');
+    const netflix = page.locator('li.row').filter({ hasText: 'Netflix' });
+    await netflix.getByRole('button', { name: 'Mark as paid' }).click();
+    await expect(page.locator('app-toast-item').filter({ hasText: '"Netflix" marked as paid' })).toBeVisible();
+    // Un mes después ya no está en la ventana de aviso: el botón desaparece.
+    await expect(netflix.getByRole('button', { name: 'Mark as paid' })).toHaveCount(0);
+
+    await page.goto('/app/report');
+    await expect(page).toHaveURL(/\/app\/analytics\/report$/);
+    await expect(page.getByRole('tab', { name: 'Report' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('main')).toContainText('Netflix');
+    await page.getByRole('tab', { name: 'Charts' }).click();
+    await expect(page).toHaveURL(/\/app\/analytics$/);
   });
 
   await test.step('account A deletes its data', async () => {
