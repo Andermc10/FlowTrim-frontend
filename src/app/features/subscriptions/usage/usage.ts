@@ -60,7 +60,8 @@ export class Usage implements OnInit {
         this.subscription.set(subscription);
         this.loadRecords();
       },
-      error: (error: HttpErrorResponse) => this.status.set(error.status === 404 ? 'notfound' : 'error'),
+      error: (error: HttpErrorResponse) =>
+        this.status.set(error.status === 404 ? 'notfound' : 'error'),
     });
   }
 
@@ -109,7 +110,9 @@ export class Usage implements OnInit {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.toast.success(this.i18n.translate('toast.usageRecorded', { name: this.subscription()?.name ?? '' }));
+          this.toast.success(
+            this.i18n.translate('toast.usageRecorded', { name: this.subscription()?.name ?? '' }),
+          );
           this.form.reset();
           this.loadRecords();
         },

@@ -24,7 +24,16 @@ import {
 import { ThemeService } from '../../theme/theme.service';
 
 // Solo se registran las piezas usadas (dona y barras) para no cargar todo Chart.js en el bundle.
-Chart.register(DoughnutController, ArcElement, BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+Chart.register(
+  DoughnutController,
+  ArcElement,
+  BarController,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+);
 
 export type ChartKind = 'doughnut' | 'bar' | 'horizontal-bar';
 
@@ -67,8 +76,16 @@ const paletteVariables = [
     '(window:afterprint)': 'resizeChart()',
   },
   styles: `
-    :host { position: relative; display: block; width: 100%; min-height: 15rem; }
-    canvas { position: absolute; inset: 0; }
+    :host {
+      position: relative;
+      display: block;
+      width: 100%;
+      min-height: 15rem;
+    }
+    canvas {
+      position: absolute;
+      inset: 0;
+    }
   `,
 })
 export class FlowTrimChart implements OnDestroy {
@@ -89,8 +106,9 @@ export class FlowTrimChart implements OnDestroy {
 
   constructor() {
     afterRenderEffect(() => {
-      // Dependencias: entradas y tema; cualquier cambio vuelve a construir el gráfico.
-      const config = this.buildConfig(this.theme.mode());
+      // Dependencias: entradas (leídas en buildConfig) y tema; cualquier cambio vuelve a construir el gráfico.
+      this.theme.mode();
+      const config = this.buildConfig();
       this.chart?.destroy();
       this.chart = this.factory(this.canvas().nativeElement, config);
     });
@@ -104,7 +122,7 @@ export class FlowTrimChart implements OnDestroy {
     this.chart?.resize?.();
   }
 
-  private buildConfig(_theme: string): ChartConfiguration {
+  private buildConfig(): ChartConfiguration {
     // Se leen las variables desde el propio elemento: heredan del tema global, pero un contenedor puede
     // redefinirlas (p. ej. la hoja clara del reporte imprimible).
     const css = getComputedStyle(this.host.nativeElement);
@@ -114,18 +132,28 @@ export class FlowTrimChart implements OnDestroy {
     const muted = color('--color-muted');
     const grid = color('--color-border');
     const format = this.formatValue();
-    const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const highlighted = new Set(this.highlight());
     const kind = this.kind();
 
-    const backgroundColor = kind === 'doughnut'
-      ? this.values().map((_, index) => palette[index % palette.length])
-      : this.values().map((_, index) => (highlighted.has(index) ? color('--color-warning') : color('--color-primary')));
+    const backgroundColor =
+      kind === 'doughnut'
+        ? this.values().map((_, index) => palette[index % palette.length])
+        : this.values().map((_, index) =>
+            highlighted.has(index) ? color('--color-warning') : color('--color-primary'),
+          );
 
     const tooltip = {
       callbacks: {
         label: (item: { label: string; parsed: number | { x: number; y: number } }) => {
-          const value = typeof item.parsed === 'number' ? item.parsed : kind === 'horizontal-bar' ? item.parsed.x : item.parsed.y;
+          const value =
+            typeof item.parsed === 'number'
+              ? item.parsed
+              : kind === 'horizontal-bar'
+                ? item.parsed.x
+                : item.parsed.y;
           return ` ${item.label}: ${format(value)}`;
         },
       },
@@ -134,23 +162,45 @@ export class FlowTrimChart implements OnDestroy {
     if (kind === 'doughnut') {
       return {
         type: 'doughnut',
-        data: { labels: this.labels(), datasets: [{ data: this.values(), backgroundColor, borderColor: color('--color-surface'), borderWidth: 2 }] },
+        data: {
+          labels: this.labels(),
+          datasets: [
+            {
+              data: this.values(),
+              backgroundColor,
+              borderColor: color('--color-surface'),
+              borderWidth: 2,
+            },
+          ],
+        },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           animation: reducedMotion ? false : undefined,
           cutout: '62%',
-          plugins: { legend: { position: 'bottom', labels: { color: text, usePointStyle: true, padding: 14 } }, tooltip },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: text, usePointStyle: true, padding: 14 },
+            },
+            tooltip,
+          },
         },
       } as ChartConfiguration;
     }
 
     const horizontal = kind === 'horizontal-bar';
-    const valueAxis = { grid: { color: grid }, ticks: { color: muted, callback: (value: string | number) => format(Number(value)) } };
+    const valueAxis = {
+      grid: { color: grid },
+      ticks: { color: muted, callback: (value: string | number) => format(Number(value)) },
+    };
     const categoryAxis = { grid: { display: false }, ticks: { color: text } };
     return {
       type: 'bar',
-      data: { labels: this.labels(), datasets: [{ data: this.values(), backgroundColor, borderRadius: 6, maxBarThickness: 42 }] },
+      data: {
+        labels: this.labels(),
+        datasets: [{ data: this.values(), backgroundColor, borderRadius: 6, maxBarThickness: 42 }],
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,

@@ -12,10 +12,19 @@ import { ToastService } from './toast.service';
   selector: 'app-toast-host',
   imports: [ToastItem, TranslatePipe],
   template: `
-    <section class="toast-stack" aria-live="polite" aria-relevant="additions" [attr.aria-label]="'toast.region' | translate">
+    <section
+      class="toast-stack"
+      aria-live="polite"
+      aria-relevant="additions"
+      [attr.aria-label]="'toast.region' | translate"
+    >
       @for (toast of toasts.visible(); track toast.id) {
-        <app-toast-item [toast]="toast" (dismissed)="toasts.dismiss($event)"
-          animate.enter="toast-enter" animate.leave="toast-leave" />
+        <app-toast-item
+          [toast]="toast"
+          (dismissed)="toasts.dismiss($event)"
+          animate.enter="toast-enter"
+          animate.leave="toast-leave"
+        />
       }
       @if (toasts.hiddenCount() > 0) {
         <p class="toast-more">{{ 'toast.more' | translate: { count: toasts.hiddenCount() } }}</p>

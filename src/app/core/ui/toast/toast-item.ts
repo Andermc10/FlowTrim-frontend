@@ -1,4 +1,13 @@
-import { Component, ElementRef, OnDestroy, OnInit, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { TranslatePipe } from '../../i18n/translate.pipe';
@@ -15,7 +24,8 @@ import { Toast } from './toast.service';
   styleUrl: './toast-item.scss',
   host: {
     '[class]': "'toast toast--' + toast().variant",
-    '[attr.role]': "toast().variant === 'error' || toast().variant === 'warning' ? 'alert' : 'status'",
+    '[attr.role]':
+      "toast().variant === 'error' || toast().variant === 'warning' ? 'alert' : 'status'",
     '[style.--toast-duration]': "(toast().duration ?? 0) + 'ms'",
     '[class.is-paused]': 'paused()',
     '[class.is-sticky]': 'toast().duration === null',

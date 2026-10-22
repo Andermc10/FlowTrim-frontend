@@ -1,5 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { SubscriptionResponse } from '../models/subscription.models';
@@ -41,7 +47,9 @@ export class SubscriptionList implements OnInit {
     return term ? items.filter((s) => s.name.toLowerCase().includes(term)) : items;
   });
 
-  protected readonly isEmpty = computed(() => this.status() === 'success' && this.all().length === 0);
+  protected readonly isEmpty = computed(
+    () => this.status() === 'success' && this.all().length === 0,
+  );
 
   ngOnInit(): void {
     this.load();

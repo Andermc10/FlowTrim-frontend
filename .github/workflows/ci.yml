@@ -34,9 +34,12 @@ jobs:
           node-version: 22
           cache: npm
 
-      # npm ci instala exactamente lo que fija package-lock.json (sin legacy-peer-deps desde TD-001).
+      # npm ci instala exactamente lo que fija package-lock.json (ver TD-001 para regenerarlo).
       - name: Install dependencies
         run: npm ci
+
+      - name: Lint
+        run: npm run lint
 
       - name: Unit tests
         run: npm test -- --watch=false

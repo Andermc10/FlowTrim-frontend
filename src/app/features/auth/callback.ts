@@ -19,10 +19,19 @@ import { TranslatePipe } from '../../core/i18n/translate.pipe';
       }
     </main>
   `,
-  styles: [`
-    :host { display: block; }
-    .auth-callback { display: grid; min-height: 100vh; place-items: center; color: var(--color-muted); }
-  `],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+      .auth-callback {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        color: var(--color-muted);
+      }
+    `,
+  ],
 })
 export class AuthCallback {
   private readonly auth = inject(AuthService);
@@ -39,7 +48,9 @@ export class AuthCallback {
       const returnUrl = await this.auth.completeLogin(this.route);
       await this.router.navigateByUrl(returnUrl);
     } catch (error) {
-      this.error.set(error instanceof Error ? error.message : 'Authentication could not be completed.');
+      this.error.set(
+        error instanceof Error ? error.message : 'Authentication could not be completed.',
+      );
     }
   }
 }
