@@ -78,7 +78,12 @@ To use your own Auth0 tenant, create a **Single Page Application** with callback
 
 - The interceptor adds the bearer token only to `<apiUrl>/api/…`, never to the identity provider.
 - A `401` from the API clears the session and the login page explains that it expired.
-- Sign-out also ends the provider session when it publishes `end_session_endpoint`.
+- Sign-out is immediate: it clears the local session and redirects to the provider's `end_session_endpoint` (saved at
+  sign-in, so no request is made first). For Auth0, add `http://localhost:4200/` (and your deployed origin) to
+  **Allowed Logout URLs**; otherwise Auth0 shows an error page instead of returning to FlowTrim.
+- Auth0 always shows the consent screen when the app runs on `localhost`. On a real domain, enable **Allow Skipping
+  User Consent** on the API so first-party users are asked only once; with Google, use your own Google OAuth client
+  instead of Auth0's development keys.
 - `returnUrl` only accepts internal routes (no open redirects); refresh tokens are not used.
 
 </details>

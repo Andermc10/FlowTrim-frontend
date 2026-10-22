@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, InjectionToken, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -23,11 +23,19 @@ const tokenExpiresAtKey = 'flowtrim.access_token_expires_at';
 const authorizationStateKey = 'flowtrim.authorization_state';
 const codeVerifierKey = 'flowtrim.code_verifier';
 const returnUrlKey = 'flowtrim.return_url';
+const endSessionEndpointKey = 'flowtrim.end_session_endpoint';
+
+/** Navegación a una URL externa (proveedor de identidad). Inyectable para poder probarla sin salir de la página. */
+export const EXTERNAL_REDIRECT = new InjectionToken<(url: string) => void>('EXTERNAL_REDIRECT', {
+  providedIn: 'root',
+  factory: () => (url: string) => window.location.assign(url),
+});
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly redirect = inject(EXTERNAL_REDIRECT);
   private readonly accessTokenState = signal(this.readValidAccessToken());
 
   readonly isAuthenticated = computed(() => this.accessTokenState() !== null);
@@ -56,7 +64,7 @@ export class AuthService {
       code_challenge_method: 'S256',
     }).toString();
 
-    window.location.assign(authorizationUrl.toString());
+    this.redirect(authorizationUrl.toString());
   }
 
   async completeLogin(route: ActivatedRoute): Promise<string> {
@@ -85,6 +93,10 @@ export class AuthService {
     const expiresAt = Date.now() + (response.expires_in ?? 300) * 1000;
     sessionStorage.setItem(accessTokenKey, response.access_token);
     sessionStorage.setItem(tokenExpiresAtKey, String(expiresAt));
+    // Se guarda ahora para que cerrar sesión no tenga que pedir el discovery por red (HU-61).
+    if (discovery.end_session_endpoint) {
+      sessionStorage.setItem(endSessionEndpointKey, discovery.end_session_endpoint);
+    }
     this.clearAuthorizationState();
     this.accessTokenState.set(response.access_token);
 
@@ -109,6 +121,7 @@ export class AuthService {
   clearSession(): void {
     sessionStorage.removeItem(accessTokenKey);
     sessionStorage.removeItem(tokenExpiresAtKey);
+    sessionStorage.removeItem(endSessionEndpointKey);
     this.accessTokenState.set(null);
   }
 
@@ -121,15 +134,16 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión local y, si el proveedor publica `end_session_endpoint`, también la del proveedor;
-   * así el siguiente inicio de sesión no reutiliza en silencio la cuenta anterior.
+   * Cierra la sesión local al instante y, si el proveedor publicó `end_session_endpoint` al iniciar sesión, también
+   * la del proveedor (así el siguiente inicio no reutiliza en silencio la cuenta anterior). Nunca espera a la red
+   * antes de salir: la URL del proveedor se guardó al completar el inicio de sesión (HU-61).
    */
-  async logout(): Promise<void> {
+  logout(): void {
+    const endSessionEndpoint = sessionStorage.getItem(endSessionEndpointKey);
     this.clearSession();
 
-    const endSessionEndpoint = await this.findEndSessionEndpoint();
     if (!endSessionEndpoint) {
-      await this.router.navigateByUrl('/');
+      void this.router.navigateByUrl('/');
       return;
     }
 
@@ -138,7 +152,7 @@ export class AuthService {
       client_id: environment.auth.clientId,
       post_logout_redirect_uri: `${window.location.origin}/`,
     }).toString();
-    window.location.assign(logoutUrl.toString());
+    this.redirect(logoutUrl.toString());
   }
 
   private async loadDiscovery(): Promise<OpenIdConfiguration> {
@@ -171,19 +185,6 @@ export class AuthService {
       }
 
       throw error;
-    }
-  }
-
-  private async findEndSessionEndpoint(): Promise<string | null> {
-    if (!environment.auth.authority) {
-      return null;
-    }
-
-    try {
-      return (await this.loadDiscovery()).end_session_endpoint ?? null;
-    } catch {
-      // Sin discovery solo se puede cerrar la sesión local, que ya se limpió.
-      return null;
     }
   }
 
