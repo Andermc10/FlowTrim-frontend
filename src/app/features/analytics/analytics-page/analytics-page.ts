@@ -11,6 +11,7 @@ import { localeFor, monthLabel, moneyFormatter } from '../../../core/format/mone
 import { FlowTrimChart } from '../../../core/ui/chart/chart';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { AnalyticsSelection } from '../analytics-selection';
 import { AnalyticsService } from '../analytics-service';
 import { CurrencyAnalytics } from '../analytics.models';
 
@@ -32,7 +33,9 @@ export class AnalyticsPage implements OnInit {
 
   protected readonly status = signal<AnalyticsStatus>('loading');
   protected readonly currencies = signal<CurrencyAnalytics[]>([]);
-  protected readonly selectedCurrency = signal<string | null>(null);
+  // Moneda compartida con la pestaña de reporte: se conserva al cambiar de pestaña (HU-59).
+  private readonly selection = inject(AnalyticsSelection);
+  protected readonly selectedCurrency = this.selection.currency;
 
   protected readonly isEmpty = computed(
     () => this.status() === 'success' && this.currencies().length === 0,
@@ -88,7 +91,7 @@ export class AnalyticsPage implements OnInit {
     this.service.getAnalytics().subscribe({
       next: (response) => {
         this.currencies.set(response.currencies);
-        this.selectedCurrency.set(response.currencies[0]?.currency ?? null);
+        this.selection.reconcile(response.currencies.map((c) => c.currency));
         this.status.set('success');
       },
       error: () => this.status.set('error'),

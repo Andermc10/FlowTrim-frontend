@@ -14,26 +14,15 @@
   align-self: start;
 }
 
-// La hoja del reporte es siempre clara (documento): redefine los tokens del tema para ella y sus gráficos,
-// que leen los colores desde su propio elemento.
+// En pantalla la hoja usa el tema activo (HU-59); al imprimir pasa a papel claro (ver @media print).
 .sheet {
-  --color-text: #102023;
-  --color-muted: #52666b;
-  --color-border: #d6e2e0;
-  --color-border-strong: #a8c1be;
-  --color-surface: #ffffff;
-  --color-primary: #087f89;
-  --color-primary-bright: #0b9ba6;
-  --color-success: #008f61;
-  --color-warning: #a86400;
-  --color-danger: #c63d47;
-
   display: grid;
   gap: 1.6rem;
   max-width: 60rem;
   padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid var(--color-border);
   border-radius: 0.9rem;
-  background: #ffffff;
+  background: var(--color-surface);
   box-shadow: 0 20px 50px var(--color-shadow, rgba(0, 0, 0, 0.3));
   color: var(--color-text);
 }
@@ -119,7 +108,7 @@ table {
   }
 
   thead th {
-    background: #f1f6f5;
+    background: var(--color-surface-soft);
     color: var(--color-muted);
     font-size: 0.7rem;
     letter-spacing: 0.08em;
@@ -170,10 +159,25 @@ table {
     display: none;
   }
 
+  // Papel claro: redefine los tokens del tema para la hoja y sus gráficos, que leen los colores de su elemento.
   .sheet {
+    --color-text: #102023;
+    --color-muted: #52666b;
+    --color-border: #d6e2e0;
+    --color-border-strong: #a8c1be;
+    --color-surface: #ffffff;
+    --color-surface-soft: #f1f6f5;
+    --color-primary: #087f89;
+    --color-primary-bright: #0b9ba6;
+    --color-success: #008f61;
+    --color-warning: #a86400;
+    --color-danger: #c63d47;
+
     max-width: none;
     padding: 0;
+    border: 0;
     border-radius: 0;
+    background: #ffffff;
     box-shadow: none;
   }
 

@@ -5,6 +5,7 @@ import { Landing } from './features/landing/landing';
 import { Login } from './features/auth/login';
 import { AuthCallback } from './features/auth/callback';
 import { authGuard } from './core/auth/auth.guard';
+import { AnalyticsSelection } from './features/analytics/analytics-selection';
 
 // El landing y el inicio de sesión van en el bundle inicial; todo el workspace se carga al entrar en él, así el
 // visitante del landing no descarga pantallas que todavía no puede usar (presupuesto inicial de 500 kB).
@@ -64,22 +65,31 @@ export const routes: Routes = [
         title: 'nav.simulator',
         loadComponent: () => import('./features/simulator/simulator/simulator').then((m) => m.Simulator),
       },
-      // Chart.js solo se descarga al abrir la analítica o el reporte.
+      // Analítica y reportes (HU-59): pestañas sobre los mismos datos; Chart.js solo se descarga al abrirlas.
       {
         path: 'analytics',
-        title: 'nav.analytics',
-        loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then((m) => m.AnalyticsPage),
+        loadComponent: () => import('./features/analytics/analytics-hub/analytics-hub').then((m) => m.AnalyticsHub),
+        providers: [AnalyticsSelection],
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            title: 'analytics.tabCharts',
+            loadComponent: () => import('./features/analytics/analytics-page/analytics-page').then((m) => m.AnalyticsPage),
+          },
+          {
+            path: 'report',
+            title: 'analytics.tabReport',
+            loadComponent: () => import('./features/reports/report-page/report-page').then((m) => m.ReportPage),
+          },
+        ],
       },
       {
         path: 'insights',
         title: 'nav.insights',
         loadComponent: () => import('./features/insights/insights-page/insights-page').then((m) => m.InsightsPage),
       },
-      {
-        path: 'report',
-        title: 'nav.report',
-        loadComponent: () => import('./features/reports/report-page/report-page').then((m) => m.ReportPage),
-      },
+      { path: 'report', redirectTo: 'analytics/report', pathMatch: 'full' },
     ],
   },
   { path: 'new', redirectTo: 'app/subscriptions/new', pathMatch: 'full' },
