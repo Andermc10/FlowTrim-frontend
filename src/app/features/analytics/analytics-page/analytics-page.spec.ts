@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { environment } from '../../../../environments/environment';
 import { CHART_FACTORY } from '../../../core/ui/chart/chart';
+import { AnalyticsSelection } from '../analytics-selection';
 import { AnalyticsResponse } from '../analytics.models';
 import { AnalyticsPage } from './analytics-page';
 
@@ -45,6 +46,7 @@ describe('AnalyticsPage', () => {
     TestBed.configureTestingModule({
       imports: [AnalyticsPage],
       providers: [
+        AnalyticsSelection,
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),

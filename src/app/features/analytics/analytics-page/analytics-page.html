@@ -6,7 +6,6 @@
       <p class="lede">{{ 'analytics.lede' | translate }}</p>
     </div>
     <div class="heading-actions">
-    <a class="btn btn--ghost" routerLink="/app/report">{{ 'analytics.openReport' | translate }}</a>
     @if (currencies().length > 1) {
       <div class="currency-switch" role="group" [attr.aria-label]="'analytics.currency' | translate">
         @for (item of currencies(); track item.currency) {
