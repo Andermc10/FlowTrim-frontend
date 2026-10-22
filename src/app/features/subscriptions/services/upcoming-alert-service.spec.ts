@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import { environment } from '../../../../environments/environment';
+import { SoundService } from '../../../core/ui/sound/sound.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { AlertWindow, UpcomingChargeItem } from '../models/subscription.models';
 import { UpcomingAlertService, upcomingAlertShownKey } from './upcoming-alert-service';
@@ -53,6 +54,15 @@ describe('UpcomingAlertService', () => {
     expect(toast.variant).toBe('error');
     expect(toast.duration).toBeNull();
     expect(toast.message).toBe('Expected charges: Gym (overdue by 1 day), Netflix (tomorrow)');
+  });
+
+  it('plays the overdue chime once with the alert (silent unless the user turned sound on)', () => {
+    const play = vi.spyOn(TestBed.inject(SoundService), 'play');
+
+    respond([item('Gym', -1, 'Overdue')]);
+
+    expect(play).toHaveBeenCalledTimes(1);
+    expect(play).toHaveBeenCalledWith('overdue');
   });
 
   it('does not show anything when charges are seven or more days away', () => {

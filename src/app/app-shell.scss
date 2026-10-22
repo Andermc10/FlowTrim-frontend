@@ -292,6 +292,11 @@
   }
 }
 
+.mobile-theme-toggle.is-on {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .mobile-actions {
   display: flex;
   gap: 0.45rem;

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { SoundService } from '../../../core/ui/sound/sound.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { AlertWindow, UpcomingChargeItem } from '../models/subscription.models';
 import { SubscriptionService } from './subscription-service';
@@ -23,6 +24,7 @@ export class UpcomingAlertService {
   private readonly subscriptions = inject(SubscriptionService);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(I18nService);
+  private readonly sound = inject(SoundService);
 
   /** Revisa los próximos cobros una sola vez por sesión. Si la petición falla, no muestra nada. */
   checkOnce(): void {
@@ -71,6 +73,8 @@ export class UpcomingAlertService {
     } else {
       this.toast.warning(message, { title, action });
     }
+    // Solo suena si el usuario activó el sonido (HU-62).
+    this.sound.play(hasOverdue ? 'overdue' : 'soon');
   }
 
   private relativeDay(item: UpcomingChargeItem): string {
