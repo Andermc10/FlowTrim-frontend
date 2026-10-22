@@ -25,12 +25,30 @@ import { SubscriptionService } from '../services/subscription-service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { productToday } from '../../../core/format/product-calendar';
+import { FieldError } from '../../../core/forms/field-error';
+import { ErrorMessages, FormValidators, visibleErrorKey } from '../../../core/forms/form-validators';
 
 type FormStatus = 'idle' | 'loading' | 'saving' | 'error';
 
+type FieldName = 'name' | 'category' | 'amount' | 'currency' | 'nextBillingDate';
+
+/** Límites del dominio (Subscription.NameMaxLength / CategoryMaxLength en la API). */
+export const nameMaxLength = 120;
+export const categoryMaxLength = 60;
+
+// Mensaje de cada regla, en el orden en que se muestran (HU-55).
+const fieldMessages: Record<FieldName, ErrorMessages> = {
+  name: [['required', 'form.nameRequired'], ['maxlength', 'form.nameLength']],
+  category: [['maxlength', 'form.categoryLength']],
+  amount: [['required', 'form.amountRequired'], ['min', 'form.amountPositive'], ['maxDecimals', 'form.amountDecimals']],
+  currency: [['currencyCode', 'form.currencyCode']],
+  nextBillingDate: [['required', 'form.dateRequired'], ['notBefore', 'form.dateInPast']],
+};
+
 @Component({
   selector: 'app-subscription-form',
-  imports: [ReactiveFormsModule, TranslatePipe],
+  imports: [ReactiveFormsModule, TranslatePipe, FieldError],
   templateUrl: './subscription-form.html',
   styleUrl: './subscription-form.scss',
 })
@@ -59,16 +77,28 @@ export class SubscriptionForm implements OnInit {
   protected readonly billingCycles: readonly BillingCycle[] = ['Monthly', 'Yearly'];
   protected readonly statuses: readonly SubscriptionStatus[] = ['Active', 'Inactive'];
 
+  /** Hoy en el calendario del producto: mínimo del selector de fecha y de la validación (HU-56). */
+  protected readonly today = productToday();
+  protected readonly nameMaxLength = nameMaxLength;
+  protected readonly categoryMaxLength = categoryMaxLength;
+
+  // Fecha guardada al editar: si no cambia, se acepta aunque ya esté vencida.
+  private originalNextBillingDate: string | null = null;
+
   protected readonly form = this.fb.group({
-    name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(120)]),
-    category: this.fb.nonNullable.control('', [Validators.maxLength(60)]),
-    amount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
-    currency: this.fb.nonNullable.control('COP', [
+    name: this.fb.nonNullable.control('', [FormValidators.requiredText, Validators.maxLength(nameMaxLength)]),
+    category: this.fb.nonNullable.control('', [Validators.maxLength(categoryMaxLength)]),
+    amount: this.fb.control<number | null>(null, [
       Validators.required,
-      Validators.pattern(/^[A-Za-z]{3}$/),
+      Validators.min(0.01),
+      FormValidators.maxDecimals(2),
     ]),
+    currency: this.fb.nonNullable.control('COP', [FormValidators.currencyCode]),
     billingCycle: this.fb.nonNullable.control<BillingCycle>('Monthly', [Validators.required]),
-    nextBillingDate: this.fb.nonNullable.control('', [Validators.required]),
+    nextBillingDate: this.fb.nonNullable.control('', [
+      Validators.required,
+      FormValidators.notBefore(() => this.today, () => this.originalNextBillingDate),
+    ]),
     status: this.fb.nonNullable.control<SubscriptionStatus>('Active', [Validators.required]),
   });
 
@@ -96,6 +126,7 @@ export class SubscriptionForm implements OnInit {
           nextBillingDate: subscription.nextBillingDate,
           status: subscription.status,
         });
+        this.originalNextBillingDate = subscription.nextBillingDate;
         this.form.markAsPristine();
         this.dirtyChange.emit(false);
         this.status.set('idle');
@@ -155,6 +186,25 @@ export class SubscriptionForm implements OnInit {
 
   protected errorsFor(field: string): string[] {
     return this.fieldErrors()[field] ?? [];
+  }
+
+  /** Mensaje de validación en vivo del campo, o null si no hay que mostrar ninguno (HU-55). */
+  protected errorKey(field: FieldName): string | null {
+    return visibleErrorKey(this.form.controls[field], fieldMessages[field]);
+  }
+
+  /** Marca el campo como inválido para tecnologías de asistencia (validación en vivo o error del servidor). */
+  protected isInvalid(field: FieldName): boolean {
+    return this.errorKey(field) !== null || this.errorsFor(field).length > 0;
+  }
+
+  /** El código de moneda se escribe siempre en mayúsculas. */
+  protected upperCaseCurrency(): void {
+    const control = this.form.controls.currency;
+    const upper = control.value.toUpperCase();
+    if (upper !== control.value) {
+      control.setValue(upper);
+    }
   }
 
   protected cancel(): void {

@@ -22,82 +22,107 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">
         <label for="name">{{ 'form.name' | translate }}</label>
-        <input id="name" type="text" formControlName="name" autocomplete="off" />
-        @if (form.controls.name.touched && form.controls.name.invalid) {
-          <small class="error">{{ 'form.requiredName' | translate }}</small>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          autocomplete="off"
+          [attr.maxlength]="nameMaxLength"
+          [placeholder]="'form.placeholder.name' | translate"
+          [attr.aria-invalid]="isInvalid('name')"
+          aria-describedby="name-error"
+        />
+        @if (form.controls.name.value.length >= nameMaxLength * 0.8) {
+          <span class="field__counter" [class.field__counter--limit]="form.controls.name.value.length >= nameMaxLength">
+            {{ form.controls.name.value.length }} / {{ nameMaxLength }}
+          </span>
         }
-        @for (message of errorsFor('name'); track message) {
-          <small class="error">{{ message }}</small>
-        }
+        <app-field-error id="name-error" [messageKey]="errorKey('name')" [serverMessages]="errorsFor('name')" />
       </div>
 
       <div class="field">
         <label for="category">{{ 'form.category' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
-        <input id="category" type="text" formControlName="category" autocomplete="off" />
-        @if (form.controls.category.touched && form.controls.category.invalid) {
-          <small class="error">{{ 'form.categoryLength' | translate }}</small>
-        }
-        @for (message of errorsFor('category'); track message) {
-          <small class="error">{{ message }}</small>
-        }
+        <input
+          id="category"
+          type="text"
+          formControlName="category"
+          autocomplete="off"
+          [attr.maxlength]="categoryMaxLength"
+          [placeholder]="'form.placeholder.category' | translate"
+          [attr.aria-invalid]="isInvalid('category')"
+          aria-describedby="category-error"
+        />
+        <app-field-error id="category-error" [messageKey]="errorKey('category')" [serverMessages]="errorsFor('category')" />
       </div>
 
       <div class="field">
         <label for="amount">{{ 'form.amount' | translate }}</label>
-        <input id="amount" type="number" step="0.01" min="0.01" formControlName="amount" />
-        @if (form.controls.amount.touched && form.controls.amount.invalid) {
-          <small class="error">{{ 'form.amountPositive' | translate }}</small>
-        }
-        @for (message of errorsFor('amount'); track message) {
-          <small class="error">{{ message }}</small>
-        }
+        <input
+          id="amount"
+          type="number"
+          inputmode="decimal"
+          step="0.01"
+          min="0.01"
+          formControlName="amount"
+          [placeholder]="'form.placeholder.amount' | translate"
+          [attr.aria-invalid]="isInvalid('amount')"
+          aria-describedby="amount-error"
+        />
+        <app-field-error id="amount-error" [messageKey]="errorKey('amount')" [serverMessages]="errorsFor('amount')" />
       </div>
 
       <div class="field">
         <label for="currency">{{ 'form.currency' | translate }}</label>
-        <input id="currency" type="text" maxlength="3" formControlName="currency" />
-        @if (form.controls.currency.touched && form.controls.currency.invalid) {
-          <small class="error">{{ 'form.currencyCode' | translate }}</small>
-        }
-        @for (message of errorsFor('currency'); track message) {
-          <small class="error">{{ message }}</small>
-        }
+        <input
+          id="currency"
+          type="text"
+          maxlength="3"
+          autocomplete="off"
+          formControlName="currency"
+          placeholder="COP"
+          [attr.aria-invalid]="isInvalid('currency')"
+          aria-describedby="currency-error"
+          (input)="upperCaseCurrency()"
+        />
+        <app-field-error id="currency-error" [messageKey]="errorKey('currency')" [serverMessages]="errorsFor('currency')" />
       </div>
 
       <div class="field">
         <label for="billingCycle">{{ 'form.billingCycle' | translate }}</label>
-        <select id="billingCycle" formControlName="billingCycle">
+        <select id="billingCycle" formControlName="billingCycle" aria-describedby="billingCycle-error">
           @for (cycle of billingCycles; track cycle) {
             <option [value]="cycle">{{ ('billing.' + cycle) | translate }}</option>
           }
         </select>
-        @for (message of errorsFor('billingCycle'); track message) {
-          <small class="error">{{ message }}</small>
-        }
+        <app-field-error id="billingCycle-error" [serverMessages]="errorsFor('billingCycle')" />
       </div>
 
       <div class="field">
         <label for="nextBillingDate">{{ 'form.nextBillingDate' | translate }}</label>
-        <input id="nextBillingDate" type="date" formControlName="nextBillingDate" />
-        @if (form.controls.nextBillingDate.touched && form.controls.nextBillingDate.invalid) {
-          <small class="error">{{ 'form.dateRequired' | translate }}</small>
-        }
-        @for (message of errorsFor('nextBillingDate'); track message) {
-          <small class="error">{{ message }}</small>
-        }
+        <input
+          id="nextBillingDate"
+          type="date"
+          formControlName="nextBillingDate"
+          [min]="today"
+          [attr.aria-invalid]="isInvalid('nextBillingDate')"
+          aria-describedby="nextBillingDate-error"
+        />
+        <app-field-error
+          id="nextBillingDate-error"
+          [messageKey]="errorKey('nextBillingDate')"
+          [serverMessages]="errorsFor('nextBillingDate')"
+        />
       </div>
 
       @if (isEdit()) {
         <div class="field">
           <label for="status">{{ 'form.status' | translate }}</label>
-          <select id="status" formControlName="status">
+          <select id="status" formControlName="status" aria-describedby="status-error">
           @for (state of statuses; track state) {
             <option [value]="state">{{ ('status.' + state) | translate }}</option>
             }
           </select>
-          @for (message of errorsFor('status'); track message) {
-            <small class="error">{{ message }}</small>
-          }
+          <app-field-error id="status-error" [serverMessages]="errorsFor('status')" />
         </div>
       }
 
