@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, expand, reduce } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
@@ -13,6 +13,9 @@ import {
   UpdateSubscriptionRequest,
   UsageRecordResponse,
 } from '../models/subscription.models';
+
+/** Tamaño de página máximo que acepta la API (ListSubscriptionsHandler.MaxPageSize). */
+const maxPageSize = 100;
 
 /** Capa HTTP tipada para suscripciones. */
 @Injectable({ providedIn: 'root' })
@@ -29,6 +32,17 @@ export class SubscriptionService {
   list(page = 1, pageSize = 20): Observable<PagedResponse<SubscriptionResponse>> {
     const params = new HttpParams().set('page', page).set('pageSize', pageSize);
     return this.http.get<PagedResponse<SubscriptionResponse>>(this.baseUrl, { params });
+  }
+
+  /**
+   * Todas las suscripciones del usuario, pidiendo páginas del tamaño máximo hasta completar el total. La importación
+   * CSV permite tener cientos; una sola página dejaría fuera suscripciones sin avisar.
+   */
+  listAll(): Observable<SubscriptionResponse[]> {
+    return this.list(1, maxPageSize).pipe(
+      expand((page) => (page.page * page.pageSize < page.totalCount ? this.list(page.page + 1, maxPageSize) : EMPTY)),
+      reduce((all, page) => all.concat(page.items), [] as SubscriptionResponse[]),
+    );
   }
 
   /** Detalle de una suscripción (404 si no existe). */

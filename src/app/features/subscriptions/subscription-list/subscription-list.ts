@@ -27,16 +27,14 @@ export class SubscriptionList implements OnInit {
 
   protected readonly status = signal<ListStatus>('loading');
   protected readonly all = signal<SubscriptionResponse[]>([]);
-  protected readonly totalCount = signal(0);
   protected readonly search = signal('');
-  protected readonly confirmingId = signal<string | null>(null);
   protected readonly editorMode = signal<'create' | 'edit' | null>(null);
   protected readonly editorId = signal<string | null>(null);
   protected readonly editorDirty = signal(false);
   protected readonly discardConfirmation = signal(false);
   protected readonly deleteTarget = signal<SubscriptionResponse | null>(null);
 
-  // Búsqueda cliente sobre la página actual (servidor diferido a una historia posterior).
+  // Búsqueda en el cliente sobre todas las suscripciones cargadas.
   protected readonly filtered = computed(() => {
     const term = this.search().trim().toLowerCase();
     const items = this.all();
@@ -51,33 +49,12 @@ export class SubscriptionList implements OnInit {
 
   protected load(): void {
     this.status.set('loading');
-    this.service.list(1, 100).subscribe({
-      next: (page) => {
-        this.all.set(page.items);
-        this.totalCount.set(page.totalCount);
+    this.service.listAll().subscribe({
+      next: (subscriptions) => {
+        this.all.set(subscriptions);
         this.status.set('success');
       },
       error: () => this.status.set('error'),
-    });
-  }
-
-  protected askDelete(id: string): void {
-    this.confirmingId.set(id);
-  }
-
-  protected cancelDelete(): void {
-    this.confirmingId.set(null);
-  }
-
-  protected confirmDelete(id: string): void {
-    const name = this.all().find((item) => item.id === id)?.name ?? '';
-    this.service.delete(id).subscribe({
-      next: () => {
-        this.confirmingId.set(null);
-        this.toast.success(this.i18n.translate('toast.subscriptionDeleted', { name }));
-        this.load();
-      },
-      error: (error: HttpErrorResponse) => this.toast.httpError(error),
     });
   }
 

@@ -186,22 +186,6 @@
   color: #fff;
 }
 
-.link--danger,
-.confirm {
-  color: var(--color-danger);
-}
-
-.danger {
-  padding: 0.35rem 0.6rem;
-  border: 0;
-  border-radius: 0.4rem;
-  background: var(--color-danger);
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
 @media (max-width: 720px) {
   .list__head,
   .list__toolbar {
