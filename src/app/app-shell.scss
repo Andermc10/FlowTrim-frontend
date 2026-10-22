@@ -292,7 +292,14 @@
   }
 }
 
+.mobile-actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
 .mobile-language-toggle {
+  height: 2.25rem;
   border: 1px solid var(--color-border);
   border-radius: 0.65rem;
   background: transparent;

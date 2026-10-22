@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { ThemeService } from './core/theme/theme.service';
@@ -22,6 +22,7 @@ export class AppShell implements OnInit {
   protected readonly i18n = inject(I18nService);
 
   protected readonly themeMode = this.theme.mode;
+  protected readonly signingOut = signal(false);
 
   ngOnInit(): void {
     // Al entrar al workspace se avisa (una vez por sesión) de cobros vencidos o inminentes (HU-54).
@@ -46,8 +47,13 @@ export class AppShell implements OnInit {
     this.i18n.toggleLanguage();
   }
 
-  protected async signOut(): Promise<void> {
+  /** Cierra la sesión sin esperar a la red; el botón queda deshabilitado mientras el navegador sale (HU-61). */
+  protected signOut(): void {
+    if (this.signingOut()) {
+      return;
+    }
+    this.signingOut.set(true);
     this.upcomingAlerts.reset();
-    await this.auth.logout();
+    this.auth.logout();
   }
 }
