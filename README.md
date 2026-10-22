@@ -5,7 +5,7 @@
 **Cut the quiet drain.** See every recurring charge, its real monthly cost and what you would save by cutting it.
 
 [![Frontend CI](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml)
-![Angular 21](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)
+![Angular 22](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![Unit tests](https://img.shields.io/badge/unit%20tests-115%20passing-2ea44f)
 ![Playwright](https://img.shields.io/badge/e2e-Playwright-2EAD33?logo=playwright&logoColor=white)
@@ -42,21 +42,22 @@ FlowTrim is a manual-data portfolio project: it never connects to banks and neve
 
 ## Built with
 
-- **Angular 21**: standalone components, signals, lazy routes; strict TypeScript and SCSS.
+- **Angular 22**: standalone components, signals, OnPush everywhere, lazy routes; strict TypeScript 6 and SCSS.
 - **Carbon Signal** design system with CSS custom properties: persisted light and dark themes, reduced-motion support and no UI library.
-- **Chart.js 4** behind a reusable chart component (lazy, so the initial bundle stays under 500 kB).
+- **Chart.js 4** behind a reusable chart component; every workspace screen is lazy (initial bundle ≈ 375 kB).
 - **English and Spanish** in the client, with a test that keeps both languages' keys in sync.
 - **OIDC Authorization Code + PKCE**: no passwords in the app, token in `sessionStorage`, guarded `/app/**`.
 - **Vitest** for unit tests and **Playwright** for the critical browser flow.
 
 ## Quick start
 
-Requirements: Node `^20.19`, `^22.12` or `>=24` and the [API](https://github.com/Andermc10/FlowTrim-backend) running on `http://localhost:5214`.
+Requirements: Node `^22.22.3`, `^24.15` or `>=26` and the [API](https://github.com/Andermc10/FlowTrim-backend) running on `http://localhost:5214`.
 
 ```bash
 npm ci
 npm start        # http://localhost:4200
 npm test         # unit tests
+npm run lint     # ESLint (angular-eslint)
 npm run build    # production build in dist/
 ```
 
@@ -115,7 +116,7 @@ Every data view handles loading, empty, success and error states. Unexpected err
 
 - **Unit tests** (`npm test`): services, pages, guards, interceptors, pipes and the language parity check.
 - **Browser flow** (`npm run e2e`): sign-in → create → Insights figure equals the overview → account isolation → CSV import → delete, failing on any console error or failed request. It starts a local OIDC issuer, the real API and an e2e build; see [e2e/README.md](e2e/README.md).
-- **CI** (`.github/workflows/ci.yml`): `npm ci`, unit tests and the production build on every pull request, with no secrets. `main` is protected.
+- **CI** (`.github/workflows/ci.yml`): `npm ci`, ESLint, unit tests and the production build on every pull request, with no secrets. `main` is protected.
 
 ## Known limitations
 

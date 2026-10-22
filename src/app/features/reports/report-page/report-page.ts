@@ -1,4 +1,10 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
@@ -9,7 +15,10 @@ import { FlowTrimChart } from '../../../core/ui/chart/chart';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { AnalyticsService } from '../../analytics/analytics-service';
 import { CurrencyAnalytics } from '../../analytics/analytics.models';
-import { SubscriptionResponse, UpcomingChargeItem } from '../../subscriptions/models/subscription.models';
+import {
+  SubscriptionResponse,
+  UpcomingChargeItem,
+} from '../../subscriptions/models/subscription.models';
 import { SubscriptionService } from '../../subscriptions/services/subscription-service';
 import { SummaryService } from '../../summary/summary-service';
 import { CurrencySummary } from '../../summary/summary.models';
@@ -47,7 +56,9 @@ export class ReportPage implements OnInit {
   protected readonly exporting = signal(false);
   protected readonly generatedAt = signal(new Date());
 
-  protected readonly isEmpty = computed(() => this.status() === 'ready' && this.subscriptions().length === 0);
+  protected readonly isEmpty = computed(
+    () => this.status() === 'ready' && this.subscriptions().length === 0,
+  );
   private readonly locale = computed(() => localeFor(this.i18n.language()));
   /**
    * Datos de los gráficos por moneda, calculados una vez por cambio de datos o idioma: pasar arrays nuevos
@@ -59,7 +70,10 @@ export class ReportPage implements OnInit {
       currency: currency.currency,
       format: moneyFormatter(currency.currency, locale),
       categoryLabels: currency.byCategory.map((c) =>
-        c.category === 'Uncategorized' ? this.i18n.translate('analytics.uncategorized') : c.category),
+        c.category === 'Uncategorized'
+          ? this.i18n.translate('analytics.uncategorized')
+          : c.category,
+      ),
       categoryValues: currency.byCategory.map((c) => c.monthlyEquivalent),
       monthLabels: currency.expectedCharges.map((m) => monthLabel(m.month, locale)),
       monthValues: currency.expectedCharges.map((m) => m.amount),
@@ -67,7 +81,10 @@ export class ReportPage implements OnInit {
   });
 
   protected readonly generatedLabel = computed(() =>
-    new Intl.DateTimeFormat(this.locale(), { dateStyle: 'long', timeStyle: 'short' }).format(this.generatedAt()));
+    new Intl.DateTimeFormat(this.locale(), { dateStyle: 'long', timeStyle: 'short' }).format(
+      this.generatedAt(),
+    ),
+  );
 
   ngOnInit(): void {
     this.load();

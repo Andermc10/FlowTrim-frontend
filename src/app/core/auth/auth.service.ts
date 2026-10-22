@@ -167,7 +167,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
         const reason = error.error?.error_description ?? error.error?.error ?? `HTTP ${error.status}`;
-        throw new Error(`The identity provider rejected the sign-in (${reason}).`);
+        throw new Error(`The identity provider rejected the sign-in (${reason}).`, { cause: error });
       }
 
       throw error;

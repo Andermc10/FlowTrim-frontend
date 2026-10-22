@@ -1,5 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -57,7 +63,9 @@ export class InsightsPage {
   protected readonly length = computed(() => this.questionValue().length);
   protected readonly canSubmit = computed(() => {
     const trimmed = this.questionValue().trim().length;
-    return trimmed > 0 && trimmed <= questionMaxLength && !this.pending() && this.waitSeconds() === 0;
+    return (
+      trimmed > 0 && trimmed <= questionMaxLength && !this.pending() && this.waitSeconds() === 0
+    );
   });
 
   private request?: Subscription;
@@ -168,7 +176,10 @@ export class InsightsPage {
         this.startCountdown(retryAfterSeconds(error));
         return;
       case 502:
-        this.error.set({ key: 'insights.error.unavailable', reference: correlationReference(error) });
+        this.error.set({
+          key: 'insights.error.unavailable',
+          reference: correlationReference(error),
+        });
         return;
       case 504:
         this.error.set({ key: 'insights.error.timeout', reference: correlationReference(error) });

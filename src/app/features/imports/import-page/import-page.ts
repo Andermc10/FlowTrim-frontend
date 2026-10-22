@@ -1,5 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -10,7 +17,12 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MoneyPipe } from '../../../core/format/money.pipe';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { importTemplateCsv, importTemplateFileName, preCheckFile } from '../import-file';
-import { ImportError, ImportRow, SubscriptionImportConfirmation, SubscriptionImportPreview } from '../imports.models';
+import {
+  ImportError,
+  ImportRow,
+  SubscriptionImportConfirmation,
+  SubscriptionImportPreview,
+} from '../imports.models';
 import { ImportsService } from '../imports-service';
 
 type ImportAction = 'preview' | 'confirm';
@@ -126,11 +138,17 @@ export class ImportPage {
 
   protected downloadTemplate(): void {
     // BOM de UTF-8 como en el export: Excel muestra bien tildes y eñes.
-    saveFile({ blob: new Blob(['﻿', importTemplateCsv], { type: 'text/csv;charset=utf-8' }), fileName: importTemplateFileName });
+    saveFile({
+      blob: new Blob(['﻿', importTemplateCsv], { type: 'text/csv;charset=utf-8' }),
+      fileName: importTemplateFileName,
+    });
   }
 
   protected fileErrorMessage(code: string, detail: string | null): string {
-    return this.translateOr(`imports.fileError.${code}`, detail ?? this.i18n.translate('imports.fileError.generic'));
+    return this.translateOr(
+      `imports.fileError.${code}`,
+      detail ?? this.i18n.translate('imports.fileError.generic'),
+    );
   }
 
   protected rowErrorMessage(error: ImportError): string {
@@ -157,12 +175,20 @@ export class ImportPage {
     });
   }
 
-  private showError(error: HttpErrorResponse, action: ImportAction, preview: SubscriptionImportPreview | null): void {
+  private showError(
+    error: HttpErrorResponse,
+    action: ImportAction,
+    preview: SubscriptionImportPreview | null,
+  ): void {
     const code = typeof error.error?.code === 'string' ? error.error.code : null;
     if (error.status === 400 || error.status === 413) {
       // Un 413 del límite del cuerpo llega sin código: para el usuario es el mismo caso que un archivo muy grande.
       const detail = typeof error.error?.detail === 'string' ? error.error.detail : null;
-      this.state.set({ kind: 'fileError', code: code ?? (error.status === 413 ? 'file_too_large' : 'generic'), detail });
+      this.state.set({
+        kind: 'fileError',
+        code: code ?? (error.status === 413 ? 'file_too_large' : 'generic'),
+        detail,
+      });
       return;
     }
     if (error.status === 401) {
@@ -170,7 +196,13 @@ export class ImportPage {
       this.state.set(preview ? { kind: 'preview', preview } : { kind: 'idle' });
       return;
     }
-    this.state.set({ kind: 'serverError', action, network: error.status === 0, reference: correlationReference(error), preview });
+    this.state.set({
+      kind: 'serverError',
+      action,
+      network: error.status === 0,
+      reference: correlationReference(error),
+      preview,
+    });
   }
 
   private translateOr(key: string, fallback: string): string {

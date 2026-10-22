@@ -1,4 +1,10 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { localeFor, monthLabel, moneyFormatter } from '../../../core/format/money';
@@ -28,22 +34,40 @@ export class AnalyticsPage implements OnInit {
   protected readonly currencies = signal<CurrencyAnalytics[]>([]);
   protected readonly selectedCurrency = signal<string | null>(null);
 
-  protected readonly isEmpty = computed(() => this.status() === 'success' && this.currencies().length === 0);
+  protected readonly isEmpty = computed(
+    () => this.status() === 'success' && this.currencies().length === 0,
+  );
   protected readonly current = computed(() => {
     const currencies = this.currencies();
-    return currencies.find((c) => c.currency === this.selectedCurrency()) ?? currencies.at(0) ?? null;
+    return (
+      currencies.find((c) => c.currency === this.selectedCurrency()) ?? currencies.at(0) ?? null
+    );
   });
 
   private readonly locale = computed(() => localeFor(this.i18n.language()));
 
-  protected readonly money = computed(() => moneyFormatter(this.current()?.currency ?? 'COP', this.locale()));
+  protected readonly money = computed(() =>
+    moneyFormatter(this.current()?.currency ?? 'COP', this.locale()),
+  );
 
-  protected readonly categoryLabels = computed(() => this.current()?.byCategory.map((c) => this.categoryName(c.category)) ?? []);
-  protected readonly categoryValues = computed(() => this.current()?.byCategory.map((c) => c.monthlyEquivalent) ?? []);
-  protected readonly topLabels = computed(() => this.current()?.topSubscriptions.map((t) => t.name) ?? []);
-  protected readonly topValues = computed(() => this.current()?.topSubscriptions.map((t) => t.monthlyEquivalent) ?? []);
-  protected readonly monthLabels = computed(() => this.current()?.expectedCharges.map((m) => this.monthName(m.month)) ?? []);
-  protected readonly monthValues = computed(() => this.current()?.expectedCharges.map((m) => m.amount) ?? []);
+  protected readonly categoryLabels = computed(
+    () => this.current()?.byCategory.map((c) => this.categoryName(c.category)) ?? [],
+  );
+  protected readonly categoryValues = computed(
+    () => this.current()?.byCategory.map((c) => c.monthlyEquivalent) ?? [],
+  );
+  protected readonly topLabels = computed(
+    () => this.current()?.topSubscriptions.map((t) => t.name) ?? [],
+  );
+  protected readonly topValues = computed(
+    () => this.current()?.topSubscriptions.map((t) => t.monthlyEquivalent) ?? [],
+  );
+  protected readonly monthLabels = computed(
+    () => this.current()?.expectedCharges.map((m) => this.monthName(m.month)) ?? [],
+  );
+  protected readonly monthValues = computed(
+    () => this.current()?.expectedCharges.map((m) => m.amount) ?? [],
+  );
 
   /** Meses pico: los que superan el cobro mensual más frecuente (p. ej. cuando cae una anual). */
   protected readonly peakMonths = computed(() => {

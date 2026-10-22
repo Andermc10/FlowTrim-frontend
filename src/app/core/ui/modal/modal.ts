@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 
 import { TranslatePipe } from '../../i18n/translate.pipe';
 
@@ -9,25 +17,84 @@ let nextModalId = 0;
   selector: 'app-modal',
   imports: [TranslatePipe],
   template: `
-    <dialog #dialog class="modal" [attr.aria-labelledby]="titleId" (cancel)="handleCancel($event)" (click)="handleBackdropClick($event)">
-      <div class="modal__panel" (click)="$event.stopPropagation()">
+    <!-- El clic en el fondo es solo un atajo de ratón: con teclado, Escape dispara (cancel) en el <dialog> nativo. -->
+    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+    <dialog
+      #dialog
+      class="modal"
+      [attr.aria-labelledby]="titleId"
+      (cancel)="handleCancel($event)"
+      (click)="handleBackdropClick($event)"
+    >
+      <div class="modal__panel">
         <header class="modal__header">
           <h2 [id]="titleId">{{ title }}</h2>
-          <button class="modal__close" type="button" [attr.aria-label]="'modal.close' | translate" (click)="requestClose()">×</button>
+          <button
+            class="modal__close"
+            type="button"
+            [attr.aria-label]="'modal.close' | translate"
+            (click)="requestClose()"
+          >
+            ×
+          </button>
         </header>
         <div class="modal__body"><ng-content /></div>
       </div>
     </dialog>
   `,
   styles: `
-    .modal { width: min(100% - 2rem, 42rem); max-height: calc(100dvh - 2rem); padding: 0; border: 1px solid var(--color-border-strong); border-radius: 1rem; background: var(--color-surface); color: var(--color-text); box-shadow: 0 2rem 6rem var(--color-shadow); }
-    .modal::backdrop { background: rgba(3, 8, 10, 0.72); backdrop-filter: blur(5px); }
-    .modal__panel { max-height: calc(100dvh - 2rem); overflow: auto; }
-    .modal__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--color-border); }
-    .modal__header h2 { margin: 0; font-size: 1rem; letter-spacing: -.03em; }
-    .modal__close { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid var(--color-border); border-radius: .55rem; background: transparent; color: var(--color-muted); cursor: pointer; font-size: 1.35rem; line-height: 1; }
-    .modal__close:hover { border-color: var(--color-primary); color: var(--color-primary); }
-    .modal__body { padding: 1.25rem; }
+    .modal {
+      width: min(100% - 2rem, 42rem);
+      max-height: calc(100dvh - 2rem);
+      padding: 0;
+      border: 1px solid var(--color-border-strong);
+      border-radius: 1rem;
+      background: var(--color-surface);
+      color: var(--color-text);
+      box-shadow: 0 2rem 6rem var(--color-shadow);
+    }
+    .modal::backdrop {
+      background: rgba(3, 8, 10, 0.72);
+      backdrop-filter: blur(5px);
+    }
+    .modal__panel {
+      max-height: calc(100dvh - 2rem);
+      overflow: auto;
+    }
+    .modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .modal__header h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
+    .modal__close {
+      display: grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      border-radius: 0.55rem;
+      background: transparent;
+      color: var(--color-muted);
+      cursor: pointer;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+    .modal__close:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .modal__body {
+      padding: 1.25rem;
+    }
   `,
 })
 export class Modal implements AfterViewInit {

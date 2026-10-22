@@ -1,5 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -53,7 +63,10 @@ export class SubscriptionForm implements OnInit {
     name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(120)]),
     category: this.fb.nonNullable.control('', [Validators.maxLength(60)]),
     amount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
-    currency: this.fb.nonNullable.control('COP', [Validators.required, Validators.pattern(/^[A-Za-z]{3}$/)]),
+    currency: this.fb.nonNullable.control('COP', [
+      Validators.required,
+      Validators.pattern(/^[A-Za-z]{3}$/),
+    ]),
     billingCycle: this.fb.nonNullable.control<BillingCycle>('Monthly', [Validators.required]),
     nextBillingDate: this.fb.nonNullable.control('', [Validators.required]),
     status: this.fb.nonNullable.control<SubscriptionStatus>('Active', [Validators.required]),
