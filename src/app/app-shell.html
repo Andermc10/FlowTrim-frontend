@@ -83,12 +83,25 @@
         </span>
         <span class="brand__name">Flow<span>Trim</span></span>
       </a>
-      <button class="mobile-theme-toggle" type="button" (click)="toggleTheme()" [attr.aria-label]="themeLabel()">
-        {{ themeIcon() }}
-      </button>
-      <button class="mobile-language-toggle" type="button" (click)="toggleLanguage()" [attr.aria-label]="i18n.languageLabel()">
-        {{ i18n.languageName() }}
-      </button>
+      <div class="mobile-actions">
+        <button class="mobile-theme-toggle" type="button" (click)="toggleTheme()" [attr.aria-label]="themeLabel()">
+          {{ themeIcon() }}
+        </button>
+        <button class="mobile-language-toggle" type="button" (click)="toggleLanguage()" [attr.aria-label]="i18n.languageLabel()">
+          {{ i18n.languageName() }}
+        </button>
+        <!-- En móvil el riel está oculto: sin este botón no había forma de cerrar sesión (HU-61). -->
+        <button
+          class="mobile-theme-toggle"
+          type="button"
+          [disabled]="signingOut()"
+          [attr.aria-label]="(signingOut() ? 'auth.signingOut' : 'auth.signOut') | translate"
+          [attr.title]="'auth.signOut' | translate"
+          (click)="signOut()"
+        >
+          ↪
+        </button>
+      </div>
     </header>
 
     <main class="workspace-main">
