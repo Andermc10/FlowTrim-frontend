@@ -12,7 +12,7 @@ Status legend: **OPEN** (not addressed) · **PLANNED** (scheduled) · **RESOLVED
 
 - **Detected:** 2026-10-14 · EP-00 frontend task #1 (`feature/ep-00-angular-init`)
 - **Area:** dependency install (`.npmrc`, `package-lock.json`)
-- **Status:** OPEN (workaround in place)
+- **Status:** RESOLVED (2026-10-21)
 - **What:** A plain `npm install` fails with `Cannot read properties of null (reading 'edgesOut')`
   inside npm's arborist while resolving the peer set of Vitest (Angular 21's default unit-test
   runner). It is a known bug in npm 10.9.2, the version bundled with Node 22.15.0.
@@ -23,6 +23,10 @@ Status legend: **OPEN** (not addressed) · **PLANNED** (scheduled) · **RESOLVED
   delete `package-lock.json` + `node_modules`, and run a clean `npm install` to confirm it works
   without the flag.
 - **Owner decision:** Pending — Node version kept as-is for now.
+- **Resolution:** Node is now 22.23.3 (npm 10.9.9), which resolves the Vitest peer set without crashing.
+  `.npmrc` was removed; `npm install` only added the optional platform binaries that the old flag had
+  skipped (esbuild, rolldown, lmdb, …; no new direct or transitive library), and a clean `npm ci`,
+  `npm test` and `npm run build` pass without the flag.
 
 ---
 
@@ -31,10 +35,13 @@ Status legend: **OPEN** (not addressed) · **PLANNED** (scheduled) · **RESOLVED
 - **Detected:** 2026-10-14 · EP-00 frontend task #1
 - **Area:** framework version
 - **Status:** OPEN (accepted for now)
-- **What:** The latest Angular (22) requires Node `>=22.22.3`; the installed Node is `22.15.0`.
-  Angular 21 (requires `^22.12.0`) is the newest major compatible with the current Node.
+- **What:** The latest Angular (22) requires Node `>=22.22.3`; the installed Node was `22.15.0`.
+  Angular 21 (requires `^22.12.0`) is the newest major compatible with that Node.
 - **Why deferred:** Avoid changing the user's Node install mid-setup.
-- **Next step:** After updating Node, `ng update` to Angular 22.
+- **Update (2026-10-21):** Node is now 22.23.3, so the blocker is gone. The upgrade is a major version
+  change (framework, CLI, Vitest builder) and would also allow `ng2-charts` 11; it needs the owner's
+  approval and its own branch with the full unit, build and e2e checks.
+- **Next step:** `ng update @angular/core@22 @angular/cli@22` on a dedicated branch.
 - **Owner decision:** Pending.
 
 ---
