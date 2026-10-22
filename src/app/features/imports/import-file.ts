@@ -19,7 +19,24 @@ export function preCheckFile(file: File): string | null {
 
 export const importTemplateFileName = 'flowtrim-import-template.csv';
 
-/** Plantilla con el formato del export (HU-52): columnas obligatorias, opcionales y una fila de ejemplo. */
-export const importTemplateCsv =
-  'name,amount,currency,billing_cycle,next_billing_date,category,status\r\n' +
-  'Example Streaming,38900,COP,Monthly,2026-11-05,Streaming,Active\r\n';
+/**
+ * Plantilla con el formato del export (HU-52, HU-58): línea `sep=,` para que Excel separe las columnas en cualquier
+ * configuración regional, cabecera y cuatro ejemplos (mensual, anual, sin categoría e inactiva). Las fechas se calculan
+ * desde hoy para que la plantilla siempre se pueda importar (HU-56 no admite fechas pasadas).
+ */
+export function buildImportTemplate(today: string): string {
+  const rows = [
+    'name,amount,currency,billing_cycle,next_billing_date,category,status',
+    `Example Streaming,38900,COP,Monthly,${addDays(today, 10)},Streaming,Active`,
+    `Example Cloud Storage,119.88,USD,Yearly,${addDays(today, 60)},Productivity,Active`,
+    `Example Gym,90000,COP,Monthly,${addDays(today, 3)},,Active`,
+    `Example Newspaper,15900,COP,Monthly,${addDays(today, 20)},News,Inactive`,
+  ];
+  return ['sep=,', ...rows].join('\r\n') + '\r\n';
+}
+
+// Suma días a una fecha yyyy-MM-dd sin depender de la zona horaria del navegador.
+function addDays(date: string, days: number): string {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
