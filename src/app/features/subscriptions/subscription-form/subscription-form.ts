@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -30,6 +31,7 @@ export class SubscriptionForm implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(I18nService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input() modalMode: 'create' | 'edit' | null = null;
   @Input() subscriptionId: string | null = null;
@@ -58,7 +60,9 @@ export class SubscriptionForm implements OnInit {
   });
 
   ngOnInit(): void {
-    this.form.valueChanges.subscribe(() => this.dirtyChange.emit(this.form.dirty));
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.dirtyChange.emit(this.form.dirty));
     const id = this.subscriptionId ?? this.route.snapshot.paramMap.get('id');
     if (id) {
       this.editingId.set(id);

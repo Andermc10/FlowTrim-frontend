@@ -66,6 +66,36 @@ describe('SubscriptionService', () => {
     httpRequest.flush({ items: [], page: 2, pageSize: 10, totalCount: 0 });
   });
 
+  it('listAll requests every page of 100 until the total is reached', () => {
+    const item = (index: number) => ({ id: `id-${index}`, name: `Sub ${index}` }) as SubscriptionResponse;
+    let result: SubscriptionResponse[] | undefined;
+
+    service.listAll().subscribe((all) => (result = all));
+
+    const pageRequest = (page: number) => httpMock.expectOne(
+      (r) => r.url === `${environment.apiUrl}/api/subscriptions` && r.params.get('page') === String(page));
+    const first = pageRequest(1);
+    expect(first.request.params.get('pageSize')).toBe('100');
+    first.flush({ items: Array.from({ length: 100 }, (_, i) => item(i)), page: 1, pageSize: 100, totalCount: 150 });
+    expect(result).toBeUndefined();
+    pageRequest(2).flush({ items: Array.from({ length: 50 }, (_, i) => item(100 + i)), page: 2, pageSize: 100, totalCount: 150 });
+
+    expect(result?.length).toBe(150);
+    expect(result?.at(-1)?.name).toBe('Sub 149');
+    httpMock.verify();
+  });
+
+  it('listAll makes a single request when everything fits in one page', () => {
+    let result: SubscriptionResponse[] | undefined;
+
+    service.listAll().subscribe((all) => (result = all));
+    httpMock.expectOne((r) => r.url === `${environment.apiUrl}/api/subscriptions`)
+      .flush({ items: [], page: 1, pageSize: 100, totalCount: 0 });
+
+    expect(result).toEqual([]);
+    httpMock.verify();
+  });
+
   it('DELETEs a subscription by id', () => {
     const id = '4f6c0000-0000-0000-0000-000000000000';
     service.delete(id).subscribe();

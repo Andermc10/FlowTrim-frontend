@@ -33,7 +33,7 @@
         <span aria-hidden="true">⌕</span>
         <input type="search" [placeholder]="'subscriptions.search' | translate" [attr.aria-label]="'subscriptions.search' | translate" #q (input)="search.set(q.value)" />
       </label>
-      <span class="list__count">{{ totalCount() }} {{ 'subscriptions.records' | translate }}</span>
+      <span class="list__count">{{ all().length }} {{ 'subscriptions.records' | translate }}</span>
     </div>
 
 
@@ -62,15 +62,9 @@
               </span>
             </td>
             <td class="actions-col" [attr.data-label]="'subscriptions.actions' | translate">
-              @if (confirmingId() === subscription.id) {
-                <span class="confirm">{{ 'subscriptions.deleteQuestion' | translate }}</span>
-                <button type="button" class="danger" (click)="confirmDelete(subscription.id)">{{ 'subscriptions.yes' | translate }}</button>
-                <button type="button" class="link" (click)="cancelDelete()">{{ 'subscriptions.no' | translate }}</button>
-              } @else {
-                <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.edit' | translate" [attr.title]="'subscriptions.edit' | translate" (click)="openEdit(subscription.id)"><app-icon name="edit" /></button>
-                <a class="icon-button" [attr.aria-label]="'subscriptions.usage' | translate" [attr.title]="'subscriptions.usage' | translate" [routerLink]="['/app/subscriptions', subscription.id, 'usage']"><app-icon name="usage" /></a>
-                <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'subscriptions.delete' | translate" [attr.title]="'subscriptions.delete' | translate" (click)="openDelete(subscription)"><app-icon name="delete" /></button>
-              }
+              <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.edit' | translate" [attr.title]="'subscriptions.edit' | translate" (click)="openEdit(subscription.id)"><app-icon name="edit" /></button>
+              <a class="icon-button" [attr.aria-label]="'subscriptions.usage' | translate" [attr.title]="'subscriptions.usage' | translate" [routerLink]="['/app/subscriptions', subscription.id, 'usage']"><app-icon name="usage" /></a>
+              <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'subscriptions.delete' | translate" [attr.title]="'subscriptions.delete' | translate" (click)="openDelete(subscription)"><app-icon name="delete" /></button>
             </td>
           </tr>
         } @empty {

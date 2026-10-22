@@ -78,13 +78,13 @@ export class ReportPage implements OnInit {
     forkJoin({
       summary: this.summaryService.getSummary(),
       analytics: this.analyticsService.getAnalytics(),
-      subscriptions: this.subscriptionService.list(1, 100),
+      subscriptions: this.subscriptionService.listAll(),
       upcoming: this.subscriptionService.getUpcoming(),
     }).subscribe({
       next: ({ summary, analytics, subscriptions, upcoming }) => {
         this.summary.set(summary.currencies);
         this.analytics.set(analytics.currencies);
-        this.subscriptions.set([...subscriptions.items].sort((a, b) => a.name.localeCompare(b.name)));
+        this.subscriptions.set([...subscriptions].sort((a, b) => a.name.localeCompare(b.name)));
         this.upcoming.set(upcoming.items.slice(0, upcomingLimit));
         this.generatedAt.set(new Date());
         this.status.set('ready');
