@@ -7,7 +7,7 @@
 [![Frontend CI](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml)
 ![Angular 22](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![Unit tests](https://img.shields.io/badge/unit%20tests-115%20passing-2ea44f)
+![Unit tests](https://img.shields.io/badge/unit%20tests-147%20passing-2ea44f)
 ![Playwright](https://img.shields.io/badge/e2e-Playwright-2EAD33?logo=playwright&logoColor=white)
 
 [API](https://github.com/Andermc10/FlowTrim-backend) · [Specs & backlog](https://github.com/Andermc10/FlowTrim-tracker) · [CSV format](https://github.com/Andermc10/FlowTrim-tracker/blob/main/docs/SUBSCRIPTION-CSV-FORMAT.md)
@@ -21,11 +21,13 @@
 | | |
 |---|---|
 | **Know your burn** | Monthly equivalent and annual projection per currency, never mixed or converted. |
-| **Never be surprised** | Upcoming charges with a countdown and alert windows, plus one in-app heads-up per session for anything overdue or due within 3 days. |
-| **Find the waste** | Spending by category, the most expensive services and the expected charges month by month. |
+| **Never be surprised** | Upcoming charges with a countdown and alert windows, one in-app heads-up per session (with an optional sound) for anything overdue or due within 3 days, and **Mark as paid** to move a charge to its next cycle. |
+| **Find the waste** | Analytics & reports: spending by category, the most expensive services and the expected charges month by month, next to a themed, printable report. |
 | **Decide before you cut** | The simulator shows savings at 1, 12 and 24 months. It cancels nothing and always shows its assumptions. |
-| **Ask in plain words** | Insights answers short questions from FlowTrim's own calculations; the figures come from the backend, not from the AI's text. |
-| **Bring your data** | Import a CSV with a row-by-row preview (errors and duplicates) before anything is saved; export it back or print a PDF report. |
+| **Ask in plain words** | The AI Assistant answers short questions from FlowTrim's own calculations; the figures come from the backend, not from the AI's text. |
+| **Bring your data** | Import a CSV (comma or Excel's semicolon style) with a row-by-row preview before anything is saved; export it back or print a PDF report. |
+
+Forms guide you with examples and show each error as you type; dates follow the America/Bogota calendar like the API.
 
 FlowTrim is a manual-data portfolio project: it never connects to banks and never presents an expected renewal as a payment.
 
@@ -100,16 +102,16 @@ To use your own Auth0 tenant, create a **Single Page Application** with callback
 | `/app/subscriptions/:id/usage` | Declared usage and cost per use |
 | `/app/upcoming` | Upcoming charges and countdown |
 | `/app/simulator` | Cancellation simulator |
-| `/app/analytics` | Charts by category, top services, expected charges |
-| `/app/insights` | Questions about your data |
-| `/app/report` | Printable report and CSV export |
+| `/app/analytics` | Analytics & reports: Charts tab (category, top services, expected charges) |
+| `/app/analytics/report` | Report tab: printable report and CSV export (`/app/report` redirects here) |
+| `/app/insights` | AI Assistant: questions about your data |
 
 ## Project structure
 
 ```
 src/app/
   core/       auth (guard, interceptors, PKCE), i18n, theme, money/date formatting, files,
-              ui (modal, toast, chart, icon)
+              forms (shared validators, field errors), ui (modal, toast, chart, icon, sound, back-to-top)
   features/   landing · auth · subscriptions · summary · simulator · analytics · insights · reports · imports
 src/styles.scss   design tokens and shared building blocks (buttons, banners, data tables)
 e2e/              Playwright flow, local OIDC test issuer, static SPA server
@@ -120,7 +122,7 @@ Every data view handles loading, empty, success and error states. Unexpected err
 ## Quality
 
 - **Unit tests** (`npm test`): services, pages, guards, interceptors, pipes and the language parity check.
-- **Browser flow** (`npm run e2e`): sign-in → create → Insights figure equals the overview → account isolation → CSV import → delete, failing on any console error or failed request. It starts a local OIDC issuer, the real API and an e2e build; see [e2e/README.md](e2e/README.md).
+- **Browser flow** (`npm run e2e`): sign-in → create with live validation → AI Assistant figure equals the overview → account isolation → CSV import and template → mark as paid → report tab → delete, failing on any console error or failed request. It starts a local OIDC issuer, the real API and an e2e build; see [e2e/README.md](e2e/README.md).
 - **CI** (`.github/workflows/ci.yml`): `npm ci`, ESLint, unit tests and the production build on every pull request, with no secrets. `main` is protected.
 
 ## Known limitations
