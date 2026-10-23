@@ -9,10 +9,12 @@ import { BackToTop } from './core/ui/back-to-top/back-to-top';
 import { SoundService } from './core/ui/sound/sound.service';
 import { ToastHost } from './core/ui/toast/toast-host';
 import { UpcomingAlertService } from './features/subscriptions/services/upcoming-alert-service';
+import { QuickAdd } from './features/transactions/quick-add/quick-add';
+import { QuickAddService } from './features/transactions/quick-add/quick-add.service';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, ToastHost, BackToTop, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, ToastHost, BackToTop, TranslatePipe, QuickAdd],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss',
 })
@@ -20,6 +22,7 @@ export class AppShell implements OnInit {
   private readonly theme = inject(ThemeService);
   private readonly auth = inject(AuthService);
   private readonly upcomingAlerts = inject(UpcomingAlertService);
+  private readonly quickAdd = inject(QuickAddService);
   protected readonly sound = inject(SoundService);
   protected readonly i18n = inject(I18nService);
 
@@ -29,6 +32,10 @@ export class AppShell implements OnInit {
   ngOnInit(): void {
     // Al entrar al workspace se avisa (una vez por sesión) de cobros vencidos o inminentes (HU-54).
     this.upcomingAlerts.checkOnce();
+  }
+
+  protected openQuickAdd(): void {
+    this.quickAdd.open();
   }
 
   protected toggleTheme(): void {

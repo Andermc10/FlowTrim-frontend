@@ -109,6 +109,11 @@
   color: var(--color-muted);
 }
 
+.empty .hint {
+  margin: 0.9rem 0 0;
+  font-size: 0.75rem;
+}
+
 .totals {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));

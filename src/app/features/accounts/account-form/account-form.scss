@@ -50,8 +50,9 @@ button.secondary {
 }
 
 @media (max-width: 580px) {
+  // minmax(0, 1fr): con 1fr la columna no encoge por debajo del contenido (fecha, selects) y desborda a 360 px.
   form {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .field--wide,

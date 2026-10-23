@@ -92,7 +92,8 @@
         <span class="empty__mark" aria-hidden="true">≡</span>
         <p>{{ (filtered() ? 'transactions.noMatch' : 'transactions.emptyMonth') | translate }}</p>
         @if (hasActiveAccounts() && !filtered()) {
-          <button class="btn" type="button" (click)="openCreate()">{{ 'transactions.add' | translate }}</button>
+          <button class="btn" type="button" (click)="openQuickAdd()">{{ 'transactions.add' | translate }}</button>
+          <p class="hint">{{ 'transactions.quickAddHint' | translate }}</p>
         }
       </div>
     } @else {
