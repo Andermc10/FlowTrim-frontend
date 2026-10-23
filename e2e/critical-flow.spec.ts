@@ -38,8 +38,11 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(page).toHaveURL(/\/auth\/login\?returnUrl=/);
   });
 
-  await test.step('account A signs in and sees the empty overview', async () => {
+  await test.step('account A signs in on Today and sees the first-use guide', async () => {
     await signIn(page, 'A');
+    // EP-12 D9: /app es el panel Hoy; el resumen de suscripciones vive en /app/summary.
+    await expect(page.getByRole('heading', { name: 'Add an account' })).toBeVisible();
+    await page.goto('/app/summary');
     await expect(page.getByText('No active subscriptions yet.')).toBeVisible();
   });
 
@@ -67,7 +70,7 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     subscriptionId = usageHref?.match(/subscriptions\/([0-9a-f-]{36})\/usage/)?.[1] ?? '';
     expect(subscriptionId).not.toBe('');
 
-    await page.goto('/app');
+    await page.goto('/app/summary');
     await expect(page.locator('main')).toContainText('38,900');
     await page.screenshot({ path: `${checkpoints}/01-overview-account-a.png`, fullPage: true });
   });
@@ -186,6 +189,44 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(page.locator('main')).toContainText('Netflix');
     await page.getByRole('tab', { name: 'Charts' }).click();
     await expect(page).toHaveURL(/\/app\/analytics$/);
+  });
+
+  await test.step('account A records an expense with quick add and Today updates without a reload', async () => {
+    // EP-12: cuenta → registro rápido solo con teclado (HU-67 AC-1) → el panel Hoy cambia → el movimiento está listado.
+    await page.goto('/app/accounts');
+    await page.getByRole('button', { name: 'Add your first account' }).click();
+    const accountDialog = page.getByRole('dialog', { name: 'New account' });
+    await accountDialog.getByLabel('Name').fill('Bank');
+    await accountDialog.getByLabel('Opening balance').fill('500000');
+    await accountDialog.getByRole('button', { name: 'Create account' }).click();
+    await expect(page.locator('li.account').filter({ hasText: 'Bank' })).toContainText('COP 500,000');
+
+    await page.getByRole('link', { name: 'Today' }).first().click();
+    const spentToday = page.locator('.tile').filter({ hasText: 'Spent today' });
+    await expect(spentToday).toContainText('COP 0');
+    await page.locator('main h1').click();
+    await page.keyboard.press('n');
+    await expect(page.locator('#tx-amount')).toBeFocused();
+    await page.keyboard.type('38900');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('dialog', { name: 'Quick add' })).toHaveCount(0);
+    await expect(spentToday).toContainText('COP 38,900');
+    await expect(page.locator('.formula')).toContainText('COP 461,100');
+    await page.screenshot({ path: `${checkpoints}/09-today-after-quick-add.png`, fullPage: true });
+
+    await page.goto('/app/transactions');
+    const row = page.locator('li.row');
+    await expect(row).toHaveCount(1);
+    await expect(row).toContainText('-COP 38,900');
+    await row.getByRole('button', { name: /Delete transaction/ }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
+    await expect(row).toHaveCount(0);
+
+    await page.goto('/app/accounts');
+    await page.getByRole('button', { name: 'Delete account: Bank' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete account' }).click();
+    await expect(page.getByText('You have no accounts yet.')).toBeVisible();
   });
 
   await test.step('account A deletes its data', async () => {

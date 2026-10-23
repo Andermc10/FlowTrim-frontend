@@ -7,14 +7,16 @@ import { TranslatePipe } from './core/i18n/translate.pipe';
 import { AuthService } from './core/auth/auth.service';
 import { BackToTop } from './core/ui/back-to-top/back-to-top';
 import { SoundService } from './core/ui/sound/sound.service';
+import { Modal } from './core/ui/modal/modal';
 import { ToastHost } from './core/ui/toast/toast-host';
 import { UpcomingAlertService } from './features/subscriptions/services/upcoming-alert-service';
 import { QuickAdd } from './features/transactions/quick-add/quick-add';
 import { QuickAddService } from './features/transactions/quick-add/quick-add.service';
+import { mobileLinks, navGroups } from './workspace-nav';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, ToastHost, BackToTop, TranslatePipe, QuickAdd],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, ToastHost, BackToTop, TranslatePipe, QuickAdd, Modal],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss',
 })
@@ -28,6 +30,10 @@ export class AppShell implements OnInit {
 
   protected readonly themeMode = this.theme.mode;
   protected readonly signingOut = signal(false);
+  protected readonly navGroups = navGroups;
+  protected readonly mobileLinks = mobileLinks;
+  /** Menú completo del móvil ("Más"). */
+  protected readonly moreOpen = signal(false);
 
   ngOnInit(): void {
     // Al entrar al workspace se avisa (una vez por sesión) de cobros vencidos o inminentes (HU-54).

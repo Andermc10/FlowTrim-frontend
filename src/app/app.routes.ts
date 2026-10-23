@@ -19,11 +19,12 @@ export const routes: Routes = [
     loadComponent: () => import('./app-shell').then((m) => m.AppShell),
     canActivate: [authGuard],
     children: [
+      // Portada del workspace: el panel Hoy (EP-12 D9). El resumen de suscripciones sigue en /app/summary.
       {
         path: '',
         pathMatch: 'full',
-        title: 'nav.overview',
-        loadComponent: () => import('./features/summary/summary-dashboard/summary-dashboard').then((m) => m.SummaryDashboard),
+        title: 'nav.today',
+        loadComponent: () => import('./features/today/today-page/today-page').then((m) => m.TodayPage),
       },
       {
         path: 'subscriptions',

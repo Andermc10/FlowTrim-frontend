@@ -1,0 +1,154 @@
+<section class="today">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'today.kicker' | translate }}@if (dateTitle()) { · {{ dateTitle() }} }</p>
+      <h1>{{ 'today.title' | translate }}</h1>
+      <p class="lede">{{ 'today.lede' | translate }}</p>
+    </div>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'today.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (data(); as today) {
+    @if (!hasAccounts()) {
+      <!-- Primer uso: dos pasos, crear una cuenta y registrar el primer movimiento. -->
+      <ol class="guide">
+        <li class="guide__step">
+          <span class="guide__number" aria-hidden="true">1</span>
+          <div>
+            <h2>{{ 'today.guide.accountTitle' | translate }}</h2>
+            <p>{{ 'today.guide.accountText' | translate }}</p>
+            <a class="btn" routerLink="/app/accounts">{{ 'accounts.addFirst' | translate }}</a>
+          </div>
+        </li>
+        <li class="guide__step guide__step--next">
+          <span class="guide__number" aria-hidden="true">2</span>
+          <div>
+            <h2>{{ 'today.guide.transactionTitle' | translate }}</h2>
+            <p>{{ 'today.guide.transactionText' | translate }}</p>
+          </div>
+        </li>
+      </ol>
+    } @else {
+      @for (currency of today.currencies; track currency.currency) {
+        <article class="hero" [attr.aria-labelledby]="'safe-' + currency.currency">
+          <div class="hero__top">
+            <span class="hero__label" [id]="'safe-' + currency.currency">{{ 'today.safeToSpend' | translate }}</span>
+            <span class="currency-mark">{{ currency.currency }}</span>
+          </div>
+          <strong class="hero__value">{{ currency.safeToSpendToday | money: currency.currency }}</strong>
+          <p class="hero__per-day">{{ 'today.perDay' | translate: { days: currency.daysLeft } }}</p>
+
+          @if (currency.shortfall > 0) {
+            <p class="shortfall" role="note">
+              <span aria-hidden="true">!</span>
+              {{ 'today.shortfall' | translate: { amount: (currency.shortfall | money: currency.currency) } }}
+            </p>
+          }
+
+          <details class="formula">
+            <summary>{{ 'today.howCalculated' | translate }}</summary>
+            <dl>
+              <div><dt>{{ 'today.available' | translate }}</dt><dd>{{ currency.available | money: currency.currency }}</dd></div>
+              <div><dt>{{ 'today.committed' | translate: { date: monthEndLabel() } }}</dt><dd>-{{ currency.committedUntilMonthEnd | money: currency.currency }}</dd></div>
+              <div><dt>{{ 'today.daysLeft' | translate }}</dt><dd>{{ currency.daysLeft }}</dd></div>
+            </dl>
+            <p class="formula__expression">
+              ({{ currency.available | money: currency.currency }} − {{ currency.committedUntilMonthEnd | money: currency.currency }}) ÷ {{ currency.daysLeft }}
+              = <strong>{{ currency.safeToSpendToday | money: currency.currency }}</strong>
+            </p>
+            <p class="formula__caveat">{{ 'today.caveat' | translate }}</p>
+          </details>
+
+          <dl class="tiles">
+            <div class="tile"><dt>{{ 'today.todaySpending' | translate }}</dt><dd>-{{ currency.todayExpenses | money: currency.currency }}</dd></div>
+            <div class="tile"><dt>{{ 'today.monthIncome' | translate }}</dt><dd class="income">+{{ currency.monthIncome | money: currency.currency }}</dd></div>
+            <div class="tile"><dt>{{ 'today.monthExpenses' | translate }}</dt><dd class="expense">-{{ currency.monthExpenses | money: currency.currency }}</dd></div>
+            <div class="tile"><dt>{{ 'today.monthNet' | translate }}</dt><dd [class.expense]="currency.monthNet < 0">{{ currency.monthNet | money: currency.currency }}</dd></div>
+          </dl>
+        </article>
+      }
+
+      @if (!hasTransactions()) {
+        <div class="notice notice--next">
+          <p>{{ 'today.firstTransaction' | translate }}</p>
+          <button type="button" class="btn" (click)="openQuickAdd()">{{ 'transactions.add' | translate }}</button>
+        </div>
+      }
+
+      <div class="panels">
+        <section class="panel" aria-labelledby="today-accounts">
+          <header class="panel__head">
+            <h2 id="today-accounts">{{ 'today.accounts' | translate }}</h2>
+            <a class="link" routerLink="/app/accounts">{{ 'today.seeAll' | translate }}</a>
+          </header>
+          <ul class="account-strip">
+            @for (account of today.accounts; track account.id) {
+              <li>
+                <span class="account-strip__name">{{ account.name }}</span>
+                <small>{{ ((isOwed(account) ? 'accounts.owed' : 'accounts.type.' + account.type)) | translate }}</small>
+                <strong>{{ (isOwed(account) ? -account.balance : account.balance) | money: account.currency }}</strong>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="panel" aria-labelledby="today-recent">
+          <header class="panel__head">
+            <h2 id="today-recent">{{ 'today.recent' | translate }}</h2>
+            <a class="link" routerLink="/app/transactions">{{ 'today.seeAll' | translate }}</a>
+          </header>
+          @if (hasTransactions()) {
+            <ul class="list">
+              @for (item of today.recentTransactions; track item.id) {
+                <li [style.--swatch]="item.categoryColor ? 'var(--category-' + item.categoryColor + ')' : 'var(--color-primary)'">
+                  <span class="list__icon" aria-hidden="true">
+                    @if (item.categoryIcon; as icon) { <app-category-icon [name]="icon" /> } @else { ⇄ }
+                  </span>
+                  <span class="list__main"><strong>{{ rowTitle(item) }}</strong><small>{{ chargeDate(item.date) }} · {{ item.accountName }}</small></span>
+                  <span class="list__amount" [class.income]="item.type === 'Income'" [class.expense]="item.type === 'Expense'">
+                    <span class="visually-hidden">{{ ('transactions.type.' + item.type) | translate }}:</span>
+                    {{ item.type === 'Income' ? '+' : item.type === 'Expense' ? '-' : '' }}{{ item.amount | money: item.currency }}
+                  </span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="muted">{{ 'today.noRecent' | translate }}</p>
+          }
+        </section>
+
+        <section class="panel" aria-labelledby="today-charges">
+          <header class="panel__head">
+            <h2 id="today-charges">{{ 'today.charges' | translate }}</h2>
+            <a class="link" routerLink="/app/upcoming">{{ 'nav.upcoming' | translate }}</a>
+          </header>
+          @if (today.chargesUntilMonthEnd.length > 0) {
+            <ul class="list">
+              @for (charge of today.chargesUntilMonthEnd; track charge.subscriptionId) {
+                <li>
+                  <span class="list__main">
+                    <strong>{{ charge.name }}</strong>
+                    <small>
+                      {{ chargeDate(charge.nextBillingDate) }}
+                      @if (charge.isOverdue) { <span class="badge">{{ 'today.overdue' | translate }}</span> }
+                    </small>
+                  </span>
+                  <span class="list__amount">{{ charge.amount | money: charge.currency }}</span>
+                </li>
+              }
+            </ul>
+            <p class="panel__note">{{ 'today.chargesNote' | translate }}</p>
+          } @else {
+            <p class="muted">{{ 'today.noCharges' | translate }}</p>
+          }
+        </section>
+      </div>
+    }
+  }
+</section>

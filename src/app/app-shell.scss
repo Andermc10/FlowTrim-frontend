@@ -19,6 +19,8 @@
   width: 16rem;
   height: 100dvh;
   padding: 1.5rem 1rem 1.25rem;
+  // Con el menú agrupado el riel puede superar la altura de pantallas bajas: se desplaza en vez de cortarse.
+  overflow-y: auto;
   background: var(--color-rail);
   border-right: 1px solid var(--color-border);
 }
@@ -33,7 +35,22 @@
 }
 
 .rail-label {
-  margin: 3rem 0 0.75rem 0.7rem;
+  margin: 2rem 0 0.5rem 0.7rem;
+}
+
+// Rótulo de grupo del menú (Diario, Suscripciones, Herramientas).
+.rail-group {
+  margin: 0.9rem 0 0.25rem 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.rail-group:first-child {
+  margin-top: 0;
 }
 
 .rail-nav {
@@ -45,8 +62,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-height: 2.75rem;
-  padding: 0.65rem 0.75rem;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid transparent;
   border-radius: 0.7rem;
   color: var(--color-muted);
@@ -331,6 +348,25 @@
     backdrop-filter: blur(16px);
   }
 
+  // "Más" se ve igual que los enlaces de la barra.
+  .mobile-nav__more {
+    display: grid;
+    gap: 0.2rem;
+    justify-items: center;
+    padding: 0.45rem 0.1rem;
+    border: 0;
+    border-radius: 0.55rem;
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .mobile-nav__more.is-active {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+
   .mobile-nav a {
     display: grid;
     gap: 0.2rem;
@@ -348,6 +384,14 @@
 
   .mobile-nav span {
     font-size: 1.1rem;
+  }
+
+  .mobile-nav__more span {
+    font-size: 1.1rem;
+  }
+
+  .mobile-nav__more small {
+    font-size: 0.62rem;
   }
 
   .mobile-nav small {
@@ -379,4 +423,37 @@
   cursor: pointer;
   font-size: 0.65rem;
   font-weight: 800;
+}
+
+// Menú completo del móvil ("Más"): los mismos grupos que el riel.
+.more-menu {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.more-menu__group {
+  margin: 0.8rem 0 0.2rem;
+  color: var(--color-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.more-menu__group:first-child {
+  margin-top: 0;
+}
+
+.more-menu a {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.65rem;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.more-menu a.is-active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
 }

@@ -1,0 +1,392 @@
+:host {
+  display: block;
+}
+
+.today {
+  width: 100%;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.link {
+  padding: 0 0.35rem;
+}
+
+// Primer uso: dos pasos numerados.
+.guide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide__step {
+  display: flex;
+  gap: 1rem;
+  padding: 1.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.guide__step--next {
+  opacity: 0.7;
+}
+
+.guide__step h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.guide__step p {
+  margin: 0 0 1rem;
+  color: var(--color-muted);
+  line-height: 1.55;
+}
+
+.guide__number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+// Tarjeta principal por moneda.
+.hero {
+  position: relative;
+  margin-bottom: 1rem;
+  padding: 1.4rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 1.1rem;
+  background: var(--color-surface);
+}
+
+.hero::after {
+  position: absolute;
+  top: -5rem;
+  right: -4rem;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  content: '';
+  pointer-events: none;
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero__label {
+  color: var(--color-muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.currency-mark {
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.35rem;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.hero__value {
+  display: block;
+  margin: 0.8rem 0 0.2rem;
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  letter-spacing: -0.07em;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.hero__per-day {
+  margin: 0 0 1rem;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.shortfall {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--color-warning) 45%, transparent);
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  font-size: 0.8rem;
+}
+
+.shortfall span {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: var(--color-warning);
+  color: #1a1000;
+  font-weight: 900;
+}
+
+.formula {
+  margin-bottom: 1.1rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  background: var(--color-surface-soft);
+}
+
+.formula summary {
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.formula dl {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0.7rem;
+}
+
+.formula dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.8rem;
+}
+
+.formula dt {
+  color: var(--color-muted);
+}
+
+.formula dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  // El signo y el importe no se separan al envolver.
+  white-space: nowrap;
+}
+
+.formula__expression {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.formula__caveat {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.tile {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.tile dt {
+  color: var(--color-muted);
+  font-size: 0.68rem;
+}
+
+.tile dd {
+  margin: 0.3rem 0 0;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+// El signo dice ingreso o gasto; el color solo lo refuerza.
+.income {
+  color: var(--color-success);
+}
+
+.expense {
+  color: var(--color-danger);
+}
+
+.notice--next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.notice--next p {
+  margin: 0;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.panel {
+  padding: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.panel__head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.panel__note {
+  margin: 0.7rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.account-strip,
+.list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-strip li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.65rem;
+  background: var(--color-surface-soft);
+}
+
+.account-strip__name {
+  overflow: hidden;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-strip small {
+  grid-row: 2;
+  color: var(--color-muted);
+  font-size: 0.68rem;
+}
+
+.account-strip strong {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  font-variant-numeric: tabular-nums;
+}
+
+.list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.list li:not(:has(.list__icon)) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.list__icon {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--swatch) 16%, transparent);
+  color: var(--swatch);
+}
+
+.list__main {
+  display: grid;
+  min-width: 0;
+}
+
+.list__main strong {
+  overflow: hidden;
+  font-size: 0.84rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list__main small {
+  color: var(--color-muted);
+  font-size: 0.68rem;
+}
+
+.list__amount {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.badge {
+  margin-left: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+  color: var(--color-danger);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    padding: 1.1rem;
+  }
+}
