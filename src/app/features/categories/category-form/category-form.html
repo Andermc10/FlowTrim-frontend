@@ -1,0 +1,72 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="field">
+    <label for="category-name">{{ 'form.name' | translate }}</label>
+    <input
+      id="category-name"
+      type="text"
+      formControlName="name"
+      autocomplete="off"
+      [attr.maxlength]="nameMaxLength"
+      [placeholder]="'categories.form.placeholder.name' | translate"
+      [attr.aria-invalid]="nameInvalid()"
+      aria-describedby="category-name-error"
+    />
+    @if (form.controls.name.value.length >= nameMaxLength * 0.8) {
+      <span class="field__counter" [class.field__counter--limit]="form.controls.name.value.length >= nameMaxLength">
+        {{ form.controls.name.value.length }} / {{ nameMaxLength }}
+      </span>
+    }
+    <app-field-error id="category-name-error" [messageKey]="nameErrorKey()" [serverMessages]="errorsFor('name')" />
+  </div>
+
+  <fieldset class="choices">
+    <legend>{{ 'categories.form.kind' | translate }}</legend>
+    <div class="kind-options">
+      @for (kind of kinds; track kind) {
+        <label class="kind-option">
+          <input type="radio" formControlName="kind" [value]="kind" />
+          <span>{{ ('categories.kind.' + kind) | translate }}</span>
+        </label>
+      }
+    </div>
+    @if (kindLocked) {
+      <small class="hint">{{ 'categories.form.kindLocked' | translate }}</small>
+    }
+    <app-field-error id="category-kind-error" [serverMessages]="errorsFor('kind')" />
+  </fieldset>
+
+  <fieldset class="choices">
+    <legend>{{ 'categories.form.color' | translate }}</legend>
+    <div class="swatches">
+      @for (color of colors; track color) {
+        <label class="swatch" [style.--swatch]="'var(--category-' + color + ')'" [attr.title]="('categories.color.' + color) | translate">
+          <input type="radio" formControlName="color" [value]="color" />
+          <span class="swatch__dot" aria-hidden="true"></span>
+          <span class="visually-hidden">{{ ('categories.color.' + color) | translate }}</span>
+        </label>
+      }
+    </div>
+    <app-field-error id="category-color-error" [serverMessages]="errorsFor('color')" />
+  </fieldset>
+
+  <fieldset class="choices">
+    <legend>{{ 'categories.form.icon' | translate }}</legend>
+    <div class="icon-grid" [style.--swatch]="'var(--category-' + form.controls.color.value + ')'">
+      @for (icon of icons; track icon) {
+        <label class="icon-option" [attr.title]="('categories.icon.' + icon) | translate">
+          <input type="radio" formControlName="icon" [value]="icon" />
+          <span class="icon-option__box" aria-hidden="true"><app-category-icon [name]="icon" /></span>
+          <span class="visually-hidden">{{ ('categories.icon.' + icon) | translate }}</span>
+        </label>
+      }
+    </div>
+    <app-field-error id="category-icon-error" [serverMessages]="errorsFor('icon')" />
+  </fieldset>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? ('form.saving' | translate) : (category ? ('form.saveChanges' | translate) : ('categories.create' | translate)) }}
+    </button>
+  </div>
+</form>
