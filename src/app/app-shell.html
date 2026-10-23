@@ -129,12 +129,22 @@
     </header>
 
     <main class="workspace-main">
-      <div class="workspace-eyebrow">FLOWTRIM / PERSONAL FINANCE CONTROL</div>
+      <div class="workspace-topbar">
+        <div class="workspace-eyebrow">FLOWTRIM / PERSONAL FINANCE CONTROL</div>
+        <!-- Registro rápido (HU-67): también con la tecla N. -->
+        <button class="quick-add-trigger" type="button" [attr.aria-keyshortcuts]="'N'" [attr.title]="'quickAdd.shortcutHint' | translate" (click)="openQuickAdd()">
+          <span aria-hidden="true">+</span> {{ 'quickAdd.open' | translate }}
+        </button>
+      </div>
       <router-outlet />
     </main>
 
     <app-toast-host />
     <app-back-to-top />
+    <app-quick-add />
+    <button class="quick-add-fab" type="button" [attr.aria-label]="'quickAdd.title' | translate" (click)="openQuickAdd()">
+      <span aria-hidden="true">+</span>
+    </button>
 
     <nav class="mobile-nav" [attr.aria-label]="'nav.controlWorkspace' | translate">
       <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">

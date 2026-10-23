@@ -17,6 +17,7 @@
       }
     </label>
     <input
+      #amountInput
       id="tx-amount"
       type="number"
       inputmode="decimal"
@@ -31,15 +32,23 @@
     <app-field-error id="tx-amount-error" [messageKey]="errorKey('amount')" [serverMessages]="errorsFor('amount')" />
   </div>
 
-  <div class="field">
-    <label for="tx-account">{{ (type() === 'Transfer' ? 'transactions.form.fromAccount' : 'transactions.form.account') | translate }}</label>
-    <select id="tx-account" formControlName="accountId" [attr.aria-invalid]="isInvalid('accountId')" aria-describedby="tx-account-error">
-      @for (account of sourceAccounts(); track account.id) {
-        <option [value]="account.id">{{ account.name }} · {{ account.currency }}</option>
-      }
-    </select>
-    <app-field-error id="tx-account-error" [messageKey]="errorKey('accountId')" [serverMessages]="errorsFor('accountId')" />
-  </div>
+  <!-- La cuenta se declara una vez y se coloca según el modo: en el registro rápido de gastos e ingresos va después de
+       las categorías, para que del importe un solo Tab lleve a la categoría (HU-67 AC-1). -->
+  <ng-template #accountField>
+    <div class="field">
+      <label for="tx-account">{{ (type() === 'Transfer' ? 'transactions.form.fromAccount' : 'transactions.form.account') | translate }}</label>
+      <select id="tx-account" formControlName="accountId" [attr.aria-invalid]="isInvalid('accountId')" aria-describedby="tx-account-error">
+        @for (account of sourceAccounts(); track account.id) {
+          <option [value]="account.id">{{ account.name }} · {{ account.currency }}</option>
+        }
+      </select>
+      <app-field-error id="tx-account-error" [messageKey]="errorKey('accountId')" [serverMessages]="errorsFor('accountId')" />
+    </div>
+  </ng-template>
+
+  @if (!accountAfterCategories()) {
+    <ng-container *ngTemplateOutlet="accountField" />
+  }
 
   @if (type() === 'Transfer') {
     <div class="field">
@@ -53,6 +62,26 @@
       <small id="tx-to-account-hint" class="hint">{{ 'transactions.form.sameCurrencyHint' | translate }}</small>
       <app-field-error id="tx-to-account-error" [messageKey]="errorKey('toAccountId')" [serverMessages]="errorsFor('toAccountId')" />
     </div>
+  } @else if (quickAdd) {
+    <!-- Chips de categoría (más usadas primero): Tab entra al grupo, las flechas cambian y Enter guarda. -->
+    <fieldset class="chips field--wide" aria-describedby="tx-category-error">
+      <legend>{{ 'transactions.form.category' | translate }}</legend>
+      <div class="chips__list">
+        @for (category of kindCategories(); track category.id) {
+          <label class="chip" [style.--swatch]="'var(--category-' + category.color + ')'">
+            <input
+              type="radio"
+              formControlName="categoryId"
+              [value]="category.id"
+              (keydown.enter)="chooseCategoryAndSubmit($event, category.id)"
+            />
+            <span class="chip__body"><app-category-icon [name]="category.icon" /> {{ category.name }}</span>
+          </label>
+        }
+      </div>
+      <app-field-error id="tx-category-error" [messageKey]="errorKey('categoryId')" [serverMessages]="errorsFor('categoryId')" />
+    </fieldset>
+    <ng-container *ngTemplateOutlet="accountField" />
   } @else {
     <div class="field">
       <label for="tx-category">{{ 'transactions.form.category' | translate }}</label>
@@ -94,6 +123,7 @@
     <app-field-error id="tx-description-error" [messageKey]="errorKey('description')" [serverMessages]="errorsFor('description')" />
   </div>
 
+  @if (!quickAdd) {
   <div class="field field--wide">
     <label for="tx-note">{{ 'transactions.form.note' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
     <textarea
@@ -106,9 +136,13 @@
     ></textarea>
     <app-field-error id="tx-note-error" [messageKey]="errorKey('note')" [serverMessages]="errorsFor('note')" />
   </div>
+  }
 
   <div class="actions">
     <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    @if (quickAdd) {
+      <button type="button" class="secondary" [disabled]="saving()" (click)="submit(true)">{{ 'quickAdd.saveAndAddAnother' | translate }}</button>
+    }
     <button type="submit" [disabled]="saving()">
       {{ saving() ? ('form.saving' | translate) : (transaction ? ('form.saveChanges' | translate) : ('transactions.save' | translate)) }}
     </button>

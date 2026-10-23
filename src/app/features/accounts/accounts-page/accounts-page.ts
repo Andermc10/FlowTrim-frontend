@@ -1,12 +1,14 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AccountResponse, AccountType } from '../accounts.models';
 import { AccountsService } from '../accounts-service';
 import { accountErrorToast } from '../account-errors';
 import { totalsByCurrency } from '../account-totals';
 import { AccountForm } from '../account-form/account-form';
+import { QuickAddService } from '../../transactions/quick-add/quick-add.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MoneyPipe } from '../../../core/format/money.pipe';
@@ -36,6 +38,8 @@ const typeIcons: Record<AccountType, IconName> = {
 export class AccountsPage implements OnInit {
   private readonly service = inject(AccountsService);
   private readonly toast = inject(ToastService);
+  private readonly quickAdd = inject(QuickAddService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly i18n = inject(I18nService);
 
   protected readonly status = signal<PageStatus>('loading');
@@ -54,6 +58,8 @@ export class AccountsPage implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    // Un movimiento registrado desde el registro rápido cambia los saldos: se recargan.
+    this.quickAdd.saved$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.load());
   }
 
   protected load(): void {

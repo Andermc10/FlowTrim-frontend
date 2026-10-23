@@ -1,11 +1,15 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
+  AfterViewInit,
   Component,
   DestroyRef,
+  ElementRef,
   EventEmitter,
   Input,
   OnInit,
   Output,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -18,7 +22,9 @@ import { TransactionsService } from '../transactions-service';
 import { AccountResponse } from '../../accounts/accounts.models';
 import { CategoryResponse } from '../../categories/categories.models';
 import { ValidationProblemDetails } from '../../subscriptions/models/subscription.models';
+import { localeFor, moneyFormatter } from '../../../core/format/money';
 import { productToday } from '../../../core/format/product-calendar';
+import { CategoryIcon } from '../../../core/ui/icon/category-icon';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ToastService } from '../../../core/ui/toast/toast.service';
@@ -50,14 +56,17 @@ function requiredWhen(condition: () => boolean) {
  * Registrar o editar un ingreso, un gasto o una transferencia (HU-66). Recibe las cuentas y categorías del padre para
  * que el registro rápido (HU-67) pueda reutilizarlo. Las categorías se filtran por clase; las cuentas destino, por la
  * misma moneda (no hay conversión). Las archivadas no se ofrecen, salvo la que ya tiene el movimiento que se edita.
+ *
+ * En modo registro rápido (HU-67) el foco empieza en el importe, las categorías son chips ordenados por uso (Enter sobre
+ * un chip guarda) y "Guardar y agregar otro" deja el formulario listo con el mismo tipo y la misma cuenta.
  */
 @Component({
   selector: 'app-transaction-form',
-  imports: [ReactiveFormsModule, TranslatePipe, FieldError],
+  imports: [NgTemplateOutlet, ReactiveFormsModule, TranslatePipe, FieldError, CategoryIcon],
   templateUrl: './transaction-form.html',
   styleUrl: './transaction-form.scss',
 })
-export class TransactionForm implements OnInit {
+export class TransactionForm implements OnInit, AfterViewInit {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(TransactionsService);
   private readonly toast = inject(ToastService);
@@ -68,7 +77,16 @@ export class TransactionForm implements OnInit {
   @Input() transaction: TransactionResponse | null = null;
   @Input({ required: true }) accounts: readonly AccountResponse[] = [];
   @Input({ required: true }) categories: readonly CategoryResponse[] = [];
+  /** Modo registro rápido (HU-67). */
+  @Input() quickAdd = false;
+  /** Cuenta preseleccionada al registrar (la última usada); se ignora si ya no está disponible. */
+  @Input() initialAccountId: string | null = null;
+  /** Usos recientes por categoría: ordena los chips de más a menos usada. */
+  @Input() categoryUsage: ReadonlyMap<string, number> = new Map();
   @Output() readonly saved = new EventEmitter<TransactionResponse>();
+  /** "Guardar y agregar otro": se guardó y el formulario sigue abierto para el siguiente. */
+  @Output() readonly savedAndContinued = new EventEmitter<TransactionResponse>();
+  @ViewChild('amountInput') private readonly amountInput?: ElementRef<HTMLInputElement>;
   @Output() readonly closeRequested = new EventEmitter<void>();
   @Output() readonly dirtyChange = new EventEmitter<boolean>();
 
@@ -109,9 +127,17 @@ export class TransactionForm implements OnInit {
   /** Categorías de la clase del tipo elegido. */
   protected readonly kindCategories = computed(() => {
     const kind = this.type() === 'Income' ? 'Income' : 'Expense';
-    return this.categories.filter((category) =>
-      category.kind === kind && (!category.isArchived || category.id === this.transaction?.categoryId));
+    const usage = this.categoryUsage;
+    return this.categories
+      .filter((category) => category.kind === kind && (!category.isArchived || category.id === this.transaction?.categoryId))
+      // Más usadas primero (registro rápido); sin usos se conserva el orden de la API (por nombre).
+      .map((category, index) => ({ category, index, uses: usage.get(category.id) ?? 0 }))
+      .sort((a, b) => b.uses - a.uses || a.index - b.index)
+      .map((entry) => entry.category);
   });
+
+  /** En el registro rápido de gastos e ingresos la cuenta (ya preseleccionada) va después de las categorías. */
+  protected readonly accountAfterCategories = computed(() => this.quickAdd && this.type() !== 'Transfer');
 
   protected readonly currency = computed(
     () => this.accounts.find((account) => account.id === this.value().accountId)?.currency ?? null);
@@ -130,7 +156,8 @@ export class TransactionForm implements OnInit {
         note: existing.note ?? '',
       });
     } else {
-      const firstAccount = this.sourceAccounts()[0];
+      const remembered = this.sourceAccounts().find((account) => account.id === this.initialAccountId);
+      const firstAccount = remembered ?? this.sourceAccounts()[0];
       if (firstAccount) {
         this.form.controls.accountId.setValue(firstAccount.id);
       }
@@ -152,11 +179,28 @@ export class TransactionForm implements OnInit {
     });
   }
 
+  /**
+   * En el registro rápido el foco empieza en el importe (HU-67 FR-2). Se espera a que el modal padre abra el diálogo,
+   * porque showModal() mueve el foco al primer elemento enfocable (el botón de cerrar).
+   */
+  ngAfterViewInit(): void {
+    if (this.quickAdd) {
+      queueMicrotask(() => this.amountInput?.nativeElement.focus());
+    }
+  }
+
   protected isTransfer(): boolean {
     return this.form?.controls.type.value === 'Transfer';
   }
 
-  protected submit(): void {
+  /** Enter sobre un chip de categoría lo elige y guarda: el registro rápido se completa solo con teclado (HU-67 AC-1). */
+  protected chooseCategoryAndSubmit(event: Event, categoryId: string): void {
+    event.preventDefault();
+    this.form.controls.categoryId.setValue(categoryId);
+    this.submit();
+  }
+
+  protected submit(addAnother = false): void {
     this.fieldErrors.set({});
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -182,7 +226,12 @@ export class TransactionForm implements OnInit {
     call.subscribe({
       next: (saved) => {
         this.saving.set(false);
-        this.toast.success(this.i18n.translate(existing ? 'toast.transactionUpdated' : 'toast.transactionCreated'));
+        this.toast.success(this.successMessage(saved, existing !== null));
+        if (addAnother) {
+          this.resetForNext();
+          this.savedAndContinued.emit(saved);
+          return;
+        }
         this.saved.emit(saved);
       },
       error: (error: HttpErrorResponse) => {
@@ -194,6 +243,29 @@ export class TransactionForm implements OnInit {
         this.toast.httpError(error);
       },
     });
+  }
+
+  // En el registro rápido el aviso dice qué se guardó ("Gasto registrado · Comida · COP 38.900").
+  private successMessage(saved: TransactionResponse, updated: boolean): string {
+    if (updated) {
+      return this.i18n.translate('toast.transactionUpdated');
+    }
+    if (!this.quickAdd) {
+      return this.i18n.translate('toast.transactionCreated');
+    }
+    const detail = saved.type === 'Transfer' ? `${saved.accountName} → ${saved.toAccountName}` : saved.categoryName ?? '';
+    return this.i18n.translate(`toast.quickAdded.${saved.type}`, {
+      detail,
+      amount: moneyFormatter(saved.currency, localeFor(this.i18n.language()))(saved.amount),
+    });
+  }
+
+  // Deja el formulario listo para el siguiente: mismo tipo, cuenta y fecha; importe, categoría y textos vacíos.
+  private resetForNext(): void {
+    const { type, accountId, toAccountId, date } = this.form.getRawValue();
+    this.form.reset({ type, accountId, toAccountId, date, categoryId: '', amount: null, description: '', note: '' });
+    this.dirtyChange.emit(false);
+    this.amountInput?.nativeElement.focus();
   }
 
   protected errorsFor(field: string): string[] {

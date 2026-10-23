@@ -8,6 +8,7 @@ import { TransactionFilter, TransactionResponse, TransactionType, CurrencyTotals
 import { TransactionsService } from '../transactions-service';
 import { groupByDay, monthOf, monthRange, shiftMonth } from '../transaction-days';
 import { TransactionForm } from '../transaction-form/transaction-form';
+import { QuickAddService } from '../quick-add/quick-add.service';
 import { AccountResponse } from '../../accounts/accounts.models';
 import { AccountsService } from '../../accounts/accounts-service';
 import { CategoryResponse } from '../../categories/categories.models';
@@ -41,6 +42,7 @@ export class TransactionsPage implements OnInit {
   private readonly categoriesService = inject(CategoriesService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly quickAdd = inject(QuickAddService);
   protected readonly i18n = inject(I18nService);
 
   protected readonly status = signal<PageStatus>('loading');
@@ -112,6 +114,9 @@ export class TransactionsPage implements OnInit {
         this.search.set(term);
         this.reload$.next();
       });
+
+    // Un movimiento registrado desde el registro rápido aparece sin recargar la página.
+    this.quickAdd.saved$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.reload$.next());
 
     this.loadReferences();
   }
@@ -200,6 +205,11 @@ export class TransactionsPage implements OnInit {
   /** Título de la fila: la descripción, o la categoría, o "Transferencia". */
   protected rowTitle(item: TransactionResponse): string {
     return item.description ?? item.categoryName ?? this.i18n.translate('transactions.type.Transfer');
+  }
+
+  /** Abre el registro rápido (HU-67), el mismo del atajo N. */
+  protected openQuickAdd(): void {
+    this.quickAdd.open();
   }
 
   protected openCreate(): void {

@@ -197,6 +197,43 @@
   margin-bottom: 1.5rem;
 }
 
+// Fila superior del workspace: rótulo y el botón de registro rápido (HU-67).
+.workspace-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.quick-add-trigger {
+  display: inline-flex;
+  flex: none;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: -0.4rem;
+  padding: 0.55rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #061014;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.quick-add-trigger span {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.quick-add-trigger:hover {
+  background: var(--color-primary-bright);
+}
+
+.quick-add-fab {
+  display: none;
+}
+
 .mobile-header,
 .mobile-nav {
   display: none;
@@ -206,8 +243,8 @@
   .app-shell {
     display: block;
     padding-bottom: 4.8rem;
-    // El botón "volver arriba" (HU-63) queda sobre la navegación inferior fija.
-    --back-to-top-bottom: 5.6rem;
+    // El botón "volver arriba" (HU-63) queda sobre el botón flotante de registro rápido, que va sobre la navegación.
+    --back-to-top-bottom: 9.4rem;
   }
 
   .workspace-rail {
@@ -246,6 +283,36 @@
   .workspace-eyebrow {
     margin-bottom: 1.1rem;
     font-size: 0.56rem;
+  }
+
+  // En móvil el registro rápido es un botón flotante sobre la navegación inferior.
+  .quick-add-trigger {
+    display: none;
+  }
+
+  .quick-add-fab {
+    position: fixed;
+    right: 1.1rem;
+    bottom: 5.4rem;
+    z-index: 15;
+    display: grid;
+    place-items: center;
+    width: 3.3rem;
+    height: 3.3rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #061014;
+    box-shadow: 0 0.8rem 2rem var(--color-shadow);
+    cursor: pointer;
+    font-size: 1.7rem;
+    line-height: 1;
+  }
+
+  .quick-add-fab:focus-visible {
+    outline: 3px solid var(--color-primary-soft-strong);
+    outline-offset: 2px;
   }
 
   .mobile-nav {
