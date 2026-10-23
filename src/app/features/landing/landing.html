@@ -1,5 +1,7 @@
-<main class="landing">
-  <nav class="landing-nav" aria-label="Main navigation">
+<div class="landing" id="top">
+  <a class="skip-link" href="#content">{{ 'landing.skip' | translate }}</a>
+
+  <nav class="landing-nav" [attr.aria-label]="'landing.navLabel' | translate">
     <a class="landing-brand" routerLink="/" aria-label="FlowTrim home">
       <span class="landing-brand__mark" aria-hidden="true">
         <svg viewBox="0 0 32 32"><path d="M7 8.5h10.5c4.7 0 7.5 2.3 7.5 6.2 0 3.8-2.8 6.1-7.5 6.1H12" /><path d="M7 23.5h7.2M12 20.8l4.5 4.5M12 20.8l4.5-4.5" /></svg>
@@ -7,126 +9,235 @@
       <span>Flow<span>Trim</span></span>
     </a>
     <div class="landing-nav__links">
-      <a href="#how-it-works">{{ 'landing.howItWorks' | translate }}</a>
-      <a href="#principles">{{ 'landing.principles' | translate }}</a>
-      <button class="landing-language-toggle" type="button" (click)="toggleLanguage()" [attr.aria-label]="i18n.languageLabel()">{{ i18n.languageName() }}</button>
+      <a class="landing-nav__anchor" href="#how-it-works">{{ 'landing.nav.how' | translate }}</a>
+      <a class="landing-nav__anchor" href="#subscriptions">{{ 'landing.nav.subscriptions' | translate }}</a>
+      <a class="landing-nav__anchor" href="#formula">{{ 'landing.nav.formula' | translate }}</a>
+      <button class="landing-toggle" type="button" [attr.aria-label]="themeLabel()" [attr.title]="themeLabel()" (click)="toggleTheme()">
+        <span aria-hidden="true">{{ themeMode() === 'dark' ? '☼' : '☾' }}</span>
+      </button>
+      <button class="landing-toggle" type="button" [attr.aria-label]="i18n.languageLabel()" (click)="toggleLanguage()">{{ i18n.languageName() }}</button>
       <a class="landing-nav__cta" routerLink="/app">{{ 'landing.openWorkspace' | translate }} <span aria-hidden="true">↗</span></a>
     </div>
   </nav>
 
-  <section class="landing-hero">
-    <div class="hero-copy">
-      <p class="eyebrow"><span></span> {{ 'landing.kicker' | translate }}</p>
-      <h1>{{ 'landing.heroTitle' | translate }}</h1>
-      <p class="hero-lead">{{ 'landing.heroLead' | translate }}</p>
-      <div class="hero-actions">
-        <a class="button button--primary" routerLink="/app">{{ 'landing.openWorkspace' | translate }} <span aria-hidden="true">↗</span></a>
-        <a class="button button--ghost" href="#how-it-works">{{ 'landing.seeHow' | translate }} <span aria-hidden="true">↓</span></a>
+  <main id="content" tabindex="-1">
+    <!-- 1. Portada -->
+    <section class="hero" aria-labelledby="hero-title" data-motion="hero">
+      <div class="hero__copy">
+        <p class="eyebrow"><span aria-hidden="true"></span> {{ 'landing.hero.kicker' | translate }}</p>
+        <h1 id="hero-title">{{ 'landing.hero.title' | translate }}</h1>
+        <p class="hero__lead">{{ 'landing.hero.lead' | translate }}</p>
+        <div class="hero__actions">
+          <a class="button button--primary" routerLink="/app">{{ 'landing.openWorkspace' | translate }} <span aria-hidden="true">↗</span></a>
+          <a class="button button--ghost" href="#how-it-works">{{ 'landing.hero.secondary' | translate }} <span aria-hidden="true">↓</span></a>
+        </div>
+        <p class="hero__note">{{ 'landing.hero.note' | translate }}</p>
       </div>
-      <div class="hero-note"><span class="signal-line" aria-hidden="true"></span> {{ 'landing.note' | translate }}</div>
-    </div>
 
-    <div class="hero-visual" aria-label="FlowTrim workspace preview">
-      <span class="preview-caption">{{ 'landing.preview' | translate }}</span>
-      <div class="orbit orbit--one" aria-hidden="true"></div>
-      <div class="orbit orbit--two" aria-hidden="true"></div>
-      <article class="preview-card preview-card--main">
-        <div class="preview-card__topline"><span>{{ 'overview.monthlyBurn' | translate }}</span><span class="live-dot">LIVE</span></div>
-        <strong>$ 168.900 <small>COP</small></strong>
-        <div class="preview-chart" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b></div>
-        <div class="preview-card__footer"><span>{{ 'landing.sampleView' | translate }}</span><em>{{ 'landing.baseline' | translate }}</em></div>
-      </article>
-      <article class="preview-card preview-card--side">
-        <span class="preview-label">{{ 'landing.nextCharge' | translate }}</span>
-        <strong>Netflix</strong>
-        <span class="preview-date">{{ 'landing.inThreeDays' | translate }} <b>38.900 COP</b></span>
-      </article>
-      <article class="preview-card preview-card--cut">
-        <span class="cut-mark" aria-hidden="true">✂</span>
-        <span><small>{{ 'landing.potentialSavings' | translate }}</small><strong>118.800 <em>{{ 'landing.perYear' | translate }}</em></strong></span>
-      </article>
-    </div>
-  </section>
+      <figure class="hero__visual">
+        <div class="mock mock--today" role="img" [attr.aria-label]="'landing.mock.todayLabel' | translate: { amount: (sample.safeToSpend | money: sample.currency), days: sample.daysLeft }">
+          <div aria-hidden="true">
+            <div class="mock__top"><span class="mock__label">{{ 'today.safeToSpend' | translate }}</span><span class="mock__currency">{{ sample.currency }}</span></div>
+            <strong class="mock__big" data-motion="counter">{{ sample.safeToSpend | money: sample.currency }}</strong>
+            <span class="mock__sub">{{ 'today.perDay' | translate: { days: sample.daysLeft } }}</span>
+            <div class="mock__formula">
+              <span>{{ sample.available | money: sample.currency }}</span><b>−</b><span>{{ sample.committed | money: sample.currency }}</span><b>÷</b><span>{{ sample.daysLeft }}</span>
+            </div>
+            <div class="mock__tiles">
+              <span><small>{{ 'today.todaySpending' | translate }}</small>-{{ sample.spentToday | money: sample.currency }}</span>
+              <span><small>{{ 'today.committed' | translate: { date: ('landing.mock.monthEnd' | translate) } }}</small>{{ sample.committed | money: sample.currency }}</span>
+            </div>
+          </div>
+        </div>
+        <figcaption class="sample-tag">{{ 'landing.sample' | translate }}</figcaption>
+      </figure>
+    </section>
 
-  <section class="signal-rail" aria-labelledby="signalRailTitle">
-    <div class="signal-rail__header">
-      <p class="section-kicker" id="signalRailTitle">{{ 'landing.railKicker' | translate }}</p>
-      <span>{{ 'landing.railHint' | translate }} <b aria-hidden="true">→</b></span>
-    </div>
-    <div class="signal-rail__track" tabindex="0">
-      <article class="signal-card signal-card--teal">
-        <span class="signal-card__index">01</span>
-        <span class="signal-card__glyph" aria-hidden="true">◌</span>
-        <h2>{{ 'landing.railVisibleTitle' | translate }}</h2>
-        <p>{{ 'landing.railVisibleText' | translate }}</p>
-        <span class="signal-card__line" aria-hidden="true"></span>
-      </article>
-      <article class="signal-card signal-card--green">
-        <span class="signal-card__index">02</span>
-        <span class="signal-card__glyph" aria-hidden="true">≈</span>
-        <h2>{{ 'landing.railCostTitle' | translate }}</h2>
-        <p>{{ 'landing.railCostText' | translate }}</p>
-        <span class="signal-card__line" aria-hidden="true"></span>
-      </article>
-      <article class="signal-card signal-card--amber">
-        <span class="signal-card__index">03</span>
-        <span class="signal-card__glyph" aria-hidden="true">✂</span>
-        <h2>{{ 'landing.railTrimTitle' | translate }}</h2>
-        <p>{{ 'landing.railTrimText' | translate }}</p>
-        <span class="signal-card__line" aria-hidden="true"></span>
-      </article>
-    </div>
-  </section>
+    <!-- 2. Historia del día: 4 pasos (HU-70 la fija y la recorre con scroll en escritorio). -->
+    <section class="story" id="how-it-works" aria-labelledby="story-title" data-motion="story">
+      <header class="section-head">
+        <p class="section-kicker">{{ 'landing.story.kicker' | translate }}</p>
+        <h2 id="story-title">{{ 'landing.story.title' | translate }}</h2>
+        <p class="section-lead">{{ 'landing.story.lead' | translate }} <span class="sample-tag sample-tag--inline">{{ 'landing.sample' | translate }}</span></p>
+      </header>
 
-  <section class="landing-story" aria-labelledby="storyTitle">
-    <p class="section-kicker" id="storyTitle">{{ 'landing.storyKicker' | translate }}</p>
-    <div class="story-grid">
-      <article class="story-card story-card--objective">
-        <span class="story-card__index">01 / OBJECTIVE</span>
-        <h2>{{ 'landing.objectiveTitle' | translate }}</h2>
-        <p>{{ 'landing.objectiveText' | translate }}</p>
-      </article>
-      <article class="story-card story-card--problem">
-        <span class="story-card__index">02 / PROBLEM</span>
-        <h2>{{ 'landing.problemTitle' | translate }}</h2>
-        <p>{{ 'landing.problemText' | translate }}</p>
-      </article>
-      <article class="story-card story-card--solution">
-        <span class="story-card__index">03 / SOLUTION</span>
-        <h2>{{ 'landing.solutionTitle' | translate }}</h2>
-        <p>{{ 'landing.solutionText' | translate }}</p>
-        <a routerLink="/app">{{ 'landing.storyCta' | translate }} <span aria-hidden="true">↗</span></a>
-      </article>
-    </div>
-  </section>
+      <ol class="story__steps">
+        <li class="story-step" data-motion="step">
+          <div class="story-step__text">
+            <span class="story-step__index">01</span>
+            <h3>{{ 'landing.story.accountsTitle' | translate }}</h3>
+            <p>{{ 'landing.story.accountsText' | translate }}</p>
+          </div>
+          <div class="mock mock--accounts" role="img" [attr.aria-label]="'landing.mock.accountsLabel' | translate: { amount: (sample.available | money: sample.currency) }">
+            <div aria-hidden="true">
+              <span class="mock__label">{{ 'accounts.inAccounts' | translate }}</span>
+              <strong class="mock__big mock__big--small">{{ sample.available | money: sample.currency }}</strong>
+              <ul class="mock__rows">
+                @for (account of sample.accounts; track account.name) {
+                  <li>
+                    <span><b>{{ account.name }}</b><small>{{ (account.type === 'CreditCard' ? 'accounts.owed' : 'accounts.type.' + account.type) | translate }}</small></span>
+                    <strong>{{ (account.balance < 0 ? -account.balance : account.balance) | money: sample.currency }}</strong>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        </li>
 
-  <section class="landing-proof" id="how-it-works">
-    <p class="section-kicker">{{ 'landing.sectionKicker' | translate }}</p>
-    <div class="proof-grid">
-      <article><span class="proof-number">01</span><h2>{{ 'landing.seePicture' | translate }}</h2><p>{{ 'landing.seePictureText' | translate }}</p></article>
-      <article><span class="proof-number">02</span><h2>{{ 'landing.realCost' | translate }}</h2><p>{{ 'landing.realCostText' | translate }}</p></article>
-      <article><span class="proof-number">03</span><h2>{{ 'landing.trimIntent' | translate }}</h2><p>{{ 'landing.trimIntentText' | translate }}</p></article>
-    </div>
-  </section>
+        <li class="story-step" data-motion="step">
+          <div class="story-step__text">
+            <span class="story-step__index">02</span>
+            <h3>{{ 'landing.story.recordTitle' | translate }}</h3>
+            <p>{{ 'landing.story.recordText' | translate }}</p>
+          </div>
+          <div class="mock mock--quick" role="img" [attr.aria-label]="'landing.mock.quickLabel' | translate: { amount: (sample.quickAddAmount | money: sample.currency) }">
+            <div aria-hidden="true">
+              <div class="mock__top"><span class="mock__label">{{ 'quickAdd.title' | translate }}</span><kbd>N</kbd></div>
+              <div class="mock__segments"><span class="is-on">{{ 'transactions.type.Expense' | translate }}</span><span>{{ 'transactions.type.Income' | translate }}</span><span>{{ 'transactions.type.Transfer' | translate }}</span></div>
+              <strong class="mock__amount">{{ sample.quickAddAmount | money: sample.currency }}</strong>
+              <div class="mock__chips"><span class="is-on"><app-category-icon name="food" /> {{ 'landing.mock.food' | translate }}</span><span>{{ 'landing.mock.transport' | translate }}</span><span>{{ 'landing.mock.groceries' | translate }}</span></div>
+              <span class="mock__keys"><kbd>Tab</kbd> <kbd>Enter</kbd></span>
+            </div>
+          </div>
+        </li>
 
-  <section class="landing-principles" id="principles">
-    <div class="formula-panel">
-      <p class="section-kicker">{{ 'landing.transparent' | translate }}</p>
-      <h2>{{ 'landing.noMystery' | translate }}</h2>
-      <p>{{ 'landing.noMysteryText' | translate }}</p>
-      <div class="formula"><span>{{ 'landing.annualProjection' | translate }}</span><b>=</b><span>{{ 'landing.monthlyEquivalent' | translate }}</span><b>×</b><span>12</span></div>
-    </div>
-    <div class="principle-list">
-      <div><span>01</span><strong>{{ 'landing.honestData' | translate }}</strong><p>{{ 'landing.honestDataText' | translate }}</p></div>
-      <div><span>02</span><strong>{{ 'landing.declaredUsage' | translate }}</strong><p>{{ 'landing.declaredUsageText' | translate }}</p></div>
-      <div><span>03</span><strong>{{ 'landing.actionableChoices' | translate }}</strong><p>{{ 'landing.actionableChoicesText' | translate }}</p></div>
-    </div>
-  </section>
+        <li class="story-step" data-motion="step">
+          <div class="story-step__text">
+            <span class="story-step__index">03</span>
+            <h3>{{ 'landing.story.chargesTitle' | translate }}</h3>
+            <p>{{ 'landing.story.chargesText' | translate }}</p>
+          </div>
+          <div class="mock mock--charges" role="img" [attr.aria-label]="'landing.mock.chargesLabel' | translate: { name: sample.nextCharge.name, amount: (sample.committed | money: sample.currency) }">
+            <div aria-hidden="true">
+              <span class="mock__label">{{ 'today.charges' | translate }}</span>
+              <ul class="mock__rows">
+                <li>
+                  <span><b>{{ sample.nextCharge.name }}</b><small>{{ 'landing.mock.day' | translate: { day: sample.nextCharge.dueDay } }}</small></span>
+                  <strong>{{ sample.nextCharge.amount | money: sample.currency }}</strong>
+                </li>
+              </ul>
+              <span class="mock__note">{{ 'landing.mock.expectedNote' | translate }}</span>
+            </div>
+          </div>
+        </li>
+
+        <li class="story-step" data-motion="step">
+          <div class="story-step__text">
+            <span class="story-step__index">04</span>
+            <h3>{{ 'landing.story.todayTitle' | translate }}</h3>
+            <p>{{ 'landing.story.todayText' | translate }}</p>
+          </div>
+          <div class="mock mock--result" role="img" [attr.aria-label]="'landing.mock.todayLabel' | translate: { amount: (sample.safeToSpend | money: sample.currency), days: sample.daysLeft }">
+            <div aria-hidden="true">
+              <span class="mock__label">{{ 'today.safeToSpend' | translate }}</span>
+              <strong class="mock__big">{{ sample.safeToSpend | money: sample.currency }}</strong>
+              <dl class="mock__dl">
+                <div><dt>{{ 'today.available' | translate }}</dt><dd>{{ sample.available | money: sample.currency }}</dd></div>
+                <div><dt>{{ 'landing.mock.chargesShort' | translate }}</dt><dd>-{{ sample.committed | money: sample.currency }}</dd></div>
+                <div><dt>{{ 'today.daysLeft' | translate }}</dt><dd>{{ sample.daysLeft }}</dd></div>
+              </dl>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- 3. Capítulo de suscripciones -->
+    <section class="chapter" id="subscriptions" aria-labelledby="subscriptions-title" data-motion="reveal">
+      <header class="section-head">
+        <p class="section-kicker">{{ 'landing.subs.kicker' | translate }}</p>
+        <h2 id="subscriptions-title">{{ 'landing.subs.title' | translate }}</h2>
+        <p class="section-lead">{{ 'landing.subs.lead' | translate }} <span class="sample-tag sample-tag--inline">{{ 'landing.sample' | translate }}</span></p>
+      </header>
+      <div class="subs-grid">
+        <article class="subs-card">
+          <span class="mock__label">{{ 'overview.monthlyBurn' | translate }}</span>
+          <strong>{{ sample.monthlyBurn | money: sample.currency }}</strong>
+          <p>{{ 'landing.subs.burnText' | translate: { count: sample.subscriptions.length } }}</p>
+        </article>
+        <article class="subs-card">
+          <span class="mock__label">{{ 'landing.subs.nextCharge' | translate }}</span>
+          <strong>{{ sample.nextCharge.name }} · {{ sample.nextCharge.amount | money: sample.currency }}</strong>
+          <p>{{ 'landing.subs.countdown' | translate: { days: sample.nextChargeInDays } }}</p>
+        </article>
+        <article class="subs-card subs-card--cut">
+          <span class="mock__label"><span aria-hidden="true">✂</span> {{ 'landing.subs.simulator' | translate: { name: sample.cancelled.name } }}</span>
+          <dl class="savings">
+            @for (saving of sample.savings; track saving.months) {
+              <div><dt>{{ 'landing.subs.months' | translate: { months: saving.months } }}</dt><dd>{{ saving.amount | money: sample.currency }}</dd></div>
+            }
+          </dl>
+          <p>{{ 'landing.subs.assumption' | translate }}</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. Sin misterio: la fórmula -->
+    <section class="formula-section" id="formula" aria-labelledby="formula-title" data-motion="reveal">
+      <div class="formula-section__copy">
+        <p class="section-kicker">{{ 'landing.formula.kicker' | translate }}</p>
+        <h2 id="formula-title">{{ 'landing.formula.title' | translate }}</h2>
+        <p class="section-lead">{{ 'landing.formula.lead' | translate }}</p>
+      </div>
+      <div class="formula-card">
+        <p class="formula-line">
+          <span>{{ 'landing.formula.safe' | translate }}</span><b>=</b><span>(</span><span>{{ 'landing.formula.available' | translate }}</span><b>−</b><span>{{ 'landing.formula.charges' | translate }}</span><span>)</span><b>÷</b><span>{{ 'landing.formula.days' | translate }}</span>
+        </p>
+        <ul class="formula-notes">
+          <li>{{ 'landing.formula.availableNote' | translate }}</li>
+          <li>{{ 'landing.formula.chargesNote' | translate }}</li>
+          <li>{{ 'landing.formula.daysNote' | translate }}</li>
+        </ul>
+        <p class="formula-caveat">{{ 'landing.formula.caveat' | translate }}</p>
+      </div>
+    </section>
+
+    <!-- 5. Funciones -->
+    <section class="features" aria-labelledby="features-title" data-motion="reveal">
+      <header class="section-head">
+        <p class="section-kicker">{{ 'landing.features.kicker' | translate }}</p>
+        <h2 id="features-title">{{ 'landing.features.title' | translate }}</h2>
+      </header>
+      <ul class="features__grid">
+        @for (feature of features; track feature.key) {
+          <li class="feature">
+            <span class="feature__icon" aria-hidden="true">{{ feature.icon }}</span>
+            <h3>{{ ('landing.features.' + feature.key + 'Title') | translate }}</h3>
+            <p>{{ ('landing.features.' + feature.key + 'Text') | translate }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- 6. Principios -->
+    <section class="principles" aria-labelledby="principles-title" data-motion="reveal">
+      <header class="section-head">
+        <p class="section-kicker">{{ 'landing.principles.kicker' | translate }}</p>
+        <h2 id="principles-title">{{ 'landing.principles.title' | translate }}</h2>
+      </header>
+      <ol class="principles__list">
+        @for (principle of principles; track principle; let index = $index) {
+          <li>
+            <span class="principles__index">0{{ index + 1 }}</span>
+            <h3>{{ ('landing.principles.' + principle + 'Title') | translate }}</h3>
+            <p>{{ ('landing.principles.' + principle + 'Text') | translate }}</p>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- 7. Llamado final -->
+    <section class="final-cta" aria-labelledby="final-title" data-motion="reveal">
+      <h2 id="final-title">{{ 'landing.final.title' | translate }}</h2>
+      <p>{{ 'landing.final.text' | translate }}</p>
+      <a class="button button--primary" routerLink="/app">{{ 'landing.openWorkspace' | translate }} <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
 
   <footer class="landing-footer">
-    <a class="landing-brand" routerLink="/"><span class="landing-brand__mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M7 8.5h10.5c4.7 0 7.5 2.3 7.5 6.2 0 3.8-2.8 6.1-7.5 6.1H12" /><path d="M7 23.5h7.2M12 20.8l4.5 4.5M12 20.8l4.5-4.5" /></svg></span><span>Flow<span>Trim</span></span></a>
-    <span>{{ 'landing.kicker' | translate }}</span>
+    <a class="landing-brand" routerLink="/" aria-label="FlowTrim home"><span class="landing-brand__mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M7 8.5h10.5c4.7 0 7.5 2.3 7.5 6.2 0 3.8-2.8 6.1-7.5 6.1H12" /><path d="M7 23.5h7.2M12 20.8l4.5 4.5M12 20.8l4.5-4.5" /></svg></span><span>Flow<span>Trim</span></span></a>
+    <span>{{ 'landing.footer' | translate }}</span>
     <a href="#top">{{ 'landing.backToTop' | translate }} ↑</a>
   </footer>
   <app-back-to-top />
-</main>
+</div>
