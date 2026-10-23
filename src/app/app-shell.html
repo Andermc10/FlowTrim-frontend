@@ -12,43 +12,19 @@
 
     <div class="rail-label">{{ 'nav.controlWorkspace' | translate }}</div>
 
+    <!-- Navegación agrupada (EP-12 D9): el uso diario primero, luego suscripciones y las herramientas. -->
     <nav class="rail-nav">
-      <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
-        <span class="nav-icon" aria-hidden="true">⌂</span>
-        <span>{{ 'nav.overview' | translate }}</span>
-      </a>
-      <a routerLink="/app/transactions" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">≡</span>
-        <span>{{ 'nav.transactions' | translate }}</span>
-      </a>
-      <a routerLink="/app/accounts" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">◧</span>
-        <span>{{ 'nav.accounts' | translate }}</span>
-      </a>
-      <a routerLink="/app/categories" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">◈</span>
-        <span>{{ 'nav.categories' | translate }}</span>
-      </a>
-      <a routerLink="/app/subscriptions" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">◫</span>
-        <span>{{ 'nav.subscriptions' | translate }}</span>
-      </a>
-      <a routerLink="/app/upcoming" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">↗</span>
-        <span>{{ 'nav.upcoming' | translate }}</span>
-      </a>
-      <a routerLink="/app/simulator" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">✂</span>
-        <span>{{ 'nav.simulator' | translate }}</span>
-      </a>
-      <a routerLink="/app/analytics" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">◔</span>
-        <span>{{ 'nav.analyticsReports' | translate }}</span>
-      </a>
-      <a routerLink="/app/insights" routerLinkActive="is-active">
-        <span class="nav-icon" aria-hidden="true">◎</span>
-        <span>{{ 'nav.insights' | translate }}</span>
-      </a>
+      @for (group of navGroups; track group.labelKey) {
+        @if (group.labelKey) {
+          <div class="rail-group">{{ group.labelKey | translate }}</div>
+        }
+        @for (link of group.links; track link.path) {
+          <a [routerLink]="link.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: link.exact ?? false }">
+            <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>
+            <span>{{ link.labelKey | translate }}</span>
+          </a>
+        }
+      }
     </nav>
 
     <div class="rail-spacer"></div>
@@ -146,34 +122,33 @@
       <span aria-hidden="true">+</span>
     </button>
 
+    <!-- En móvil caben cuatro accesos directos; el resto del menú está en "Más" (con 9 enlaces se truncaban). -->
     <nav class="mobile-nav" [attr.aria-label]="'nav.controlWorkspace' | translate">
-      <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
-        <span aria-hidden="true">⌂</span><small>{{ 'nav.overview' | translate }}</small>
-      </a>
-      <a routerLink="/app/transactions" routerLinkActive="is-active">
-        <span aria-hidden="true">≡</span><small>{{ 'nav.transactions' | translate }}</small>
-      </a>
-      <a routerLink="/app/accounts" routerLinkActive="is-active">
-        <span aria-hidden="true">◧</span><small>{{ 'nav.accounts' | translate }}</small>
-      </a>
-      <a routerLink="/app/categories" routerLinkActive="is-active">
-        <span aria-hidden="true">◈</span><small>{{ 'nav.categories' | translate }}</small>
-      </a>
-      <a routerLink="/app/subscriptions" routerLinkActive="is-active">
-        <span aria-hidden="true">◫</span><small>{{ 'nav.subscriptions' | translate }}</small>
-      </a>
-      <a routerLink="/app/upcoming" routerLinkActive="is-active">
-        <span aria-hidden="true">↗</span><small>{{ 'nav.upcoming' | translate }}</small>
-      </a>
-      <a routerLink="/app/simulator" routerLinkActive="is-active">
-        <span aria-hidden="true">✂</span><small>{{ 'nav.simulator' | translate }}</small>
-      </a>
-      <a routerLink="/app/analytics" routerLinkActive="is-active">
-        <span aria-hidden="true">◔</span><small>{{ 'nav.analytics' | translate }}</small>
-      </a>
-      <a routerLink="/app/insights" routerLinkActive="is-active">
-        <span aria-hidden="true">◎</span><small>{{ 'nav.insights' | translate }}</small>
-      </a>
+      @for (link of mobileLinks; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: link.exact ?? false }">
+          <span aria-hidden="true">{{ link.icon }}</span><small>{{ link.labelKey | translate }}</small>
+        </a>
+      }
+      <button type="button" class="mobile-nav__more" [class.is-active]="moreOpen()" [attr.aria-expanded]="moreOpen()" (click)="moreOpen.set(true)">
+        <span aria-hidden="true">⋯</span><small>{{ 'nav.more' | translate }}</small>
+      </button>
     </nav>
+
+    @if (moreOpen()) {
+      <app-modal [title]="'nav.menu' | translate" (closeRequested)="moreOpen.set(false)">
+        <nav class="more-menu" [attr.aria-label]="'nav.menu' | translate">
+          @for (group of navGroups; track group.labelKey) {
+            @if (group.labelKey) {
+              <h3 class="more-menu__group">{{ group.labelKey | translate }}</h3>
+            }
+            @for (link of group.links; track link.path) {
+              <a [routerLink]="link.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: link.exact ?? false }" (click)="moreOpen.set(false)">
+                <span aria-hidden="true">{{ link.icon }}</span> {{ link.labelKey | translate }}
+              </a>
+            }
+          }
+        </nav>
+      </app-modal>
+    }
   </div>
 </div>
