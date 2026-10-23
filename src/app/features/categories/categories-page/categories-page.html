@@ -1,0 +1,114 @@
+<section class="categories">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'categories.kicker' | translate }}</p>
+      <h1>{{ 'categories.title' | translate }}</h1>
+      <p class="lede">{{ 'categories.lede' | translate }}</p>
+    </div>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'categories.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <div class="groups">
+      @for (kind of kinds; track kind) {
+        <section class="group" [attr.aria-labelledby]="'group-' + kind">
+          <header class="group__head">
+            <h2 [id]="'group-' + kind">{{ ('categories.group.' + kind) | translate }}</h2>
+            <button type="button" class="btn btn--ghost" (click)="openCreate(kind)">
+              <app-icon name="plus" /> {{ ('categories.add.' + kind) | translate }}
+            </button>
+          </header>
+          @if (activeOf(kind).length > 0) {
+            <ul class="chips">
+              @for (category of activeOf(kind); track category.id) {
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: category }" />
+              }
+            </ul>
+          } @else {
+            <p class="muted">{{ 'categories.emptyGroup' | translate }}</p>
+          }
+        </section>
+      }
+    </div>
+
+    @if (archived().length > 0) {
+      <details class="archived">
+        <summary>{{ 'categories.archived' | translate }} ({{ archived().length }})</summary>
+        <ul class="chips">
+          @for (category of archived(); track category.id) {
+            <ng-container *ngTemplateOutlet="chip; context: { $implicit: category }" />
+          }
+        </ul>
+      </details>
+    }
+  }
+
+  <ng-template #chip let-category>
+    <li class="chip" [class.chip--archived]="category.isArchived" [style.--swatch]="'var(--category-' + category.color + ')'">
+      <span class="chip__icon" aria-hidden="true"><app-category-icon [name]="category.icon" /></span>
+      <span class="chip__name">{{ category.name }}</span>
+      @if (category.isArchived) {
+        <span class="chip__kind">{{ ('categories.kind.' + category.kind) | translate }}</span>
+      }
+      <span class="chip__actions">
+        @if (!category.isArchived) {
+          <button type="button" class="icon-button" [attr.aria-label]="('categories.edit' | translate) + ': ' + category.name" [attr.title]="'categories.edit' | translate" (click)="openEdit(category)"><app-icon name="edit" /></button>
+          <button type="button" class="icon-button" [disabled]="busyId() === category.id" [attr.aria-label]="('categories.archive' | translate) + ': ' + category.name" [attr.title]="'categories.archive' | translate" (click)="setArchived(category, true)"><app-icon name="archive" /></button>
+        } @else {
+          <button type="button" class="icon-button" [disabled]="busyId() === category.id" [attr.aria-label]="('categories.restore' | translate) + ': ' + category.name" [attr.title]="'categories.restore' | translate" (click)="setArchived(category, false)"><app-icon name="restore" /></button>
+        }
+        <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="('categories.delete' | translate) + ': ' + category.name" [attr.title]="'categories.delete' | translate" (click)="openDelete(category)"><app-icon name="delete" /></button>
+      </span>
+    </li>
+  </ng-template>
+
+  @if (editorOpen()) {
+    <app-modal [title]="(editing() ? 'categories.editTitle' : 'categories.createTitle') | translate" (closeRequested)="requestEditorClose()">
+      <app-category-form
+        [category]="editing()"
+        [initialKind]="editorKind()"
+        (saved)="handleSaved()"
+        (closeRequested)="requestEditorClose()"
+        (dirtyChange)="editorDirty.set($event)" />
+    </app-modal>
+  }
+
+  @if (discardConfirmation()) {
+    <app-modal [title]="'modal.discardTitle' | translate" (closeRequested)="discardConfirmation.set(false)">
+      <p class="modal-copy">{{ 'modal.discardText' | translate }}</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="discardConfirmation.set(false)">{{ 'modal.keepEditing' | translate }}</button>
+        <button type="button" class="danger-button" (click)="closeEditor()">{{ 'modal.discard' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+
+  @if (deleteTarget(); as target) {
+    @if (target.hasTransactions) {
+      <!-- Usada por movimientos: no se puede borrar (EP-12 D5); archivarla la conserva en el historial. -->
+      <app-modal [title]="'categories.cannotDeleteTitle' | translate" (closeRequested)="closeDelete()">
+        <p class="modal-copy">{{ 'categories.cannotDeleteText' | translate: { name: target.name } }}</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary" (click)="closeDelete()">{{ 'common.cancel' | translate }}</button>
+          @if (!target.isArchived) {
+            <button type="button" class="primary-button" [disabled]="busyId() === target.id" (click)="setArchived(target, true)"><app-icon name="archive" /> {{ 'categories.archive' | translate }}</button>
+          }
+        </div>
+      </app-modal>
+    } @else {
+      <app-modal [title]="'modal.deleteTitle' | translate" (closeRequested)="closeDelete()">
+        <p class="modal-copy">{{ 'modal.deleteText' | translate }} <strong>{{ target.name }}</strong>.</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary" (click)="closeDelete()">{{ 'common.cancel' | translate }}</button>
+          <button type="button" class="danger-button" [disabled]="busyId() === target.id" (click)="confirmDelete()"><app-icon name="delete" /> {{ 'categories.delete' | translate }}</button>
+        </div>
+      </app-modal>
+    }
+  }
+</section>

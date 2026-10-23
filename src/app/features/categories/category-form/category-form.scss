@@ -1,0 +1,151 @@
+:host {
+  display: block;
+}
+
+form {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.choices {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choices legend {
+  margin-bottom: 0.5rem;
+  padding: 0;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.hint {
+  color: var(--color-muted);
+  font-size: 0.7rem;
+}
+
+// Radios nativos ocultos a la vista pero enfocables: el estilo va en el elemento hermano.
+.choices input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.kind-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.kind-option span {
+  display: inline-block;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.kind-option input:checked + span {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.kind-option input:disabled + span {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.swatch {
+  position: relative;
+  cursor: pointer;
+}
+
+.swatch__dot {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+// Solo el color elegido lleva anillo (en el color del texto, visible en ambos temas) y un hueco interior.
+.swatch input:checked + .swatch__dot {
+  border-color: var(--color-text);
+  box-shadow: inset 0 0 0 3px var(--color-surface);
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.6rem, 1fr));
+  gap: 0.45rem;
+}
+
+.icon-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.icon-option__box {
+  display: grid;
+  place-items: center;
+  height: 2.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  color: var(--color-muted);
+}
+
+.icon-option input:checked + .icon-option__box {
+  border-color: var(--swatch);
+  background: color-mix(in srgb, var(--swatch) 14%, transparent);
+  color: var(--swatch);
+}
+
+// Foco visible con teclado en los grupos de opciones.
+.choices input:focus-visible + span {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+button {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: var(--color-primary);
+  color: #061014;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button.secondary {
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+}

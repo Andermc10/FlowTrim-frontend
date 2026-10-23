@@ -22,6 +22,17 @@
   --color-warning: #ffb547;
   --color-danger: #ff6b6b;
   --color-shadow: rgba(0, 0, 0, 0.35);
+  // Colores de categoría (HU-65): claves fijas de la API; tonos claros para leerse sobre las superficies oscuras.
+  --category-slate: #a3b3ba;
+  --category-red: #ff7a7a;
+  --category-orange: #ff9f5a;
+  --category-amber: #ffc94d;
+  --category-green: #3ddc97;
+  --category-teal: #2fd4c4;
+  --category-blue: #6aa8ff;
+  --category-indigo: #a0a3ff;
+  --category-violet: #c08cff;
+  --category-pink: #ff85c0;
 }
 
 :root[data-theme='light'] {
@@ -44,6 +55,17 @@
   --color-warning: #a86400;
   --color-danger: #c63d47;
   --color-shadow: rgba(28, 62, 60, 0.14);
+  // Tonos oscuros con contraste suficiente sobre blanco.
+  --category-slate: #4f5f66;
+  --category-red: #b92f3a;
+  --category-orange: #a84b0c;
+  --category-amber: #7f5800;
+  --category-green: #0b7448;
+  --category-teal: #08736b;
+  --category-blue: #1f5cb8;
+  --category-indigo: #4549bd;
+  --category-violet: #7339b8;
+  --category-pink: #b02d6a;
 }
 
 html,
