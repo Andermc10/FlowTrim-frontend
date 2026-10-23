@@ -51,6 +51,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/subscriptions/usage/usage').then((m) => m.Usage),
       },
       {
+        path: 'accounts',
+        title: 'nav.accounts',
+        loadComponent: () => import('./features/accounts/accounts-page/accounts-page').then((m) => m.AccountsPage),
+      },
+      {
         path: 'upcoming',
         title: 'nav.upcoming',
         loadComponent: () => import('./features/subscriptions/upcoming-panel/upcoming-panel').then((m) => m.UpcomingPanel),

@@ -17,6 +17,10 @@
         <span class="nav-icon" aria-hidden="true">⌂</span>
         <span>{{ 'nav.overview' | translate }}</span>
       </a>
+      <a routerLink="/app/accounts" routerLinkActive="is-active">
+        <span class="nav-icon" aria-hidden="true">◧</span>
+        <span>{{ 'nav.accounts' | translate }}</span>
+      </a>
       <a routerLink="/app/subscriptions" routerLinkActive="is-active">
         <span class="nav-icon" aria-hidden="true">◫</span>
         <span>{{ 'nav.subscriptions' | translate }}</span>
@@ -127,6 +131,9 @@
     <nav class="mobile-nav" [attr.aria-label]="'nav.controlWorkspace' | translate">
       <a routerLink="/app" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
         <span aria-hidden="true">⌂</span><small>{{ 'nav.overview' | translate }}</small>
+      </a>
+      <a routerLink="/app/accounts" routerLinkActive="is-active">
+        <span aria-hidden="true">◧</span><small>{{ 'nav.accounts' | translate }}</small>
       </a>
       <a routerLink="/app/subscriptions" routerLinkActive="is-active">
         <span aria-hidden="true">◫</span><small>{{ 'nav.subscriptions' | translate }}</small>

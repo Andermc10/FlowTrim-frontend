@@ -1,0 +1,276 @@
+:host {
+  display: block;
+}
+
+.accounts {
+  width: 100%;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.empty {
+  padding: 4rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.empty p {
+  margin: 0 0 1.2rem;
+  color: var(--color-muted);
+}
+
+// Totales por moneda: dinero propio y, aparte, tarjetas de crédito.
+.totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.total {
+  padding: 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.total__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.total__label {
+  color: var(--color-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.currency-mark {
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.35rem;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.total__value {
+  display: block;
+  margin: 0.9rem 0 0.4rem;
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  letter-spacing: -0.06em;
+  overflow-wrap: anywhere;
+}
+
+.total__cards {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.total__cards strong {
+  color: var(--color-text);
+}
+
+.caveat {
+  margin: 0.8rem 0 1.6rem;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.account--archived {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.account__head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.account__head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.account__head small {
+  color: var(--color-muted);
+  font-size: 0.7rem;
+}
+
+.account__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 0.7rem;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.account__balance {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.account__balance-label {
+  color: var(--color-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.account__balance strong {
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+}
+
+// El signo "−" del formato ya indica el saldo negativo; el color solo lo refuerza.
+.account__balance .is-negative {
+  color: var(--color-danger);
+}
+
+.account__opening {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+}
+
+.account__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.archived {
+  margin-top: 1.6rem;
+}
+
+.archived summary {
+  margin-bottom: 1rem;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.icon-button:hover:not(:disabled),
+.icon-button:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.icon-button--danger {
+  color: var(--color-danger);
+}
+
+.icon-button--danger:hover:not(:disabled),
+.icon-button--danger:focus-visible {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+.link {
+  padding: 0 0.35rem;
+}
+
+.modal-copy {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.modal-actions .danger-button {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.modal-actions .primary-button {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #061014;
+}
+
+.modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 720px) {
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+}

@@ -1,0 +1,73 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="field field--wide">
+    <label for="account-name">{{ 'form.name' | translate }}</label>
+    <input
+      id="account-name"
+      type="text"
+      formControlName="name"
+      autocomplete="off"
+      [attr.maxlength]="nameMaxLength"
+      [placeholder]="'accounts.form.placeholder.name' | translate"
+      [attr.aria-invalid]="isInvalid('name')"
+      aria-describedby="account-name-error"
+    />
+    @if (form.controls.name.value.length >= nameMaxLength * 0.8) {
+      <span class="field__counter" [class.field__counter--limit]="form.controls.name.value.length >= nameMaxLength">
+        {{ form.controls.name.value.length }} / {{ nameMaxLength }}
+      </span>
+    }
+    <app-field-error id="account-name-error" [messageKey]="errorKey('name')" [serverMessages]="errorsFor('name')" />
+  </div>
+
+  <div class="field">
+    <label for="account-type">{{ 'accounts.form.type' | translate }}</label>
+    <select id="account-type" formControlName="type" aria-describedby="account-type-error">
+      @for (type of types; track type) {
+        <option [value]="type">{{ ('accounts.type.' + type) | translate }}</option>
+      }
+    </select>
+    <app-field-error id="account-type-error" [serverMessages]="errorsFor('type')" />
+  </div>
+
+  <div class="field">
+    <label for="account-currency">{{ 'form.currency' | translate }}</label>
+    <input
+      id="account-currency"
+      type="text"
+      maxlength="3"
+      autocomplete="off"
+      formControlName="currency"
+      placeholder="COP"
+      [attr.aria-invalid]="isInvalid('currency')"
+      [attr.aria-describedby]="currencyLocked ? 'account-currency-error account-currency-hint' : 'account-currency-error'"
+      (input)="upperCaseCurrency()"
+    />
+    @if (currencyLocked) {
+      <small id="account-currency-hint" class="hint">{{ 'accounts.form.currencyLocked' | translate }}</small>
+    }
+    <app-field-error id="account-currency-error" [messageKey]="errorKey('currency')" [serverMessages]="errorsFor('currency')" />
+  </div>
+
+  <div class="field field--wide">
+    <label for="account-opening">{{ 'accounts.form.openingBalance' | translate }}</label>
+    <input
+      id="account-opening"
+      type="number"
+      inputmode="decimal"
+      step="0.01"
+      formControlName="openingBalance"
+      [placeholder]="'accounts.form.placeholder.openingBalance' | translate"
+      [attr.aria-invalid]="isInvalid('openingBalance')"
+      aria-describedby="account-opening-error account-opening-hint"
+    />
+    <small id="account-opening-hint" class="hint">{{ 'accounts.form.openingBalanceHint' | translate }}</small>
+    <app-field-error id="account-opening-error" [messageKey]="errorKey('openingBalance')" [serverMessages]="errorsFor('openingBalance')" />
+  </div>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? ('form.saving' | translate) : (account ? ('form.saveChanges' | translate) : ('accounts.create' | translate)) }}
+    </button>
+  </div>
+</form>
