@@ -1,0 +1,116 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <fieldset class="type-toggle field--wide">
+    <legend class="visually-hidden">{{ 'transactions.form.type' | translate }}</legend>
+    @for (option of types; track option) {
+      <label class="type-option" [class]="'type-option type-option--' + option">
+        <input type="radio" formControlName="type" [value]="option" />
+        <span>{{ ('transactions.type.' + option) | translate }}</span>
+      </label>
+    }
+  </fieldset>
+
+  <div class="field field--wide">
+    <label for="tx-amount">
+      {{ 'form.amount' | translate }}
+      @if (currency(); as code) {
+        <span class="optional">({{ code }})</span>
+      }
+    </label>
+    <input
+      id="tx-amount"
+      type="number"
+      inputmode="decimal"
+      step="0.01"
+      min="0.01"
+      formControlName="amount"
+      class="amount-input"
+      [placeholder]="'form.placeholder.amount' | translate"
+      [attr.aria-invalid]="isInvalid('amount')"
+      aria-describedby="tx-amount-error"
+    />
+    <app-field-error id="tx-amount-error" [messageKey]="errorKey('amount')" [serverMessages]="errorsFor('amount')" />
+  </div>
+
+  <div class="field">
+    <label for="tx-account">{{ (type() === 'Transfer' ? 'transactions.form.fromAccount' : 'transactions.form.account') | translate }}</label>
+    <select id="tx-account" formControlName="accountId" [attr.aria-invalid]="isInvalid('accountId')" aria-describedby="tx-account-error">
+      @for (account of sourceAccounts(); track account.id) {
+        <option [value]="account.id">{{ account.name }} · {{ account.currency }}</option>
+      }
+    </select>
+    <app-field-error id="tx-account-error" [messageKey]="errorKey('accountId')" [serverMessages]="errorsFor('accountId')" />
+  </div>
+
+  @if (type() === 'Transfer') {
+    <div class="field">
+      <label for="tx-to-account">{{ 'transactions.form.toAccount' | translate }}</label>
+      <select id="tx-to-account" formControlName="toAccountId" [attr.aria-invalid]="isInvalid('toAccountId')" aria-describedby="tx-to-account-error tx-to-account-hint">
+        <option value="" disabled>{{ 'transactions.form.choose' | translate }}</option>
+        @for (account of destinationAccounts(); track account.id) {
+          <option [value]="account.id">{{ account.name }} · {{ account.currency }}</option>
+        }
+      </select>
+      <small id="tx-to-account-hint" class="hint">{{ 'transactions.form.sameCurrencyHint' | translate }}</small>
+      <app-field-error id="tx-to-account-error" [messageKey]="errorKey('toAccountId')" [serverMessages]="errorsFor('toAccountId')" />
+    </div>
+  } @else {
+    <div class="field">
+      <label for="tx-category">{{ 'transactions.form.category' | translate }}</label>
+      <select id="tx-category" formControlName="categoryId" [attr.aria-invalid]="isInvalid('categoryId')" aria-describedby="tx-category-error">
+        <option value="" disabled>{{ 'transactions.form.choose' | translate }}</option>
+        @for (category of kindCategories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+      <app-field-error id="tx-category-error" [messageKey]="errorKey('categoryId')" [serverMessages]="errorsFor('categoryId')" />
+    </div>
+  }
+
+  <div class="field">
+    <label for="tx-date">{{ 'transactions.form.date' | translate }}</label>
+    <input
+      id="tx-date"
+      type="date"
+      formControlName="date"
+      [max]="today"
+      [attr.aria-invalid]="isInvalid('date')"
+      aria-describedby="tx-date-error"
+    />
+    <app-field-error id="tx-date-error" [messageKey]="errorKey('date')" [serverMessages]="errorsFor('date')" />
+  </div>
+
+  <div class="field">
+    <label for="tx-description">{{ 'transactions.form.description' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+    <input
+      id="tx-description"
+      type="text"
+      autocomplete="off"
+      formControlName="description"
+      [attr.maxlength]="descriptionMaxLength"
+      [placeholder]="'transactions.form.placeholder.description' | translate"
+      [attr.aria-invalid]="isInvalid('description')"
+      aria-describedby="tx-description-error"
+    />
+    <app-field-error id="tx-description-error" [messageKey]="errorKey('description')" [serverMessages]="errorsFor('description')" />
+  </div>
+
+  <div class="field field--wide">
+    <label for="tx-note">{{ 'transactions.form.note' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+    <textarea
+      id="tx-note"
+      rows="2"
+      formControlName="note"
+      [attr.maxlength]="noteMaxLength"
+      [attr.aria-invalid]="isInvalid('note')"
+      aria-describedby="tx-note-error"
+    ></textarea>
+    <app-field-error id="tx-note-error" [messageKey]="errorKey('note')" [serverMessages]="errorsFor('note')" />
+  </div>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? ('form.saving' | translate) : (transaction ? ('form.saveChanges' | translate) : ('transactions.save' | translate)) }}
+    </button>
+  </div>
+</form>
