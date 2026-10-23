@@ -1,0 +1,384 @@
+:host {
+  display: block;
+}
+
+.transactions {
+  width: 100%;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+// El título del mes se ve; el <input type="month"> nativo queda encima, transparente, para abrir el selector.
+.month-picker {
+  position: relative;
+  min-width: 10rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.month-picker__title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.month-picker input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.month-picker:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter select,
+.filter--search {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.filter--search {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  color: var(--color-primary);
+}
+
+.filter--search input {
+  width: 9rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.filter--search:focus-within,
+.filter select:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.empty {
+  padding: 3.5rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.empty p {
+  margin: 0 0 1.2rem;
+  color: var(--color-muted);
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
+}
+
+.total {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.total dl {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.7rem 0 0;
+}
+
+.total dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.total dt {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.total dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.currency-mark {
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.35rem;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+// El signo (+ / −) y el texto oculto dicen el tipo; el color solo lo refuerza.
+.amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.amount--income {
+  color: var(--color-success);
+}
+
+.amount--expense {
+  color: var(--color-danger);
+}
+
+.day {
+  margin-bottom: 1.1rem;
+}
+
+.day__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0.2rem 0.45rem;
+}
+
+.day__head h2 {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.day__net {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.row + .row {
+  border-top: 1px solid var(--color-border);
+}
+
+.row__icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--swatch) 16%, transparent);
+  color: var(--swatch);
+}
+
+.row__main {
+  display: grid;
+  min-width: 0;
+}
+
+.row__main strong {
+  overflow: hidden;
+  font-size: 0.86rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row__main small {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row__amount {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.row__actions {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.load-more {
+  display: block;
+  margin: 0.5rem auto 0;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.icon-button:hover:not(:disabled),
+.icon-button:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.icon-button--danger {
+  color: var(--color-danger);
+}
+
+.icon-button--danger:hover:not(:disabled),
+.icon-button--danger:focus-visible {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+.link {
+  padding: 0 0.35rem;
+}
+
+.modal-copy {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.modal-actions .danger-button {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 720px) {
+  .toolbar,
+  .filters {
+    display: grid;
+    width: 100%;
+  }
+
+  .month-nav {
+    justify-content: space-between;
+  }
+
+  .month-picker {
+    flex: 1;
+  }
+
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter select,
+  .filter--search,
+  .filter--search input {
+    width: 100%;
+  }
+
+  .filter--search {
+    grid-column: 1 / -1;
+  }
+
+  // En móvil las acciones pasan debajo del importe para que el título tenga espacio.
+  .row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .row__actions {
+    grid-column: 2 / -1;
+    justify-content: flex-end;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+}

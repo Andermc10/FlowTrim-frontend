@@ -1,0 +1,136 @@
+:host {
+  display: block;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field--wide,
+.actions {
+  grid-column: 1 / -1;
+}
+
+.hint {
+  color: var(--color-muted);
+  font-size: 0.7rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.78rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  outline: 0;
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  font: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.amount-input {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+// Selector de tipo: radios nativos con estilo de botones segmentados.
+.type-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.type-option {
+  position: relative;
+}
+
+.type-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.type-option span {
+  display: block;
+  padding: 0.55rem;
+  border-radius: 0.55rem;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.type-option input:checked + span {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.type-option--Expense input:checked + span {
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+  color: var(--color-danger);
+}
+
+.type-option--Income input:checked + span {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.type-option input:focus-visible + span {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+button {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: var(--color-primary);
+  color: #061014;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button.secondary {
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+}
+
+@media (max-width: 580px) {
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .field--wide,
+  .actions {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,182 @@
+<section class="transactions">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'transactions.kicker' | translate }}</p>
+      <h1>{{ 'transactions.title' | translate }}</h1>
+      <p class="lede">{{ 'transactions.lede' | translate }}</p>
+    </div>
+    @if (hasActiveAccounts()) {
+      <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'transactions.add' | translate }}</button>
+    }
+  </div>
+
+  <div class="toolbar">
+    <div class="month-nav" role="group" [attr.aria-label]="'transactions.month' | translate">
+      <button type="button" class="icon-button" [attr.aria-label]="'transactions.previousMonth' | translate" (click)="changeMonth(-1)">‹</button>
+      <label class="month-picker">
+        <span class="month-picker__title">{{ monthTitle() }}</span>
+        <input type="month" [value]="month()" [max]="currentMonth" [attr.aria-label]="'transactions.month' | translate" #m (change)="setMonth(m.value)" />
+      </label>
+      <button type="button" class="icon-button" [attr.aria-label]="'transactions.nextMonth' | translate" [disabled]="month() >= currentMonth" (click)="changeMonth(1)">›</button>
+    </div>
+
+    <div class="filters">
+      <label class="filter">
+        <span class="visually-hidden">{{ 'transactions.filter.account' | translate }}</span>
+        <select [value]="accountId()" #a (change)="setAccount(a.value)">
+          <option value="">{{ 'transactions.filter.allAccounts' | translate }}</option>
+          @for (account of accounts(); track account.id) {
+            <option [value]="account.id">{{ account.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="filter">
+        <span class="visually-hidden">{{ 'transactions.filter.category' | translate }}</span>
+        <select [value]="categoryId()" #c (change)="setCategory(c.value)">
+          <option value="">{{ 'transactions.filter.allCategories' | translate }}</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="filter">
+        <span class="visually-hidden">{{ 'transactions.filter.type' | translate }}</span>
+        <select [value]="type()" #t (change)="setType(t.value)">
+          <option value="">{{ 'transactions.filter.allTypes' | translate }}</option>
+          @for (option of types; track option) {
+            <option [value]="option">{{ ('transactions.type.' + option) | translate }}</option>
+          }
+        </select>
+      </label>
+      <label class="filter filter--search">
+        <span aria-hidden="true">⌕</span>
+        <input type="search" [value]="search()" [placeholder]="'transactions.filter.search' | translate" [attr.aria-label]="'transactions.filter.search' | translate" #q (input)="setSearch(q.value)" />
+      </label>
+      @if (filtered()) {
+        <button type="button" class="link" (click)="clearFilters()">{{ 'transactions.filter.clear' | translate }}</button>
+      }
+    </div>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'transactions.loadError' | translate }}
+      <button type="button" class="link" (click)="retry()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (!hasActiveAccounts() && items().length === 0) {
+    <div class="empty">
+      <span class="empty__mark" aria-hidden="true">◧</span>
+      <p>{{ 'transactions.noAccounts' | translate }}</p>
+      <a class="btn" routerLink="/app/accounts">{{ 'accounts.addFirst' | translate }}</a>
+    </div>
+  } @else {
+    @if (totals().length > 0) {
+      <div class="totals" role="list" [attr.aria-label]="'transactions.totals' | translate">
+        @for (total of totals(); track total.currency) {
+          <article class="total" role="listitem">
+            <span class="currency-mark">{{ total.currency }}</span>
+            <dl>
+              <div><dt>{{ 'transactions.income' | translate }}</dt><dd class="amount amount--income">+{{ total.income | money: total.currency }}</dd></div>
+              <div><dt>{{ 'transactions.expenses' | translate }}</dt><dd class="amount amount--expense">-{{ total.expense | money: total.currency }}</dd></div>
+              <div><dt>{{ 'transactions.net' | translate }}</dt><dd class="amount" [class.amount--expense]="total.net < 0">{{ total.net | money: total.currency }}</dd></div>
+            </dl>
+          </article>
+        }
+      </div>
+    }
+
+    @if (days().length === 0) {
+      <div class="empty">
+        <span class="empty__mark" aria-hidden="true">≡</span>
+        <p>{{ (filtered() ? 'transactions.noMatch' : 'transactions.emptyMonth') | translate }}</p>
+        @if (hasActiveAccounts() && !filtered()) {
+          <button class="btn" type="button" (click)="openCreate()">{{ 'transactions.add' | translate }}</button>
+        }
+      </div>
+    } @else {
+      @for (day of days(); track day.date) {
+        <section class="day" [attr.aria-label]="dayTitle(day.date)">
+          <header class="day__head">
+            <h2>{{ dayTitle(day.date) }}</h2>
+            <span class="day__net">
+              @for (net of day.net; track net.currency) {
+                <span class="amount" [class.amount--expense]="net.amount < 0">{{ net.amount | money: net.currency }}</span>
+              }
+            </span>
+          </header>
+          <ul class="rows">
+            @for (item of day.items; track item.id) {
+              <li class="row" [style.--swatch]="item.categoryColor ? 'var(--category-' + item.categoryColor + ')' : 'var(--color-primary)'">
+                <span class="row__icon" aria-hidden="true">
+                  @if (item.categoryIcon; as icon) {
+                    <app-category-icon [name]="icon" />
+                  } @else {
+                    ⇄
+                  }
+                </span>
+                <span class="row__main">
+                  <strong>{{ rowTitle(item) }}</strong>
+                  <small>
+                    {{ item.accountName }}
+                    @if (item.toAccountName) { → {{ item.toAccountName }} }
+                    @if (item.description && item.categoryName) { · {{ item.categoryName }} }
+                  </small>
+                </span>
+                <span class="row__amount amount" [class.amount--income]="item.type === 'Income'" [class.amount--expense]="item.type === 'Expense'">
+                  <span class="visually-hidden">{{ ('transactions.type.' + item.type) | translate }}:</span>
+                  {{ item.type === 'Income' ? '+' : item.type === 'Expense' ? '-' : '' }}{{ item.amount | money: item.currency }}
+                </span>
+                <span class="row__actions">
+                  <button type="button" class="icon-button" [attr.aria-label]="('transactions.edit' | translate) + ': ' + rowTitle(item)" [attr.title]="'transactions.edit' | translate" (click)="openEdit(item)"><app-icon name="edit" /></button>
+                  <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="('transactions.delete' | translate) + ': ' + rowTitle(item)" [attr.title]="'transactions.delete' | translate" (click)="deleteTarget.set(item)"><app-icon name="delete" /></button>
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+      @if (hasMore()) {
+        <button type="button" class="btn btn--ghost load-more" [disabled]="loadingMore()" (click)="loadMore()">
+          {{ (loadingMore() ? 'common.loading' : 'transactions.loadMore') | translate }}
+        </button>
+      }
+    }
+  }
+
+  @if (editorOpen()) {
+    <app-modal [title]="(editing() ? 'transactions.editTitle' : 'transactions.createTitle') | translate" (closeRequested)="requestEditorClose()">
+      <app-transaction-form
+        [transaction]="editing()"
+        [accounts]="accounts()"
+        [categories]="categories()"
+        (saved)="handleSaved($event)"
+        (closeRequested)="requestEditorClose()"
+        (dirtyChange)="editorDirty.set($event)" />
+    </app-modal>
+  }
+
+  @if (discardConfirmation()) {
+    <app-modal [title]="'modal.discardTitle' | translate" (closeRequested)="discardConfirmation.set(false)">
+      <p class="modal-copy">{{ 'modal.discardText' | translate }}</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="discardConfirmation.set(false)">{{ 'modal.keepEditing' | translate }}</button>
+        <button type="button" class="danger-button" (click)="closeEditor()">{{ 'modal.discard' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+
+  @if (deleteTarget(); as target) {
+    <app-modal [title]="'modal.deleteTitle' | translate" (closeRequested)="deleteTarget.set(null)">
+      <p class="modal-copy">
+        {{ 'transactions.deleteText' | translate }}
+        <strong>{{ rowTitle(target) }} · {{ target.amount | money: target.currency }} · {{ dayTitle(target.date) }}</strong>
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="deleteTarget.set(null)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="danger-button" [disabled]="deleting()" (click)="confirmDelete()"><app-icon name="delete" /> {{ 'transactions.delete' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+</section>
