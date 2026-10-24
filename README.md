@@ -41,10 +41,11 @@ FlowTrim is a manual-data portfolio project: it never connects to banks, records
 | | |
 |---|---|
 | ![Landing](docs/screenshots/landing.png) | ![Landing, light theme](docs/screenshots/landing-light.png) |
-| ![Landing: the daily story](docs/screenshots/landing-story.png) | ![Subscriptions](docs/screenshots/subscriptions.png) |
-| ![Upcoming charges](docs/screenshots/upcoming.png) | ![Analytics](docs/screenshots/analytics.png) |
-| ![Simulator](docs/screenshots/simulator.png) | ![Insights](docs/screenshots/insights.png) |
-| ![CSV import preview](docs/screenshots/import.png) | |
+| ![Today: safe to spend today](docs/screenshots/today.png) | ![Transactions by day](docs/screenshots/transactions.png) |
+| ![Accounts with computed balances](docs/screenshots/accounts.png) | ![Landing: the daily story](docs/screenshots/landing-story.png) |
+| ![Subscriptions](docs/screenshots/subscriptions.png) | ![Upcoming charges](docs/screenshots/upcoming.png) |
+| ![Analytics](docs/screenshots/analytics.png) | ![Simulator](docs/screenshots/simulator.png) |
+| ![Insights](docs/screenshots/insights.png) | ![CSV import preview](docs/screenshots/import.png) |
 
 ## Built with
 
