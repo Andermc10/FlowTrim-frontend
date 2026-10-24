@@ -7,7 +7,7 @@
 [![Frontend CI](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Andermc10/FlowTrim-frontend/actions/workflows/ci.yml)
 ![Angular 22](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![Unit tests](https://img.shields.io/badge/unit%20tests-204%20passing-2ea44f)
+![Unit tests](https://img.shields.io/badge/unit%20tests-218%20passing-2ea44f)
 ![Playwright](https://img.shields.io/badge/e2e-Playwright-2EAD33?logo=playwright&logoColor=white)
 
 [API](https://github.com/Andermc10/FlowTrim-backend) · [Specs & backlog](https://github.com/Andermc10/FlowTrim-tracker) · [CSV format](https://github.com/Andermc10/FlowTrim-tracker/blob/main/docs/SUBSCRIPTION-CSV-FORMAT.md)
@@ -36,11 +36,12 @@ FlowTrim is a manual-data portfolio project: it never connects to banks, records
 
 ## Screenshots
 
-> Dark theme with fictional data.
+> Dark theme with fictional data, unless noted.
 
 | | |
 |---|---|
-| ![Landing](docs/screenshots/landing.png) | ![Subscriptions](docs/screenshots/subscriptions.png) |
+| ![Landing](docs/screenshots/landing.png) | ![Landing, light theme](docs/screenshots/landing-light.png) |
+| ![Landing: the daily story](docs/screenshots/landing-story.png) | ![Subscriptions](docs/screenshots/subscriptions.png) |
 | ![Upcoming charges](docs/screenshots/upcoming.png) | ![Analytics](docs/screenshots/analytics.png) |
 | ![Simulator](docs/screenshots/simulator.png) | ![Insights](docs/screenshots/insights.png) |
 | ![CSV import preview](docs/screenshots/import.png) | |
@@ -49,7 +50,8 @@ FlowTrim is a manual-data portfolio project: it never connects to banks, records
 
 - **Angular 22**: standalone components, signals, OnPush everywhere, lazy routes; strict TypeScript 6 and SCSS.
 - **Carbon Signal** design system with CSS custom properties: persisted light and dark themes, reduced-motion support and no UI library.
-- **Chart.js 4** behind a reusable chart component; every workspace screen is lazy (initial bundle ≈ 375 kB).
+- **Chart.js 4** behind a reusable chart component; every workspace screen is lazy (initial bundle ≈ 433 kB).
+- **GSAP 3.15 + ScrollTrigger** only on the landing, loaded with a dynamic `import()` after the first render (two lazy chunks, never in the initial bundle and never requested with reduced motion). The landing is complete without it: on desktop the daily story pins and scrubs through four steps, on phones the steps simply reveal.
 - **English and Spanish** in the client, with a test that keeps both languages' keys in sync.
 - **OIDC Authorization Code + PKCE**: no passwords in the app, token in `sessionStorage`, guarded `/app/**`.
 - **Vitest** for unit tests and **Playwright** for the critical browser flow.
@@ -119,7 +121,7 @@ To use your own Auth0 tenant, create a **Single Page Application** with callback
 src/app/
   core/       auth (guard, interceptors, PKCE), i18n, theme, money/date formatting, files,
               forms (shared validators, field errors), ui (modal, toast, chart, icon, sound, back-to-top)
-  features/   landing · auth · subscriptions · summary · simulator · analytics · insights · reports · imports
+  features/   landing · auth · today · transactions · accounts · categories · subscriptions · summary · simulator · analytics · insights · reports · imports
 src/styles.scss   design tokens and shared building blocks (buttons, banners, data tables)
 e2e/              Playwright flow, local OIDC test issuer, static SPA server
 ```
