@@ -17,6 +17,8 @@
   --color-primary-bright: #54dce5;
   --color-primary-soft: rgba(31, 193, 206, 0.12);
   --color-primary-soft-strong: rgba(31, 193, 206, 0.28);
+  // Texto sobre fondos del color principal (botones, selección): oscuro sobre el turquesa claro del tema oscuro.
+  --color-on-primary: #061014;
   --color-success: #00c483;
   --color-success-soft: rgba(0, 196, 131, 0.13);
   --color-warning: #ffb547;
@@ -46,10 +48,14 @@
   --color-muted: #607277;
   --color-border: #d6e2e0;
   --color-border-strong: #a8c1be;
-  --color-primary: #087f89;
+  // Un poco más oscuro que el original (#087f89): con él, el texto pequeño de este color sobre el fondo claro no
+  // llegaba al contraste 4,5:1 de WCAG AA (4,41). Medido en la matriz de calidad de HU-71.
+  --color-primary: #077a84;
   --color-primary-bright: #0b9ba6;
   --color-primary-soft: rgba(8, 127, 137, 0.1);
   --color-primary-soft-strong: rgba(8, 127, 137, 0.23);
+  // Sobre el turquesa oscuro del tema claro el texto oscuro daba 4,04:1; el blanco da más de 5:1.
+  --color-on-primary: #ffffff;
   --color-success: #008f61;
   --color-success-soft: rgba(0, 143, 97, 0.12);
   --color-warning: #a86400;
@@ -135,7 +141,7 @@ select:focus-visible {
 }
 
 ::selection {
-  color: #061014;
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 
@@ -194,7 +200,7 @@ select:focus-visible {
   border: 1px solid transparent;
   border-radius: 0.65rem;
   background: var(--color-primary);
-  color: #061014;
+  color: var(--color-on-primary);
   font-size: 0.78rem;
   font-weight: 800;
   text-decoration: none;

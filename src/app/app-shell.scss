@@ -177,7 +177,7 @@
   padding: 0.75rem;
   border-radius: 0.7rem;
   background: var(--color-primary);
-  color: #061014;
+  color: var(--color-on-primary);
   font-size: 0.78rem;
   font-weight: 800;
   text-decoration: none;
@@ -232,7 +232,7 @@
   border: 0;
   border-radius: 999px;
   background: var(--color-primary);
-  color: #061014;
+  color: var(--color-on-primary);
   cursor: pointer;
   font-size: 0.78rem;
   font-weight: 800;
@@ -320,7 +320,7 @@
     border: 0;
     border-radius: 50%;
     background: var(--color-primary);
-    color: #061014;
+    color: var(--color-on-primary);
     box-shadow: 0 0.8rem 2rem var(--color-shadow);
     cursor: pointer;
     font-size: 1.7rem;

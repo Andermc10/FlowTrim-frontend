@@ -50,7 +50,7 @@ import { RouterLink } from '@angular/router';
       padding: 0.8rem 1rem;
       border-radius: 0.6rem;
       background: var(--color-primary);
-      color: #061014;
+      color: var(--color-on-primary);
       font-weight: 800;
       text-decoration: none;
     }
