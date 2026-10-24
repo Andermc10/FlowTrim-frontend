@@ -3,13 +3,18 @@ import { provideRouter } from '@angular/router';
 
 import { I18nService } from '../../core/i18n/i18n.service';
 import { Landing } from './landing';
+import { LandingMotionService } from './landing-motion.service';
 import { landingSample } from './landing-sample';
 
 /** HU-69: el landing está completo sin animaciones, en los dos idiomas, y sus cifras de ejemplo cuadran. */
 describe('Landing', () => {
   beforeEach(() => {
     localStorage.clear();
-    TestBed.configureTestingModule({ imports: [Landing], providers: [provideRouter([])] });
+    TestBed.configureTestingModule({
+      imports: [Landing],
+      // Sin capa de movimiento: estas pruebas verifican la página estática (la capa tiene sus propias pruebas).
+      providers: [provideRouter([]), { provide: LandingMotionService, useValue: { start: () => new Promise(() => undefined) } }],
+    });
   });
 
   function render() {

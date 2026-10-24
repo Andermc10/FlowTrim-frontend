@@ -38,7 +38,7 @@
         <div class="mock mock--today" role="img" [attr.aria-label]="'landing.mock.todayLabel' | translate: { amount: (sample.safeToSpend | money: sample.currency), days: sample.daysLeft }">
           <div aria-hidden="true">
             <div class="mock__top"><span class="mock__label">{{ 'today.safeToSpend' | translate }}</span><span class="mock__currency">{{ sample.currency }}</span></div>
-            <strong class="mock__big" data-motion="counter">{{ sample.safeToSpend | money: sample.currency }}</strong>
+            <strong class="mock__big" data-motion="counter" [attr.data-value]="sample.safeToSpend">{{ sample.safeToSpend | money: sample.currency }}</strong>
             <span class="mock__sub">{{ 'today.perDay' | translate: { days: sample.daysLeft } }}</span>
             <div class="mock__formula">
               <span>{{ sample.available | money: sample.currency }}</span><b>−</b><span>{{ sample.committed | money: sample.currency }}</span><b>÷</b><span>{{ sample.daysLeft }}</span>
@@ -60,6 +60,10 @@
         <h2 id="story-title">{{ 'landing.story.title' | translate }}</h2>
         <p class="section-lead">{{ 'landing.story.lead' | translate }} <span class="sample-tag sample-tag--inline">{{ 'landing.sample' | translate }}</span></p>
       </header>
+
+      <!-- Progreso de la historia fijada (solo visible con la capa de movimiento en escritorio). -->
+      <div class="story__stage">
+      <div class="story__progress" aria-hidden="true"><span class="story__progress-bar"></span></div>
 
       <ol class="story__steps">
         <li class="story-step" data-motion="step">
@@ -140,6 +144,7 @@
           </div>
         </li>
       </ol>
+      </div>
     </section>
 
     <!-- 3. Capítulo de suscripciones -->
