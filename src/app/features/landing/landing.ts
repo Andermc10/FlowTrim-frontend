@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injector, afterNextRender, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { landingSample } from './landing-sample';
+import { LandingMotionHandle, LandingMotionService } from './landing-motion.service';
 import { I18nService } from '../../core/i18n/i18n.service';
+import { localeFor, moneyFormatter } from '../../core/format/money';
 import { MoneyPipe } from '../../core/format/money.pipe';
 import { ThemeService } from '../../core/theme/theme.service';
 import { BackToTop } from '../../core/ui/back-to-top/back-to-top';
@@ -29,6 +31,9 @@ interface Feature {
 export class Landing {
   protected readonly i18n = inject(I18nService);
   private readonly theme = inject(ThemeService);
+  private readonly motion = inject(LandingMotionService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
 
   protected readonly sample = landingSample;
   protected readonly themeMode = this.theme.mode;
@@ -47,6 +52,26 @@ export class Landing {
 
   protected readonly principles: readonly string[] = ['manual', 'facts', 'deterministic', 'isolated'];
 
+  private motionHandle: LandingMotionHandle | null = null;
+  private destroyed = false;
+
+  constructor() {
+    // HU-70: la capa de movimiento se carga después del primer render y nunca con movimiento reducido (EP-13 D6).
+    afterNextRender(() => this.startMotion());
+
+    // Al cambiar de idioma cambian las longitudes de los textos: ScrollTrigger recalcula el pin tras el nuevo render.
+    effect(() => {
+      this.i18n.language();
+      afterNextRender(() => this.motionHandle?.refresh(), { injector: this.injector });
+    });
+
+    inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
+      this.motionHandle?.destroy();
+      this.motionHandle = null;
+    });
+  }
+
   protected toggleLanguage(): void {
     this.i18n.toggleLanguage();
   }
@@ -58,4 +83,27 @@ export class Landing {
   protected themeLabel(): string {
     return this.i18n.translate(this.themeMode() === 'dark' ? 'nav.switchToLight' : 'nav.switchToDark');
   }
+
+  private startMotion(): void {
+    if (prefersReducedMotion()) {
+      return;
+    }
+    const format = (value: number) => moneyFormatter(this.sample.currency, localeFor(this.i18n.language()))(value);
+    this.motion.start(this.host.nativeElement, format).then(
+      (handle) => {
+        // Si el usuario ya salió del landing mientras GSAP cargaba, se deshace de inmediato.
+        if (this.destroyed) {
+          handle.destroy();
+        } else {
+          this.motionHandle = handle;
+        }
+      },
+      // Sin red o con el chunk bloqueado el landing sigue completo y estático (EP-13 §8).
+      (error: unknown) => console.warn('Landing motion is unavailable; showing the static page.', error),
+    );
+  }
+}
+
+function prefersReducedMotion(): boolean {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }

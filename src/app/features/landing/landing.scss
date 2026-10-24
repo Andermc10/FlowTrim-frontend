@@ -21,8 +21,7 @@ main > section,
 // Enlace para saltar al contenido: visible solo con el foco del teclado.
 .skip-link {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
+  inset: 0.75rem auto auto 0.75rem;
   z-index: 30;
   padding: 0.6rem 0.9rem;
   border-radius: 0.6rem;
@@ -98,10 +97,6 @@ main:focus {
   text-decoration: none;
 }
 
-.landing-nav__anchor:hover {
-  color: var(--color-text);
-}
-
 .landing-toggle {
   min-width: 2.1rem;
   height: 2.1rem;
@@ -116,10 +111,6 @@ main:focus {
   font-weight: 800;
 }
 
-.landing-toggle:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
 
 .landing-nav__cta {
   display: inline-flex;
@@ -135,6 +126,8 @@ main:focus {
   white-space: nowrap;
 }
 
+.landing-nav__anchor:hover,
+.landing-toggle:hover,
 .landing-nav__cta:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
@@ -521,11 +514,6 @@ kbd {
 }
 
 // 2. Historia del día
-.story {
-  padding: 5rem 0;
-  border-top: 1px solid var(--color-border);
-}
-
 .story__steps {
   display: grid;
   gap: 4.5rem;
@@ -545,7 +533,8 @@ kbd {
   order: 2;
 }
 
-.story-step__index {
+.story-step__index,
+.principles__index {
   color: var(--color-primary);
   font-size: 0.75rem;
   font-weight: 800;
@@ -565,11 +554,55 @@ kbd {
   line-height: 1.7;
 }
 
-// 3. Suscripciones
-.chapter {
+// Historia fijada (HU-70, escritorio): los pasos se superponen en un escenario y el scroll los recorre. Esta clase solo
+// la pone la capa de movimiento; sin ella la historia se lee apilada.
+.story__progress {
+  display: none;
+}
+
+.story--pinned .story__progress {
+  display: block;
+  height: 3px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.story__progress-bar {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.story--pinned .story__steps {
+  position: relative;
+  height: min(68vh, 34rem);
+}
+
+.story--pinned .story-step {
+  position: absolute;
+  inset: 0;
+}
+
+// Fijada, todos los pasos usan la misma disposición: el cambio ocurre en el mismo sitio y no se cruzan textos.
+.story--pinned .story-step:nth-child(even) .story-step__text {
+  order: 0;
+}
+
+// Secciones con el mismo espaciado y separador.
+.story,
+.chapter,
+.formula-section,
+.features,
+.principles {
   padding: 5rem 0;
   border-top: 1px solid var(--color-border);
 }
+
+// 3. Suscripciones
 
 .subs-grid {
   display: grid;
@@ -582,6 +615,10 @@ kbd {
   align-content: start;
   gap: 0.7rem;
   padding: 1.3rem;
+}
+
+.subs-card,
+.feature {
   border: 1px solid var(--color-border);
   border-radius: 1rem;
   background: var(--color-surface);
@@ -636,8 +673,6 @@ kbd {
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
   gap: 3rem;
   align-items: center;
-  padding: 5rem 0;
-  border-top: 1px solid var(--color-border);
 }
 
 .formula-card {
@@ -681,11 +716,6 @@ kbd {
 }
 
 // 5. Funciones
-.features {
-  padding: 5rem 0;
-  border-top: 1px solid var(--color-border);
-}
-
 .features__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -697,9 +727,6 @@ kbd {
 
 .feature {
   padding: 1.2rem;
-  border: 1px solid var(--color-border);
-  border-radius: 1rem;
-  background: var(--color-surface);
 }
 
 .feature__icon {
@@ -718,7 +745,8 @@ kbd {
   font-size: 1rem;
 }
 
-.feature p {
+.feature p,
+.principles__list p {
   margin: 0;
   color: var(--color-muted);
   font-size: 0.84rem;
@@ -726,11 +754,6 @@ kbd {
 }
 
 // 6. Principios
-.principles {
-  padding: 5rem 0;
-  border-top: 1px solid var(--color-border);
-}
-
 .principles__list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -740,23 +763,11 @@ kbd {
   list-style: none;
 }
 
-.principles__index {
-  color: var(--color-primary);
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
 .principles__list h3 {
   margin: 0.6rem 0 0.5rem;
   font-size: 1rem;
 }
 
-.principles__list p {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 0.84rem;
-  line-height: 1.6;
-}
 
 // 7. Llamado final
 .final-cta {
@@ -786,7 +797,7 @@ kbd {
   font-size: 0.75rem;
 }
 
-.landing-footer a:not(.landing-brand) {
+.landing-footer > a:last-child {
   color: var(--color-muted);
 }
 
