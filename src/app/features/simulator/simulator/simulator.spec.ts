@@ -14,6 +14,7 @@ function subscription(id: string, name: string, status: 'Active' | 'Inactive' = 
   return {
     id, name, category: null, amount: 100, currency: 'COP', billingCycle: 'Monthly', nextBillingDate: '2026-11-01',
     status, createdAt: '2026-10-01T00:00:00Z', updatedAt: '2026-10-01T00:00:00Z',
+    kind: 'Subscription', paymentUrl: null, defaultAccountId: null, categoryId: null, monthlyEquivalent: 100,
   };
 }
 

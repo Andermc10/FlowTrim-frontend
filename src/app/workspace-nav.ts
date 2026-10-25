@@ -45,10 +45,10 @@ export const navGroups: readonly NavGroup[] = [
   },
 ];
 
-/** Accesos directos de la barra inferior móvil; el resto se abre desde "Más". */
+/** Accesos directos de la barra inferior móvil (rótulos cortos para 360 px); el resto se abre desde "Más". */
 export const mobileLinks: readonly NavLink[] = [
   { path: '/app', labelKey: 'nav.today', icon: '☀', exact: true },
   { path: '/app/transactions', labelKey: 'nav.transactions', icon: '≡' },
   { path: '/app/accounts', labelKey: 'nav.accounts', icon: '◧' },
-  { path: '/app/subscriptions', labelKey: 'nav.subscriptions', icon: '◫' },
+  { path: '/app/subscriptions', labelKey: 'nav.payments', icon: '◫' },
 ];

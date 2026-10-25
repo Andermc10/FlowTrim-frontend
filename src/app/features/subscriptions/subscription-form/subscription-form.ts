@@ -13,29 +13,39 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import {
   BillingCycle,
   CreateSubscriptionRequest,
+  SubscriptionKind,
   SubscriptionStatus,
   UpdateSubscriptionRequest,
   ValidationProblemDetails,
+  billingCycles,
+  subscriptionKinds,
 } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
+import { AccountsService } from '../../accounts/accounts-service';
+import { AccountResponse } from '../../accounts/accounts.models';
+import { CategoriesService } from '../../categories/categories-service';
+import { CategoryResponse } from '../../categories/categories.models';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { productToday } from '../../../core/format/product-calendar';
 import { FieldError } from '../../../core/forms/field-error';
 import { ErrorMessages, FormValidators, visibleErrorKey } from '../../../core/forms/form-validators';
+import { CategoryIcon } from '../../../core/ui/icon/category-icon';
 
 type FormStatus = 'idle' | 'loading' | 'saving' | 'error';
 
-type FieldName = 'name' | 'category' | 'amount' | 'currency' | 'nextBillingDate';
+type FieldName = 'name' | 'category' | 'amount' | 'currency' | 'nextBillingDate' | 'paymentUrl';
 
-/** Límites del dominio (Subscription.NameMaxLength / CategoryMaxLength en la API). */
+/** Límites del dominio (Subscription.NameMaxLength / CategoryMaxLength / PaymentUrlMaxLength en la API). */
 export const nameMaxLength = 120;
 export const categoryMaxLength = 60;
+export const paymentUrlMaxLength = 500;
 
 // Mensaje de cada regla, en el orden en que se muestran (HU-55).
 const fieldMessages: Record<FieldName, ErrorMessages> = {
@@ -44,17 +54,20 @@ const fieldMessages: Record<FieldName, ErrorMessages> = {
   amount: [['required', 'form.amountRequired'], ['min', 'form.amountPositive'], ['maxDecimals', 'form.amountDecimals']],
   currency: [['currencyCode', 'form.currencyCode']],
   nextBillingDate: [['required', 'form.dateRequired'], ['notBefore', 'form.dateInPast']],
+  paymentUrl: [['httpsUrl', 'form.paymentUrlInvalid']],
 };
 
 @Component({
   selector: 'app-subscription-form',
-  imports: [ReactiveFormsModule, TranslatePipe, FieldError],
+  imports: [ReactiveFormsModule, TranslatePipe, FieldError, CategoryIcon],
   templateUrl: './subscription-form.html',
   styleUrl: './subscription-form.scss',
 })
 export class SubscriptionForm implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly service = inject(SubscriptionService);
+  private readonly accountsService = inject(AccountsService);
+  private readonly categoriesService = inject(CategoriesService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
@@ -74,18 +87,34 @@ export class SubscriptionForm implements OnInit {
   protected readonly editingId = signal<string | null>(null);
   protected readonly isEdit = computed(() => this.editingId() !== null);
 
-  protected readonly billingCycles: readonly BillingCycle[] = ['Monthly', 'Yearly'];
+  protected readonly billingCycles = billingCycles;
+  protected readonly kinds = subscriptionKinds;
   protected readonly statuses: readonly SubscriptionStatus[] = ['Active', 'Inactive'];
+
+  // Cuentas y categorías de gasto que se pueden elegir por defecto (EP-14 D7). Si fallan, el formulario sigue usable.
+  private readonly accounts = signal<AccountResponse[]>([]);
+  private readonly categories = signal<CategoryResponse[]>([]);
+  // Valores guardados al editar: una cuenta o categoría archivada después sigue visible si ya era la elegida.
+  private readonly savedAccountId = signal<string | null>(null);
+  private readonly savedCategoryId = signal<string | null>(null);
+  protected readonly accountOptions = computed(() =>
+    this.accounts().filter((a) => !a.isArchived || a.id === this.savedAccountId()),
+  );
+  protected readonly categoryOptions = computed(() =>
+    this.categories().filter((c) => c.kind === 'Expense' && (!c.isArchived || c.id === this.savedCategoryId())),
+  );
 
   /** Hoy en el calendario del producto: mínimo del selector de fecha y de la validación (HU-56). */
   protected readonly today = productToday();
   protected readonly nameMaxLength = nameMaxLength;
   protected readonly categoryMaxLength = categoryMaxLength;
+  protected readonly paymentUrlMaxLength = paymentUrlMaxLength;
 
   // Fecha guardada al editar: si no cambia, se acepta aunque ya esté vencida.
   private originalNextBillingDate: string | null = null;
 
   protected readonly form = this.fb.group({
+    kind: this.fb.nonNullable.control<SubscriptionKind>('Subscription', [Validators.required]),
     name: this.fb.nonNullable.control('', [FormValidators.requiredText, Validators.maxLength(nameMaxLength)]),
     category: this.fb.nonNullable.control('', [Validators.maxLength(categoryMaxLength)]),
     amount: this.fb.control<number | null>(null, [
@@ -100,12 +129,16 @@ export class SubscriptionForm implements OnInit {
       FormValidators.notBefore(() => this.today, () => this.originalNextBillingDate),
     ]),
     status: this.fb.nonNullable.control<SubscriptionStatus>('Active', [Validators.required]),
+    paymentUrl: this.fb.nonNullable.control('', [FormValidators.httpsUrl(paymentUrlMaxLength)]),
+    defaultAccountId: this.fb.nonNullable.control(''),
+    categoryId: this.fb.nonNullable.control(''),
   });
 
   ngOnInit(): void {
     this.form.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.dirtyChange.emit(this.form.dirty));
+    this.loadChoices();
     const id = this.subscriptionId ?? this.route.snapshot.paramMap.get('id');
     if (id) {
       this.editingId.set(id);
@@ -113,11 +146,27 @@ export class SubscriptionForm implements OnInit {
     }
   }
 
+  // Cuentas y categorías (también archivadas, para mostrar la ya elegida); un fallo deja las listas vacías.
+  private loadChoices(): void {
+    forkJoin({
+      accounts: this.accountsService.list(true).pipe(catchError(() => of([] as AccountResponse[]))),
+      categories: this.categoriesService
+        .list({ kind: 'Expense', includeArchived: true })
+        .pipe(catchError(() => of([] as CategoryResponse[]))),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ accounts, categories }) => {
+        this.accounts.set(accounts);
+        this.categories.set(categories);
+      });
+  }
+
   private load(id: string): void {
     this.status.set('loading');
     this.service.get(id).subscribe({
       next: (subscription) => {
         this.form.setValue({
+          kind: subscription.kind,
           name: subscription.name,
           category: subscription.category ?? '',
           amount: subscription.amount,
@@ -125,7 +174,12 @@ export class SubscriptionForm implements OnInit {
           billingCycle: subscription.billingCycle,
           nextBillingDate: subscription.nextBillingDate,
           status: subscription.status,
+          paymentUrl: subscription.paymentUrl ?? '',
+          defaultAccountId: subscription.defaultAccountId ?? '',
+          categoryId: subscription.categoryId ?? '',
         });
+        this.savedAccountId.set(subscription.defaultAccountId);
+        this.savedCategoryId.set(subscription.categoryId);
         this.originalNextBillingDate = subscription.nextBillingDate;
         this.form.markAsPristine();
         this.dirtyChange.emit(false);
@@ -154,6 +208,10 @@ export class SubscriptionForm implements OnInit {
       currency: value.currency.trim().toUpperCase(),
       billingCycle: value.billingCycle,
       nextBillingDate: value.nextBillingDate,
+      kind: value.kind,
+      paymentUrl: value.paymentUrl.trim() || null,
+      defaultAccountId: value.defaultAccountId || null,
+      categoryId: value.categoryId || null,
     };
 
     this.status.set('saving');

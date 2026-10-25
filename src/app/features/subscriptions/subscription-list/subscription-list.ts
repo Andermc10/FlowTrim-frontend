@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { SubscriptionResponse } from '../models/subscription.models';
+import { SubscriptionKind, SubscriptionResponse, subscriptionKinds } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
 import { SubscriptionActions } from '../services/subscription-actions';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -36,6 +36,9 @@ export class SubscriptionList implements OnInit {
   protected readonly status = signal<ListStatus>('loading');
   protected readonly all = signal<SubscriptionResponse[]>([]);
   protected readonly search = signal('');
+  // Filtro por tipo (EP-14 HU-72); vacío = todos.
+  protected readonly kindFilter = signal<SubscriptionKind | ''>('');
+  protected readonly kinds = subscriptionKinds;
   protected readonly editorMode = signal<'create' | 'edit' | null>(null);
   protected readonly editorId = signal<string | null>(null);
   protected readonly editorDirty = signal(false);
@@ -44,11 +47,13 @@ export class SubscriptionList implements OnInit {
   // Suscripción cuyo cobro se está marcando como pagado: evita el doble clic.
   protected readonly payingId = signal<string | null>(null);
 
-  // Búsqueda en el cliente sobre todas las suscripciones cargadas.
+  // Búsqueda y filtro por tipo en el cliente sobre todos los pagos cargados.
   protected readonly filtered = computed(() => {
     const term = this.search().trim().toLowerCase();
-    const items = this.all();
-    return term ? items.filter((s) => s.name.toLowerCase().includes(term)) : items;
+    const kind = this.kindFilter();
+    return this.all().filter(
+      (s) => (!term || s.name.toLowerCase().includes(term)) && (!kind || s.kind === kind),
+    );
   });
 
   protected readonly isEmpty = computed(
