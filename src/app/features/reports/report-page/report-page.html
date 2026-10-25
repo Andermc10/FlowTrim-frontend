@@ -76,7 +76,7 @@
             @for (row of subscriptions(); track row.id) {
               <tr [class.is-inactive]="row.status === 'Inactive'">
                 <th scope="row">{{ row.name }}</th><td>{{ row.category ?? '—' }}</td><td>{{ money(row.amount, row.currency) }}</td>
-                <td>{{ (row.billingCycle === 'Yearly' ? 'report.yearly' : 'report.monthlyCycle') | translate }}</td><td>{{ row.nextBillingDate }}</td>
+                <td>{{ ('billing.' + row.billingCycle) | translate }}</td><td>{{ row.nextBillingDate }}</td>
                 <td>{{ (row.status === 'Active' ? 'report.statusActive' : 'report.statusInactive') | translate }}</td>
               </tr>
             }

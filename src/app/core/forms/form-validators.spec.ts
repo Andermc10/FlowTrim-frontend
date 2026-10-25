@@ -19,6 +19,17 @@ describe('FormValidators', () => {
     expect(twoDecimals(new FormControl(null))).toBeNull();
   });
 
+  it('httpsUrl accepts empty or safe https links only (EP-14 D9)', () => {
+    const link = FormValidators.httpsUrl(500);
+
+    expect(link(new FormControl(''))).toBeNull();
+    expect(link(new FormControl(' https://pay.example.com/bill?id=1 '))).toBeNull();
+    for (const unsafe of ['javascript:alert(1)', 'http://example.com', 'https://user:pass@example.com', 'https://user@example.com', 'example.com']) {
+      expect(link(new FormControl(unsafe))).toEqual({ httpsUrl: true });
+    }
+    expect(link(new FormControl(`https://example.com/${'a'.repeat(500)}`))).toEqual({ httpsUrl: true });
+  });
+
   it('currencyCode accepts exactly three letters', () => {
     expect(FormValidators.currencyCode(new FormControl('cop'))).toBeNull();
     expect(FormValidators.currencyCode(new FormControl('CO'))).toEqual({ currencyCode: true });

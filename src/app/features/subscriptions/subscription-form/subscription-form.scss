@@ -36,8 +36,13 @@ form {
 }
 
 .field:first-child,
+.chips,
 .actions {
   grid-column: 1 / -1;
+}
+
+fieldset {
+  min-width: 0;
 }
 
 .muted {
@@ -81,6 +86,7 @@ button.secondary {
   }
 
   .field:first-child,
+  .chips,
   .actions {
     grid-column: auto;
   }

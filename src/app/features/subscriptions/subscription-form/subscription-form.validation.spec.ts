@@ -28,6 +28,10 @@ describe('SubscriptionForm live validation', () => {
   }
 
   afterEach(() => {
+    // Cuentas y categorías para los valores por defecto (EP-14 HU-72): se responden vacías.
+    httpMock
+      .match((request) => /\/api\/(accounts|categories)$/.test(request.url))
+      .forEach((request) => request.flush([]));
     httpMock.verify();
     vi.useRealTimers();
   });
@@ -108,6 +112,7 @@ describe('SubscriptionForm live validation', () => {
     httpMock.expectOne(`${environment.apiUrl}/api/subscriptions/sub-1`).flush({
       id: 'sub-1', name: 'Gym', category: null, amount: 90000, currency: 'COP', billingCycle: 'Monthly',
       nextBillingDate: '2026-10-01', status: 'Active', createdAt: '2026-09-01T00:00:00Z', updatedAt: '2026-09-01T00:00:00Z',
+      kind: 'Subscription', paymentUrl: null, defaultAccountId: null, categoryId: null, monthlyEquivalent: 90000,
     } satisfies SubscriptionResponse);
     form.fixture.detectChanges();
 

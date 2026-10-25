@@ -48,7 +48,7 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
 
   await test.step('account A creates a subscription through the form', async () => {
     await page.goto('/app/subscriptions');
-    await page.getByRole('button', { name: 'Add your first subscription' }).click();
+    await page.getByRole('button', { name: 'Add your first recurring payment' }).click();
     await page.getByLabel('Name').fill('Netflix');
 
     // EP-11: los errores aparecen al salir del campo, sin pulsar Guardar, y desaparecen al corregir.
@@ -62,7 +62,7 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
 
     await page.getByLabel('Currency').fill('COP');
     await page.getByLabel('Next billing date').fill(nextBillingDate(3));
-    await page.getByRole('button', { name: 'Create subscription' }).click();
+    await page.getByRole('button', { name: 'Create payment' }).click();
 
     const row = page.getByRole('row', { name: /Netflix/ });
     await expect(row).toBeVisible();
@@ -97,7 +97,7 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
 
     health.expect(`/api/subscriptions/${missingId}`);
     await page.goto(`/app/subscriptions/${missingId}/edit`);
-    await expect(page.getByRole('alert')).toHaveText('Subscription not found.');
+    await expect(page.getByRole('alert')).toHaveText('Recurring payment not found.');
     await expect(page.locator('form')).toHaveCount(0);
   });
 
@@ -110,12 +110,12 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
   await test.step('account B cannot see account A data', async () => {
     await signIn(page, 'B');
     await page.goto('/app/subscriptions');
-    await expect(page.getByText('No subscriptions yet.')).toBeVisible();
+    await expect(page.getByText('No recurring payments yet.')).toBeVisible();
     await page.screenshot({ path: `${checkpoints}/03-account-b-empty.png`, fullPage: true });
 
     health.expect(`/api/subscriptions/${subscriptionId}`);
     await page.goto(`/app/subscriptions/${subscriptionId}/edit`);
-    await expect(page.getByRole('alert')).toHaveText('Subscription not found.');
+    await expect(page.getByRole('alert')).toHaveText('Recurring payment not found.');
     await expect(page.locator('main')).not.toContainText('Netflix');
     await signOut(page);
   });
@@ -229,15 +229,39 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(page.getByText('You have no accounts yet.')).toBeVisible();
   });
 
+  await test.step('EP-14 HU-72: a weekly bill with a payment link', async () => {
+    await page.goto('/app/subscriptions');
+    await page.getByRole('button', { name: 'Add payment' }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Type').selectOption('Bill');
+    await dialog.getByLabel('Name').fill('Water bill');
+    await dialog.getByLabel('Amount').fill('25000');
+    await dialog.getByLabel('Billing cycle').selectOption('Weekly');
+    await dialog.getByLabel('Next billing date').fill(nextBillingDate(2));
+    await dialog.getByLabel('Payment link').fill('http://pay.example.com');
+    await dialog.getByLabel('Payment link').blur();
+    await expect(dialog.getByText('Use an https:// address without a user name or password')).toBeVisible();
+    await dialog.getByLabel('Payment link').fill('https://pay.example.com/water');
+    await dialog.getByRole('button', { name: 'Create payment' }).click();
+
+    const row = page.getByRole('row', { name: /Water bill/ });
+    await expect(row.locator('.kind-badge')).toHaveText('Bill');
+    await expect(row.getByRole('cell', { name: 'Weekly', exact: true })).toBeVisible();
+    await expect(row.getByRole('link', { name: /Pay at provider/ })).toHaveAttribute('href', 'https://pay.example.com/water');
+    await page.getByLabel('Filter by type').selectOption('Bill');
+    await expect(page.locator('tbody tr')).toHaveCount(1);
+    await page.getByLabel('Filter by type').selectOption('');
+  });
+
   await test.step('account A deletes its data', async () => {
     await page.goto('/app/subscriptions');
-    for (const name of ['Netflix', 'Gym', 'Cloud Storage']) {
+    for (const name of ['Netflix', 'Gym', 'Cloud Storage', 'Water bill']) {
       await page.getByRole('row', { name: new RegExp(name) }).getByRole('button', { name: 'Delete' }).click();
-      const dialog = page.getByRole('dialog', { name: 'Delete subscription?' });
+      const dialog = page.getByRole('dialog', { name: 'Delete recurring payment?' });
       await dialog.getByRole('button', { name: 'Delete' }).click();
       await expect(page.getByRole('row', { name: new RegExp(name) })).toHaveCount(0);
     }
-    await expect(page.getByText('No subscriptions yet.')).toBeVisible();
+    await expect(page.getByText('No recurring payments yet.')).toBeVisible();
   });
 
   expect(health.unexpected(), 'unexpected console errors or failed requests').toEqual([]);

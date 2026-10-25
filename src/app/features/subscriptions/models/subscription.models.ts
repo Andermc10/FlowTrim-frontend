@@ -1,7 +1,13 @@
 // Modelos que reflejan los DTO de la API (nombres en inglés, camelCase).
 
-export type BillingCycle = 'Monthly' | 'Yearly';
+// Ciclos de cobro (EP-14 añadió semanal, quincenal y trimestral), en el orden en que se ofrecen.
+export const billingCycles = ['Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Yearly'] as const;
+export type BillingCycle = (typeof billingCycles)[number];
 export type SubscriptionStatus = 'Active' | 'Inactive';
+
+// Tipo de pago recurrente (EP-14 D2). La API y el código conservan el nombre "subscription".
+export const subscriptionKinds = ['Subscription', 'Bill'] as const;
+export type SubscriptionKind = (typeof subscriptionKinds)[number];
 
 export interface CreateSubscriptionRequest {
   name: string;
@@ -10,6 +16,10 @@ export interface CreateSubscriptionRequest {
   currency: string;
   billingCycle: BillingCycle;
   nextBillingDate: string; // yyyy-MM-dd
+  kind: SubscriptionKind;
+  paymentUrl: string | null;
+  defaultAccountId: string | null;
+  categoryId: string | null;
 }
 
 export interface SubscriptionResponse {
@@ -21,6 +31,11 @@ export interface SubscriptionResponse {
   billingCycle: BillingCycle;
   nextBillingDate: string;
   status: SubscriptionStatus;
+  kind: SubscriptionKind;
+  paymentUrl: string | null;
+  defaultAccountId: string | null;
+  categoryId: string | null;
+  monthlyEquivalent: number;
   createdAt: string;
   updatedAt: string;
 }

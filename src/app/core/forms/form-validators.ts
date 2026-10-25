@@ -45,6 +45,27 @@ export const FormValidators = {
     };
   },
 
+  /**
+   * Enlace de pago seguro (EP-14 D9, misma regla que la API): vacío, o una dirección absoluta `https://` con servidor,
+   * de hasta `maxLength` caracteres y sin usuario ni contraseña.
+   */
+  httpsUrl(maxLength: number): ValidatorFn {
+    return (control) => {
+      const value = String(control.value ?? '').trim();
+      if (!value) {
+        return null;
+      }
+      let url: URL | null;
+      try {
+        url = new URL(value);
+      } catch {
+        url = null;
+      }
+      const safe = url !== null && url.protocol === 'https:' && url.hostname !== '' && !url.username && !url.password;
+      return safe && value.length <= maxLength ? null : { httpsUrl: true };
+    };
+  },
+
   /** Fecha no posterior a `max()` (un uso declarado no puede ser futuro). */
   notAfter(max: () => string): ValidatorFn {
     return (control) => {

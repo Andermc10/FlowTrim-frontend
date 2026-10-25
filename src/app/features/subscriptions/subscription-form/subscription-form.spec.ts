@@ -24,7 +24,13 @@ describe('SubscriptionForm (edit)', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    // Cuentas y categorías para los valores por defecto (EP-14 HU-72): se responden vacías.
+    httpMock
+      .match((request) => /\/api\/(accounts|categories)$/.test(request.url))
+      .forEach((request) => request.flush([]));
+    httpMock.verify();
+  });
 
   function load(status: number) {
     const fixture = TestBed.createComponent(SubscriptionForm);
@@ -39,14 +45,14 @@ describe('SubscriptionForm (edit)', () => {
   it('shows the translated not-found message and hides the form for a 404', () => {
     const element = load(404);
 
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain('Suscripción no encontrada.');
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('Pago recurrente no encontrado.');
     expect(element.querySelector('form')).toBeNull();
   });
 
   it('shows the translated load error for other failures', () => {
     const element = load(500);
 
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain('No se pudo cargar la suscripción.');
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('No se pudo cargar el pago recurrente.');
     expect(element.querySelector('form')).toBeNull();
   });
 });

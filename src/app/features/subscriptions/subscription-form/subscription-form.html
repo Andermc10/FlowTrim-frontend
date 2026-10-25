@@ -21,6 +21,17 @@
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="field">
+        <label for="kind">{{ 'form.kind' | translate }}</label>
+        <select id="kind" formControlName="kind" aria-describedby="kind-hint kind-error">
+          @for (kind of kinds; track kind) {
+            <option [value]="kind">{{ ('kind.' + kind) | translate }}</option>
+          }
+        </select>
+        <small id="kind-hint" class="hint">{{ 'form.kindHint' | translate }}</small>
+        <app-field-error id="kind-error" [serverMessages]="errorsFor('kind')" />
+      </div>
+
+      <div class="field">
         <label for="name">{{ 'form.name' | translate }}</label>
         <input
           id="name"
@@ -113,6 +124,53 @@
           [serverMessages]="errorsFor('nextBillingDate')"
         />
       </div>
+
+      <div class="field">
+        <label for="paymentUrl">{{ 'form.paymentUrl' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+        <input
+          id="paymentUrl"
+          type="url"
+          inputmode="url"
+          autocomplete="off"
+          formControlName="paymentUrl"
+          [attr.maxlength]="paymentUrlMaxLength"
+          placeholder="https://"
+          [attr.aria-invalid]="isInvalid('paymentUrl')"
+          aria-describedby="paymentUrl-hint paymentUrl-error"
+        />
+        <small id="paymentUrl-hint" class="hint">{{ 'form.paymentUrlHint' | translate }}</small>
+        <app-field-error id="paymentUrl-error" [messageKey]="errorKey('paymentUrl')" [serverMessages]="errorsFor('paymentUrl')" />
+      </div>
+
+      <div class="field">
+        <label for="defaultAccountId">{{ 'form.defaultAccount' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+        <select id="defaultAccountId" formControlName="defaultAccountId" aria-describedby="defaultAccountId-hint defaultAccountId-error">
+          <option value="">{{ 'form.noDefault' | translate }}</option>
+          @for (account of accountOptions(); track account.id) {
+            <option [value]="account.id">{{ account.name }} · {{ account.currency }}</option>
+          }
+        </select>
+        <small id="defaultAccountId-hint" class="hint">{{ 'form.defaultAccountHint' | translate }}</small>
+        <app-field-error id="defaultAccountId-error" [serverMessages]="errorsFor('defaultAccountId')" />
+      </div>
+
+      <!-- Categoría de gasto por defecto: chips como en el registro rápido; "Ninguna" la deja vacía. -->
+      <fieldset class="chips" aria-describedby="categoryId-error">
+        <legend>{{ 'form.defaultCategory' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></legend>
+        <div class="chips__list">
+          <label class="chip" style="--swatch: var(--color-muted)">
+            <input type="radio" formControlName="categoryId" value="" />
+            <span class="chip__body">{{ 'form.noDefault' | translate }}</span>
+          </label>
+          @for (option of categoryOptions(); track option.id) {
+            <label class="chip" [style.--swatch]="'var(--category-' + option.color + ')'">
+              <input type="radio" formControlName="categoryId" [value]="option.id" />
+              <span class="chip__body"><app-category-icon [name]="option.icon" /> {{ option.name }}</span>
+            </label>
+          }
+        </div>
+        <app-field-error id="categoryId-error" [serverMessages]="errorsFor('categoryId')" />
+      </fieldset>
 
       @if (isEdit()) {
         <div class="field">
