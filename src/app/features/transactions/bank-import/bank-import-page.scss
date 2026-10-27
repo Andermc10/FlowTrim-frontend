@@ -1,0 +1,13 @@
+// Elecciones de la importación del banco (EP-16 HU-79); el resto de estilos es el de la importación de suscripciones.
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 720px) {
+  .choices {
+    grid-template-columns: 1fr;
+  }
+}

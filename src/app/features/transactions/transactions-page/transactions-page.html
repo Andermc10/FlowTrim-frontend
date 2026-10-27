@@ -6,7 +6,10 @@
       <p class="lede">{{ 'transactions.lede' | translate }}</p>
     </div>
     @if (hasActiveAccounts()) {
-      <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'transactions.add' | translate }}</button>
+      <div class="heading-actions">
+        <a class="btn btn--ghost" routerLink="/app/transactions/import">{{ 'bankImport.open' | translate }}</a>
+        <button class="btn" type="button" (click)="openCreate()"><app-icon name="plus" /> {{ 'transactions.add' | translate }}</button>
+      </div>
     }
   </div>
 

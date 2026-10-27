@@ -52,6 +52,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/subscriptions/usage/usage').then((m) => m.Usage),
       },
       {
+        path: 'transactions/import',
+        title: 'bankImport.open',
+        loadComponent: () => import('./features/transactions/bank-import/bank-import-page').then((m) => m.BankImportPage),
+      },
+      {
         path: 'transactions',
         title: 'nav.transactions',
         loadComponent: () => import('./features/transactions/transactions-page/transactions-page').then((m) => m.TransactionsPage),

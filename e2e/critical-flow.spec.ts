@@ -276,6 +276,31 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
     await expect(row).toHaveCount(0);
 
+    // EP-16 HU-79: un CSV del banco con un gasto y un ingreso se importa a Bank; reimportarlo no duplica nada.
+    await page.goto('/app/transactions/import');
+    const bankCsv = {
+      name: 'bank.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(`date,description,amount
+${nextBillingDate(0)},Bakery,-12000
+${nextBillingDate(0)},Refund,50000
+`),
+    };
+    await page.locator('#bank-file').setInputFiles(bankCsv);
+    await expect(page.locator('.counts--valid')).toContainText('2');
+    await page.getByRole('button', { name: 'Add 2 movements' }).click();
+    await expect(page.locator('.done')).toContainText('2');
+    await page.getByRole('button', { name: 'Import another file' }).click();
+    await page.locator('#bank-file').setInputFiles(bankCsv);
+    await expect(page.locator('.counts--duplicate')).toContainText('2');
+    await page.goto('/app/transactions');
+    await expect(row).toHaveCount(2);
+    for (let remaining = 2; remaining > 0; remaining--) {
+      await row.first().getByRole('button', { name: /Delete transaction/ }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
+      await expect(row).toHaveCount(remaining - 1);
+    }
+
     await page.goto('/app/accounts');
     await page.getByRole('button', { name: 'Delete account: Bank' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Delete account' }).click();
