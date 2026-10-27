@@ -38,7 +38,7 @@
           <div class="row__end">
             <span [class]="badgeClass(item.alertWindow)">{{ ('alert.' + item.alertWindow) | translate }}</span>
             @if (canMarkPaid(item)) {
-              <button type="button" class="btn btn--ghost row__paid" [disabled]="payingId() === item.id" (click)="markPaid(item)">
+              <button type="button" class="btn btn--ghost row__paid" (click)="markPaid(item)">
                 <app-icon name="paid" /> {{ 'subscriptions.markPaid' | translate }}
               </button>
             }
@@ -46,5 +46,9 @@
         </li>
       }
     </ul>
+  }
+
+  @if (payTargetId(); as id) {
+    <app-mark-paid-dialog [subscriptionId]="id" (paid)="handlePaid()" (closeRequested)="payTargetId.set(null)" />
   }
 </section>

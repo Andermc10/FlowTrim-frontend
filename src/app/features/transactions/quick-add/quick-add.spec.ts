@@ -28,7 +28,7 @@ function used(categoryId: string): TransactionResponse {
   return {
     id: crypto.randomUUID(), type: 'Expense', accountId: 'bank', accountName: 'Bank', toAccountId: null, toAccountName: null,
     categoryId, categoryName: '', categoryColor: 'orange', categoryIcon: 'food', amount: 1, currency: 'COP', date: '2026-10-01',
-    description: null, note: null, createdAt: '', updatedAt: '',
+    description: null, note: null, createdAt: '', updatedAt: '', recurringPaymentId: null,
   };
 }
 

@@ -1,0 +1,120 @@
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+fieldset {
+  min-width: 0;
+}
+
+.muted,
+.summary {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.summary strong {
+  color: var(--color-text);
+}
+
+// Dos opciones excluyentes como tarjetas: registrar el gasto o solo mover la fecha.
+.modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mode {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.mode:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.mode:has(input:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.mode--disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mode span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.mode small {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+
+.mode input {
+  margin-top: 0.2rem;
+  accent-color: var(--color-primary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.grid .chips {
+  grid-column: 1 / -1;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.modal-actions button {
+  min-height: 2.5rem;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.modal-actions button.secondary {
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 580px) {
+  .modes,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions button {
+    flex: 1 1 100%;
+  }
+}

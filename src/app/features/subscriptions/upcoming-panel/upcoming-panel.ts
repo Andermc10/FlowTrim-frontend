@@ -9,7 +9,8 @@ import { RouterLink } from '@angular/router';
 
 import { AlertWindow, UpcomingChargeItem } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
-import { SubscriptionActions, markPaidWindows } from '../services/subscription-actions';
+import { markPaidWindows } from '../services/subscription-actions';
+import { MarkPaidDialog } from '../mark-paid-dialog/mark-paid-dialog';
 import { Icon } from '../../../core/ui/icon/icon';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
@@ -19,19 +20,19 @@ type PanelStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-upcoming-panel',
-  imports: [RouterLink, TranslatePipe, MoneyPipe, Icon],
+  imports: [RouterLink, TranslatePipe, MoneyPipe, Icon, MarkPaidDialog],
   templateUrl: './upcoming-panel.html',
   styleUrl: './upcoming-panel.scss',
 })
 export class UpcomingPanel implements OnInit {
   private readonly service = inject(SubscriptionService);
   private readonly i18n = inject(I18nService);
-  private readonly actions = inject(SubscriptionActions);
 
   protected readonly status = signal<PanelStatus>('loading');
   protected readonly items = signal<UpcomingChargeItem[]>([]);
   protected readonly referenceDate = signal<string>('');
-  protected readonly payingId = signal<string | null>(null);
+  // Pago cuyo diálogo "Marcar como pagado" está abierto.
+  protected readonly payTargetId = signal<string | null>(null);
   protected readonly isEmpty = computed(
     () => this.status() === 'success' && this.items().length === 0,
   );
@@ -57,15 +58,14 @@ export class UpcomingPanel implements OnInit {
     return markPaidWindows.includes(item.alertWindow);
   }
 
+  /** Abre el diálogo de pago (EP-14 HU-73): registrar el gasto en una cuenta o solo mover la fecha. */
   protected markPaid(item: UpcomingChargeItem): void {
-    this.payingId.set(item.id);
-    this.actions.markPaid(item).subscribe({
-      next: () => {
-        this.payingId.set(null);
-        this.load();
-      },
-      error: () => this.payingId.set(null),
-    });
+    this.payTargetId.set(item.id);
+  }
+
+  protected handlePaid(): void {
+    this.payTargetId.set(null);
+    this.load();
   }
 
   /** Texto de la cuenta regresiva a partir de los días calculados por el servidor. */

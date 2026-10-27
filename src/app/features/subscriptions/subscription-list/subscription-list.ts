@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 
 import { SubscriptionKind, SubscriptionResponse, subscriptionKinds } from '../models/subscription.models';
 import { SubscriptionService } from '../services/subscription-service';
-import { SubscriptionActions } from '../services/subscription-actions';
+import { MarkPaidDialog } from '../mark-paid-dialog/mark-paid-dialog';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { Icon } from '../../../core/ui/icon/icon';
@@ -23,7 +23,7 @@ type ListStatus = 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'app-subscription-list',
-  imports: [RouterLink, TranslatePipe, Icon, Modal, SubscriptionForm, MoneyPipe],
+  imports: [RouterLink, TranslatePipe, Icon, Modal, SubscriptionForm, MoneyPipe, MarkPaidDialog],
   templateUrl: './subscription-list.html',
   styleUrl: './subscription-list.scss',
 })
@@ -31,7 +31,6 @@ export class SubscriptionList implements OnInit {
   private readonly service = inject(SubscriptionService);
   protected readonly i18n = inject(I18nService);
   private readonly toast = inject(ToastService);
-  private readonly actions = inject(SubscriptionActions);
 
   protected readonly status = signal<ListStatus>('loading');
   protected readonly all = signal<SubscriptionResponse[]>([]);
@@ -44,8 +43,8 @@ export class SubscriptionList implements OnInit {
   protected readonly editorDirty = signal(false);
   protected readonly discardConfirmation = signal(false);
   protected readonly deleteTarget = signal<SubscriptionResponse | null>(null);
-  // Suscripción cuyo cobro se está marcando como pagado: evita el doble clic.
-  protected readonly payingId = signal<string | null>(null);
+  // Pago cuyo diálogo "Marcar como pagado" está abierto.
+  protected readonly payTargetId = signal<string | null>(null);
 
   // Búsqueda y filtro por tipo en el cliente sobre todos los pagos cargados.
   protected readonly filtered = computed(() => {
@@ -75,16 +74,14 @@ export class SubscriptionList implements OnInit {
     });
   }
 
-  /** Marca el cobro actual como pagado (HU-57) y recarga la lista con la nueva fecha. */
+  /** Abre el diálogo de pago (EP-14 HU-73): registrar el gasto en una cuenta o solo mover la fecha. */
   protected markPaid(subscription: SubscriptionResponse): void {
-    this.payingId.set(subscription.id);
-    this.actions.markPaid(subscription).subscribe({
-      next: () => {
-        this.payingId.set(null);
-        this.load();
-      },
-      error: () => this.payingId.set(null),
-    });
+    this.payTargetId.set(subscription.id);
+  }
+
+  protected handlePaid(): void {
+    this.payTargetId.set(null);
+    this.load();
   }
 
   protected openCreate(): void {

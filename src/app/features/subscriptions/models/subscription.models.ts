@@ -1,5 +1,7 @@
 // Modelos que reflejan los DTO de la API (nombres en inglés, camelCase).
 
+import { TransactionResponse } from '../../transactions/transactions.models';
+
 // Ciclos de cobro (EP-14 añadió semanal, quincenal y trimestral), en el orden en que se ofrecen.
 export const billingCycles = ['Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Yearly'] as const;
 export type BillingCycle = (typeof billingCycles)[number];
@@ -43,6 +45,21 @@ export interface SubscriptionResponse {
 // Actualización completa de una suscripción (mismo contrato que la creación más status).
 export interface UpdateSubscriptionRequest extends CreateSubscriptionRequest {
   status: SubscriptionStatus;
+}
+
+// Cuerpo opcional de "marcar como pagado" (EP-14 HU-73). Sin accountId solo se mueve la próxima fecha.
+export interface MarkPaidRequest {
+  accountId: string;
+  amount: number;
+  date: string; // yyyy-MM-dd
+  categoryId: string;
+}
+
+// Resultado de marcar como pagado: el pago con su nueva fecha y el gasto registrado (null si solo se movió la fecha).
+export interface MarkPaidResponse {
+  subscription: SubscriptionResponse;
+  transaction: TransactionResponse | null;
+  completed: boolean;
 }
 
 // Página de resultados devuelta por GET /api/subscriptions.

@@ -28,9 +28,9 @@ describe('SubscriptionForm live validation', () => {
   }
 
   afterEach(() => {
-    // Cuentas y categorías para los valores por defecto (EP-14 HU-72): se responden vacías.
+    // Cuentas, categorías (EP-14 HU-72) y últimos pagos (HU-73) del formulario: se responden vacíos.
     httpMock
-      .match((request) => /\/api\/(accounts|categories)$/.test(request.url))
+      .match((request) => /\/api\/(accounts|categories)$|\/payments$/.test(request.url))
       .forEach((request) => request.flush([]));
     httpMock.verify();
     vi.useRealTimers();

@@ -6,6 +6,8 @@ import { environment } from '../../../../environments/environment';
 import {
   CreateSubscriptionRequest,
   CostPerUseResponse,
+  MarkPaidRequest,
+  MarkPaidResponse,
   PagedResponse,
   RegisterUsageRequest,
   SubscriptionResponse,
@@ -13,6 +15,7 @@ import {
   UpdateSubscriptionRequest,
   UsageRecordResponse,
 } from '../models/subscription.models';
+import { TransactionResponse } from '../../transactions/transactions.models';
 
 /** Tamaño de página máximo que acepta la API (ListSubscriptionsHandler.MaxPageSize). */
 const maxPageSize = 100;
@@ -60,9 +63,17 @@ export class SubscriptionService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  /** Marca el cobro actual como pagado: la próxima fecha avanza un ciclo (200 / 400 inactiva / 404). */
-  markPaid(id: string): Observable<SubscriptionResponse> {
-    return this.http.post<SubscriptionResponse>(`${this.baseUrl}/${id}/mark-paid`, {});
+  /**
+   * Marca el cobro actual como pagado: la próxima fecha avanza un ciclo. Con `request` también registra el gasto en la
+   * cuenta en la misma operación (EP-14 HU-73). 200 / 400 (campos o inactiva) / 404.
+   */
+  markPaid(id: string, request: MarkPaidRequest | null = null): Observable<MarkPaidResponse> {
+    return this.http.post<MarkPaidResponse>(`${this.baseUrl}/${id}/mark-paid`, request ?? {});
+  }
+
+  /** Últimos 10 gastos registrados al marcar el pago como pagado, más recientes primero (200 / 404). */
+  listPayments(id: string): Observable<TransactionResponse[]> {
+    return this.http.get<TransactionResponse[]>(`${this.baseUrl}/${id}/payments`);
   }
 
   /** Próximos cobros ordenados por fecha, con cuenta regresiva y ventana de alerta (servidor). */

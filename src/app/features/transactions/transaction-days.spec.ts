@@ -20,6 +20,7 @@ function tx(overrides: Partial<TransactionResponse>): TransactionResponse {
     note: null,
     createdAt: '2026-10-20T15:00:00Z',
     updatedAt: '2026-10-20T15:00:00Z',
+    recurringPaymentId: null,
     ...overrides,
   };
 }
