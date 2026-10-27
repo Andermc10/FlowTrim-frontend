@@ -93,7 +93,7 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.goto('/app/insights');
     await page.getByLabel('Your question').fill('Tell me a joke');
     await page.getByRole('button', { name: 'Ask', exact: true }).click();
-    await expect(page.locator('.result .answer')).toHaveText(/^I can only answer questions about your FlowTrim subscriptions/);
+    await expect(page.locator('.result .answer')).toHaveText(/^I can only answer questions about your FlowTrim money/);
 
     health.expect(`/api/subscriptions/${missingId}`);
     await page.goto(`/app/subscriptions/${missingId}/edit`);

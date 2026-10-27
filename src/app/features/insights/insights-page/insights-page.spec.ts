@@ -105,7 +105,7 @@ describe('InsightsPage', () => {
     ask(page, 'Tell me a joke').flush({ ...answered, status: 'unsupported', answer: 'Server text', figures: [], assumptions: [], sources: [], toolsUsed: [] });
     page.refresh();
 
-    expect(page.element.textContent).toContain('I can only answer questions about your FlowTrim subscriptions');
+    expect(page.element.textContent).toContain('I can only answer questions about your FlowTrim money');
     expect(page.element.textContent).not.toContain('Server text');
   });
 

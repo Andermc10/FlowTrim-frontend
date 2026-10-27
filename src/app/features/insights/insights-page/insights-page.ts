@@ -39,7 +39,8 @@ export class InsightsPage {
   static readonly DefaultRetrySeconds = 60;
 
   protected readonly maxLength = questionMaxLength;
-  protected readonly suggestions = ['monthly', 'upcoming', 'categories', 'annual'];
+  // EP-16 HU-80: también el mes, los presupuestos y las metas.
+  protected readonly suggestions = ['monthly', 'month', 'budgets', 'goals', 'upcoming', 'categories', 'annual'];
 
   // Fuentes que tienen una pantalla determinista donde el usuario puede comprobar la cifra.
   private static readonly SourceRoutes: Record<string, string> = {
@@ -47,6 +48,9 @@ export class InsightsPage {
     analytics: '/app/analytics',
     'upcoming-charges': '/app/upcoming',
     simulator: '/app/simulator',
+    statement: '/app/analytics/statement',
+    budgets: '/app/budgets',
+    goals: '/app/goals',
   };
 
   private readonly insights = inject(InsightsService);
