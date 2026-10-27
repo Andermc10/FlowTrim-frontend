@@ -278,9 +278,30 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.getByLabel('Filter by type').selectOption('');
   });
 
+  await test.step('EP-14 HU-74: paying the last instalment completes the plan', async () => {
+    await page.goto('/app/subscriptions');
+    await page.getByRole('button', { name: 'Add payment' }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Type').selectOption('Instalment');
+    await dialog.getByLabel('Name').fill('Laptop');
+    await dialog.getByLabel('Amount').fill('250000');
+    await dialog.getByLabel('Next billing date').fill(nextBillingDate(1));
+    await dialog.getByLabel('Number of instalments').fill('2');
+    await dialog.getByLabel('Instalments already paid').fill('1');
+    await dialog.getByRole('button', { name: 'Create payment' }).click();
+
+    const row = page.getByRole('row', { name: /Laptop/ });
+    await expect(row.locator('.instalments')).toHaveText('1 of 2 paid');
+    await row.getByRole('button', { name: 'Mark as paid' }).click();
+    await page.getByRole('dialog', { name: 'Mark as paid' }).getByRole('button', { name: 'Move next date' }).click();
+    await expect(page.locator('app-toast-item').filter({ hasText: '"Laptop" is fully paid' })).toBeVisible();
+    await expect(row.locator('.instalments')).toHaveText('2 of 2 paid');
+    await expect(row.locator('.status')).toHaveText('Completed');
+  });
+
   await test.step('account A deletes its data', async () => {
     await page.goto('/app/subscriptions');
-    for (const name of ['Netflix', 'Gym', 'Cloud Storage', 'Water bill']) {
+    for (const name of ['Netflix', 'Gym', 'Cloud Storage', 'Water bill', 'Laptop']) {
       await page.getByRole('row', { name: new RegExp(name) }).getByRole('button', { name: 'Delete' }).click();
       const dialog = page.getByRole('dialog', { name: 'Delete recurring payment?' });
       await dialog.getByRole('button', { name: 'Delete' }).click();

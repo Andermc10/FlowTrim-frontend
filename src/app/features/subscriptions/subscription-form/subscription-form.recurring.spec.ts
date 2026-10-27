@@ -76,7 +76,7 @@ describe('SubscriptionForm recurring payment fields', () => {
     const form = render();
 
     const options = (id: string) => [...form.field<HTMLSelectElement>(id).options].map((option) => option.textContent?.trim());
-    expect(options('kind')).toEqual(['Subscription', 'Bill']);
+    expect(options('kind')).toEqual(['Subscription', 'Bill', 'Instalment plan']);
     expect(options('billingCycle')).toEqual(['Weekly', 'Every 2 weeks', 'Monthly', 'Quarterly', 'Yearly']);
     expect(options('defaultAccountId')).toEqual(['None', 'Bank · COP']);
     const chips = [...form.element.querySelectorAll('.chip__body')].map((chip) => chip.textContent?.trim());
@@ -114,7 +114,30 @@ describe('SubscriptionForm recurring payment fields', () => {
     expect(request.request.body).toEqual({
       name: 'Rent', category: null, amount: 1200000, currency: 'COP', billingCycle: 'Biweekly',
       nextBillingDate: '2026-11-01', kind: 'Bill', paymentUrl: 'https://pay.example.com',
-      defaultAccountId: 'bank', categoryId: 'home',
+      defaultAccountId: 'bank', categoryId: 'home', totalInstalments: null, paidInstalments: null,
     });
+  });
+
+  it('asks for the instalments of a plan, validates them live and sends them (HU-74)', () => {
+    const form = render();
+    expect(form.element.querySelector('#totalInstalments')).toBeNull();
+
+    form.choose('kind', 'Instalment');
+    form.type('name', 'Laptop');
+    form.type('amount', '250000');
+    form.type('nextBillingDate', '2026-11-01');
+    form.type('totalInstalments', '12');
+    form.type('paidInstalments', '12');
+    expect(form.element.querySelector('#paidInstalments-error')?.textContent?.trim()).toBe(
+      'Use a whole number from 0 to one less than the total.',
+    );
+    form.type('paidInstalments', '3');
+
+    form.element.querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+
+    const body = httpMock.expectOne(`${environment.apiUrl}/api/subscriptions`).request.body;
+    expect(body.kind).toBe('Instalment');
+    expect(body.totalInstalments).toBe(12);
+    expect(body.paidInstalments).toBe(3);
   });
 });

@@ -58,7 +58,14 @@
       <tbody>
         @for (subscription of filtered(); track subscription.id) {
           <tr>
-            <td [attr.data-label]="'subscriptions.name' | translate"><strong>{{ subscription.name }}</strong><small><span class="kind-badge" [class.kind-badge--bill]="subscription.kind === 'Bill'">{{ ('kind.' + subscription.kind) | translate }}</span> {{ subscription.category || ('subscriptions.uncategorized' | translate) }}
+            <td [attr.data-label]="'subscriptions.name' | translate"><strong>{{ subscription.name }}</strong>
+              @if (subscription.kind === 'Instalment' && subscription.totalInstalments) {
+                <span class="instalments">
+                  <span class="instalments__bar" aria-hidden="true"><span [style.width.%]="(subscription.paidInstalments / subscription.totalInstalments) * 100"></span></span>
+                  {{ 'instalments.progress' | translate: { paid: subscription.paidInstalments, total: subscription.totalInstalments } }}
+                </span>
+              }
+              <small><span class="kind-badge" [class.kind-badge--bill]="subscription.kind === 'Bill'">{{ ('kind.' + subscription.kind) | translate }}</span> {{ subscription.category || ('subscriptions.uncategorized' | translate) }}
               @if (subscription.paymentUrl) {
                 <!-- Enlace a la página del proveedor: FlowTrim nunca paga ni pide datos de tarjeta (EP-14 D9). -->
                 · <a class="pay-link" [href]="subscription.paymentUrl" target="_blank" rel="noopener noreferrer">{{ 'subscriptions.payAtProvider' | translate }} <span aria-hidden="true">↗</span><span class="visually-hidden">{{ 'common.opensInNewTab' | translate }}</span></a>
@@ -67,8 +74,8 @@
             <td [attr.data-label]="'subscriptions.cycle' | translate">{{ ('billing.' + subscription.billingCycle) | translate }}</td>
             <td [attr.data-label]="'subscriptions.nextCharge' | translate"><strong>{{ subscription.nextBillingDate }}</strong><small>{{ ('billing.' + subscription.billingCycle) | translate }} {{ 'subscriptions.renewal' | translate }}</small></td>
             <td [attr.data-label]="'subscriptions.status' | translate">
-              <span class="status" [class.status--inactive]="subscription.status === 'Inactive'">
-                {{ ('status.' + subscription.status) | translate }}
+              <span class="status" [class.status--inactive]="subscription.status === 'Inactive'" [class.status--completed]="isCompleted(subscription)">
+                {{ (isCompleted(subscription) ? 'instalments.completed' : 'status.' + subscription.status) | translate }}
               </span>
             </td>
             <td class="actions-col" [attr.data-label]="'subscriptions.actions' | translate">

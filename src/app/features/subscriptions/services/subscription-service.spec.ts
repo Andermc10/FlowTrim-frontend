@@ -28,7 +28,7 @@ describe('SubscriptionService', () => {
       currency: 'COP',
       billingCycle: 'Monthly',
       nextBillingDate: '2026-11-01',
-      kind: 'Subscription', paymentUrl: null, defaultAccountId: null, categoryId: null,
+      kind: 'Subscription', paymentUrl: null, defaultAccountId: null, categoryId: null, totalInstalments: null,
     };
 
     let result: SubscriptionResponse | undefined;
@@ -48,7 +48,7 @@ describe('SubscriptionService', () => {
       nextBillingDate: '2026-11-01',
       status: 'Active',
       kind: 'Subscription', paymentUrl: null, defaultAccountId: null, categoryId: null,
-      monthlyEquivalent: 38900,
+      monthlyEquivalent: 38900, totalInstalments: null, paidInstalments: 0,
       createdAt: '2026-10-14T06:30:00Z',
       updatedAt: '2026-10-14T06:30:00Z',
     } satisfies SubscriptionResponse);

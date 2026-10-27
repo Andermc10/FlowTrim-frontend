@@ -13,7 +13,7 @@ const base = `${environment.apiUrl}/api/subscriptions`;
 
 const netflix: SubscriptionResponse = {
   id: 'n', name: 'Netflix', category: null, amount: 38900, currency: 'COP', billingCycle: 'Monthly', nextBillingDate: '2026-10-20',
-  status: 'Active', kind: 'Subscription', paymentUrl: null, defaultAccountId: 'bank', categoryId: 'subs', monthlyEquivalent: 38900,
+  status: 'Active', kind: 'Subscription', paymentUrl: null, defaultAccountId: 'bank', categoryId: 'subs', monthlyEquivalent: 38900, totalInstalments: null, paidInstalments: 0,
   createdAt: '2026-10-01T00:00:00Z', updatedAt: '2026-10-01T00:00:00Z',
 };
 
@@ -138,5 +138,21 @@ describe('MarkPaidDialog', () => {
     expect(dialog.element.querySelector('#mp-account')).toBeNull();
     dialog.submit();
     expect(httpMock.expectOne(`${base}/n/mark-paid`).request.body).toEqual({});
+  });
+
+  it('announces a completed instalment plan (HU-74)', () => {
+    const toast = TestBed.inject(ToastService);
+    const dialog = render();
+    dialog.element.querySelector<HTMLInputElement>('input[value="dateOnly"]')!.click();
+    dialog.fixture.detectChanges();
+
+    dialog.submit();
+    httpMock.expectOne(`${base}/n/mark-paid`).flush({
+      subscription: { ...netflix, kind: 'Instalment', status: 'Inactive', totalInstalments: 3, paidInstalments: 3 },
+      transaction: null,
+      completed: true,
+    });
+
+    expect(toast.toasts()[0].message).toBe('"Netflix" is fully paid. The plan is completed and no longer counts as an expected charge.');
   });
 });

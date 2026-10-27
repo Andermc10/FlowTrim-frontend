@@ -28,9 +28,14 @@ export class SubscriptionActions {
   markPaid(subscription: Pick<SubscriptionResponse, 'id' | 'name'>, request: MarkPaidRequest | null = null): Observable<MarkPaidResponse> {
     return this.subscriptions.markPaid(subscription.id, request).pipe(
       tap({
-        next: ({ subscription: updated, transaction }) => {
+        next: ({ subscription: updated, transaction, completed }) => {
           const locale = localeFor(this.i18n.language());
           const date = dateLabel(updated.nextBillingDate, locale);
+          if (completed) {
+            // Última cuota: el plan quedó completado y deja de contar en los cobros esperados (HU-74).
+            this.toast.success(this.i18n.translate('toast.planCompleted', { name: updated.name }));
+            return;
+          }
           this.toast.success(
             transaction
               ? this.i18n.translate('toast.paymentRecorded', {
