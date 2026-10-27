@@ -227,6 +227,29 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
     await expect(row).toHaveCount(0);
 
+    // EP-15 HU-76: un presupuesto de Comida de 40.000 pasa a "cerca del límite" con un gasto de 35.000 y se ve en Hoy.
+    await page.getByRole('link', { name: 'Budgets' }).first().click();
+    await page.getByRole('button', { name: 'Create your first budget' }).click();
+    const budgetDialog = page.getByRole('dialog', { name: 'New budget' });
+    await budgetDialog.getByText('Food', { exact: true }).click();
+    await budgetDialog.getByLabel('Monthly limit').fill('40000');
+    await budgetDialog.getByRole('button', { name: 'Create budget' }).click();
+    await expect(page.locator('.card').filter({ hasText: 'Food' })).toContainText('0 % · On track');
+    await page.locator('main h1').click();
+    await page.keyboard.press('n');
+    const quickAdd = page.getByRole('dialog', { name: 'Quick add' });
+    await quickAdd.locator('#tx-amount').fill('35000');
+    await quickAdd.getByText('Food', { exact: true }).click();
+    await quickAdd.getByRole('button', { name: 'Save transaction' }).click();
+    await expect(quickAdd).toHaveCount(0);
+    await expect(page.locator('.card').filter({ hasText: 'Food' })).toContainText('87.5 % · Close to the limit');
+    await page.getByRole('link', { name: 'Today' }).first().click();
+    await expect(page.locator('.panel--budgets')).toContainText('Food');
+    await page.goto('/app/transactions');
+    await row.filter({ hasText: 'COP 35,000' }).getByRole('button', { name: /Delete transaction/ }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
+    await expect(row).toHaveCount(0);
+
     // EP-14 HU-73: marcar Gym como pagado registra el gasto en Bank y queda en "Últimos pagos" del pago.
     await page.goto('/app/subscriptions');
     await page.getByRole('row', { name: /Gym/ }).getByRole('button', { name: 'Mark as paid' }).click();

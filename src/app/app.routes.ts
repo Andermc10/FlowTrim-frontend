@@ -57,6 +57,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/transactions/transactions-page/transactions-page').then((m) => m.TransactionsPage),
       },
       {
+        path: 'budgets',
+        title: 'nav.budgets',
+        loadComponent: () => import('./features/budgets/budgets-page/budgets-page').then((m) => m.BudgetsPage),
+      },
+      {
         path: 'calendar',
         title: 'nav.calendar',
         loadComponent: () => import('./features/calendar/calendar-page/calendar-page').then((m) => m.CalendarPage),

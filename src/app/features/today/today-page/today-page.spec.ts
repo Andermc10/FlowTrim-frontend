@@ -32,6 +32,7 @@ function dashboard(overrides: Partial<TodayDashboard> = {}): TodayDashboard {
     accounts: [account({ name: 'Cash', type: 'Cash', balance: 200000 }), account({}), account({ name: 'Visa', type: 'CreditCard', balance: -300000 })],
     recentTransactions: [],
     chargesUntilMonthEnd: [{ subscriptionId: 's1', name: 'Netflix', amount: 38900, currency: 'COP', nextBillingDate: '2026-10-28', isOverdue: false }],
+    budgetsToWatch: [],
     ...overrides,
   };
 }
@@ -120,6 +121,32 @@ describe('TodayPage', () => {
     page.fixture.detectChanges();
 
     expect(page.text('.tiles')).toContain('Spent today-COP 38,900');
+  });
+
+  it('lists budgets to watch with their state, and hides the card when there are none (EP-15 HU-76)', () => {
+    const page = render(dashboard({
+      budgetsToWatch: [{
+        id: 'b', categoryId: 'food', categoryName: 'Food', categoryColor: 'orange', categoryIcon: 'food', categoryArchived: false,
+        currency: 'COP', limit: 400000, spent: 330000, remaining: 70000, over: 0, percent: 82.5, state: 'Warning',
+      }],
+    }));
+
+    expect(page.text('.panel--budgets')).toContain('Budgets to watch');
+    expect(page.text('.budget-watch')).toContain('COP 330,000 / COP 400,000');
+    expect(page.text('.budget-watch')).toContain('82.5 % · Close to the limit');
+  });
+
+  it('repeats a recurring payment once per expected charge in the month (EP-14)', () => {
+    const page = render(dashboard({
+      chargesUntilMonthEnd: [
+        { subscriptionId: 'w', name: 'Cleaning', amount: 10000, currency: 'COP', nextBillingDate: '2026-10-21', isOverdue: false },
+        { subscriptionId: 'w', name: 'Cleaning', amount: 10000, currency: 'COP', nextBillingDate: '2026-10-28', isOverdue: false },
+      ],
+    }));
+
+    expect(page.element.querySelector('.panel--budgets')).toBeNull();
+    const charges = page.element.querySelectorAll('[aria-labelledby="today-charges"] li');
+    expect(charges.length).toBe(2);
   });
 
   it('shows a retry banner when the request fails', () => {

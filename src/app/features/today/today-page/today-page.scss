@@ -390,3 +390,21 @@
     padding: 1.1rem;
   }
 }
+
+// Presupuestos a vigilar (EP-15 HU-76): nombre, gastado / límite y barra con estado.
+.budget-watch {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.budget-watch li {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.budget-watch__name {
+  font-weight: 800;
+}

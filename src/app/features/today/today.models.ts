@@ -1,6 +1,7 @@
 // Modelos del panel "Hoy" (HU-68), reflejo de GET /api/dashboard/today.
 
 import { AccountResponse } from '../accounts/accounts.models';
+import { BudgetResponse } from '../budgets/budgets.models';
 import { TransactionResponse } from '../transactions/transactions.models';
 
 // Cifras de una moneda con todas las entradas de "Puedes gastar hoy" (calculadas por la API).
@@ -33,4 +34,6 @@ export interface TodayDashboard {
   accounts: AccountResponse[];
   recentTransactions: TransactionResponse[];
   chargesUntilMonthEnd: MonthCharge[];
+  // Presupuestos del mes en aviso o excedidos (EP-15 HU-76).
+  budgetsToWatch: BudgetResponse[];
 }

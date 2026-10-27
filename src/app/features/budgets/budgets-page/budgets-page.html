@@ -1,0 +1,79 @@
+<section class="budgets">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'budgets.kicker' | translate }}</p>
+      <h1>{{ 'budgets.title' | translate }}</h1>
+      <p class="lede">{{ 'budgets.lede' | translate }}</p>
+    </div>
+    <button class="btn" type="button" (click)="editor.set('new')"><app-icon name="plus" /> {{ 'budgets.add' | translate }}</button>
+  </div>
+
+  <div class="month-nav" role="group" [attr.aria-label]="'transactions.month' | translate">
+    <button type="button" class="icon-button" [attr.aria-label]="'transactions.previousMonth' | translate" (click)="changeMonth(-1)">‹</button>
+    <label class="month-picker">
+      <span class="month-picker__title">{{ monthTitle() }}</span>
+      <input type="month" [value]="month()" [attr.aria-label]="'transactions.month' | translate" #m (change)="setMonth(m.value)" />
+    </label>
+    <button type="button" class="icon-button" [attr.aria-label]="'transactions.nextMonth' | translate" (click)="changeMonth(1)">›</button>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'budgets.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (budgets().length === 0) {
+    <div class="empty">
+      <p>{{ 'budgets.empty' | translate }}</p>
+      <button class="btn" type="button" (click)="editor.set('new')">{{ 'budgets.addFirst' | translate }}</button>
+    </div>
+  } @else {
+    <ul class="cards">
+      @for (budget of budgets(); track budget.id) {
+        <li class="card" [style.--swatch]="'var(--category-' + budget.categoryColor + ')'">
+          <header class="card__head">
+            <span class="card__category"><app-category-icon [name]="budget.categoryIcon" /> {{ budget.categoryName }}</span>
+            @if (budget.categoryArchived) {
+              <span class="card__archived">{{ 'budgets.archived' | translate }}</span>
+            }
+            <span class="card__actions">
+              <button type="button" class="icon-button" [attr.aria-label]="'budgets.edit' | translate: { name: budget.categoryName }" (click)="editor.set(budget)"><app-icon name="edit" /></button>
+              <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'budgets.delete' | translate: { name: budget.categoryName }" (click)="deleteTarget.set(budget)"><app-icon name="delete" /></button>
+            </span>
+          </header>
+          <p class="card__figures">
+            <strong>{{ budget.spent | money: budget.currency }}</strong>
+            <span class="muted">/ {{ budget.limit | money: budget.currency }}</span>
+          </p>
+          <app-budget-meter [percent]="budget.percent" [state]="budget.state" />
+          <p class="card__left" [class.card__left--over]="budget.over > 0">
+            @if (budget.over > 0) {
+              {{ 'budgets.over' | translate: { amount: (budget.over | money: budget.currency) } }}
+            } @else {
+              {{ 'budgets.remaining' | translate: { amount: (budget.remaining | money: budget.currency) } }}
+            }
+          </p>
+        </li>
+      }
+    </ul>
+    <p class="hint">{{ 'budgets.note' | translate }}</p>
+  }
+
+  @if (editor(); as current) {
+    <app-modal [title]="(current === 'new' ? 'budgets.form.createTitle' : 'budgets.form.editTitle') | translate" (closeRequested)="editor.set(null)">
+      <app-budget-form [budget]="editing()" (saved)="handleSaved()" (closeRequested)="editor.set(null)" />
+    </app-modal>
+  }
+
+  @if (deleteTarget(); as target) {
+    <app-modal [title]="'budgets.deleteTitle' | translate" (closeRequested)="deleteTarget.set(null)">
+      <p class="modal-copy">{{ 'budgets.deleteText' | translate: { name: target.categoryName } }}</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="deleteTarget.set(null)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="danger-button" (click)="confirmDelete()"><app-icon name="delete" /> {{ 'budgets.deleteConfirm' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+</section>
