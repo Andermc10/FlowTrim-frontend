@@ -179,6 +179,10 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.goto('/app/upcoming');
     const netflix = page.locator('li.row').filter({ hasText: 'Netflix' });
     await netflix.getByRole('button', { name: 'Mark as paid' }).click();
+    // EP-14 HU-73: sin cuentas en COP el diálogo solo permite mover la fecha y lo explica.
+    const payDialog = page.getByRole('dialog', { name: 'Mark as paid' });
+    await expect(payDialog.getByRole('note')).toContainText('no active account in COP');
+    await payDialog.getByRole('button', { name: 'Move next date' }).click();
     await expect(page.locator('app-toast-item').filter({ hasText: '"Netflix" marked as paid' })).toBeVisible();
     // Un mes después ya no está en la ventana de aviso: el botón desaparece.
     await expect(netflix.getByRole('button', { name: 'Mark as paid' })).toHaveCount(0);
@@ -219,6 +223,27 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     const row = page.locator('li.row');
     await expect(row).toHaveCount(1);
     await expect(row).toContainText('-COP 38,900');
+    await row.getByRole('button', { name: /Delete transaction/ }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
+    await expect(row).toHaveCount(0);
+
+    // EP-14 HU-73: marcar Gym como pagado registra el gasto en Bank y queda en "Últimos pagos" del pago.
+    await page.goto('/app/subscriptions');
+    await page.getByRole('row', { name: /Gym/ }).getByRole('button', { name: 'Mark as paid' }).click();
+    const payDialog = page.getByRole('dialog', { name: 'Mark as paid' });
+    await expect(payDialog.getByLabel('Pay from')).toHaveValue(/.+/);
+    await payDialog.getByText('Health', { exact: true }).click();
+    await payDialog.getByLabel('Amount paid (COP)').fill('91500');
+    await payDialog.getByRole('button', { name: 'Record payment' }).click();
+    await expect(page.locator('app-toast-item').filter({ hasText: 'for "Gym" recorded in Bank' })).toBeVisible();
+    await page.getByRole('row', { name: /Gym/ }).getByRole('button', { name: 'Edit' }).click();
+    await expect(page.getByRole('dialog').locator('.payments')).toContainText('COP 91,500');
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+
+    await page.goto('/app/transactions');
+    await expect(row).toHaveCount(1);
+    await expect(row).toContainText('Gym');
+    await expect(row).toContainText('-COP 91,500');
     await row.getByRole('button', { name: /Delete transaction/ }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();
     await expect(row).toHaveCount(0);

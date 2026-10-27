@@ -129,7 +129,7 @@ describe('TransactionForm', () => {
     const form = render({
       id: 't1', type: 'Expense', accountId: 'old', accountName: 'Old', toAccountId: null, toAccountName: null,
       categoryId: 'gone', categoryName: 'Gone', categoryColor: 'orange', categoryIcon: 'food', amount: 5,
-      currency: 'COP', date: '2026-09-01', description: null, note: null, createdAt: '', updatedAt: '',
+      currency: 'COP', date: '2026-09-01', description: null, note: null, createdAt: '', updatedAt: '', recurringPaymentId: null,
     });
 
     expect(form.options('tx-account')).toContain('Old · COP');

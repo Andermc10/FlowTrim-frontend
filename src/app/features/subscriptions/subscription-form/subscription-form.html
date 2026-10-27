@@ -191,6 +191,25 @@
         </button>
       </div>
     </form>
+
+    @if (isEdit()) {
+      <section class="payments" aria-labelledby="payments-title">
+        <h3 id="payments-title">{{ 'form.recentPayments' | translate }}</h3>
+        @if (payments().length === 0) {
+          <p class="muted">{{ 'form.noPayments' | translate }}</p>
+        } @else {
+          <ul>
+            @for (payment of payments(); track payment.id) {
+              <li>
+                <span>{{ payment.date }}</span>
+                <span class="muted">{{ payment.accountName }}</span>
+                <strong>{{ payment.amount | money: payment.currency }}</strong>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
   }
   </div>
 </section>

@@ -73,7 +73,7 @@
             </td>
             <td class="actions-col" [attr.data-label]="'subscriptions.actions' | translate">
               @if (subscription.status === 'Active') {
-                <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.markPaid' | translate" [attr.title]="'subscriptions.markPaid' | translate" [disabled]="payingId() === subscription.id" (click)="markPaid(subscription)"><app-icon name="paid" /></button>
+                <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.markPaid' | translate" [attr.title]="'subscriptions.markPaid' | translate" (click)="markPaid(subscription)"><app-icon name="paid" /></button>
               }
               <button type="button" class="icon-button" [attr.aria-label]="'subscriptions.edit' | translate" [attr.title]="'subscriptions.edit' | translate" (click)="openEdit(subscription.id)"><app-icon name="edit" /></button>
               <a class="icon-button" [attr.aria-label]="'subscriptions.usage' | translate" [attr.title]="'subscriptions.usage' | translate" [routerLink]="['/app/subscriptions', subscription.id, 'usage']"><app-icon name="usage" /></a>
@@ -121,5 +121,9 @@
         <button type="button" class="danger-button" (click)="confirmDeleteTarget()"><app-icon name="delete" /> {{ 'subscriptions.delete' | translate }}</button>
       </div>
     </app-modal>
+  }
+
+  @if (payTargetId(); as id) {
+    <app-mark-paid-dialog [subscriptionId]="id" (paid)="handlePaid()" (closeRequested)="payTargetId.set(null)" />
   }
 </section>

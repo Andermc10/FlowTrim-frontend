@@ -1,0 +1,91 @@
+<app-modal [title]="'markPaid.title' | translate" (closeRequested)="closeRequested.emit()">
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error' || !payment()) {
+    <div class="banner banner--error" role="alert">{{ 'markPaid.loadError' | translate }}</div>
+  } @else {
+    @let current = payment()!;
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <p class="summary">
+        <strong>{{ current.name }}</strong> · {{ current.amount | money: current.currency }} · {{ 'markPaid.due' | translate }}
+        {{ current.nextBillingDate }}
+      </p>
+
+      <fieldset class="modes">
+        <legend class="visually-hidden">{{ 'markPaid.title' | translate }}</legend>
+        <label class="mode" [class.mode--disabled]="accountOptions().length === 0">
+          <input type="radio" formControlName="mode" value="record" [attr.disabled]="accountOptions().length === 0 ? '' : null" />
+          <span>
+            <strong>{{ 'markPaid.record' | translate }}</strong>
+            <small>{{ 'markPaid.recordHint' | translate }}</small>
+          </span>
+        </label>
+        <label class="mode">
+          <input type="radio" formControlName="mode" value="dateOnly" />
+          <span>
+            <strong>{{ 'markPaid.dateOnly' | translate }}</strong>
+            <small>{{ 'markPaid.dateOnlyHint' | translate }}</small>
+          </span>
+        </label>
+      </fieldset>
+
+      @if (accountOptions().length === 0) {
+        <p class="notice" role="note">{{ 'markPaid.noAccount' | translate: { currency: current.currency } }}</p>
+      }
+
+      @if (recording) {
+        <div class="grid">
+          <div class="field">
+            <label for="mp-account">{{ 'markPaid.account' | translate }}</label>
+            <select id="mp-account" formControlName="accountId" [attr.aria-invalid]="isInvalid('accountId')" aria-describedby="mp-account-error">
+              <option value="" disabled>{{ 'transactions.form.choose' | translate }}</option>
+              @for (account of accountOptions(); track account.id) {
+                <option [value]="account.id">{{ account.name }} · {{ account.balance | money: account.currency }}</option>
+              }
+            </select>
+            <app-field-error id="mp-account-error" [messageKey]="errorKey('accountId')" [serverMessages]="errorsFor('accountId')" />
+          </div>
+
+          <div class="field">
+            <label for="mp-amount">{{ 'markPaid.amount' | translate }} ({{ current.currency }})</label>
+            <input id="mp-amount" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="amount"
+              [attr.aria-invalid]="isInvalid('amount')" aria-describedby="mp-amount-hint mp-amount-error" />
+            <small id="mp-amount-hint" class="hint">{{ 'markPaid.amountHint' | translate }}</small>
+            <app-field-error id="mp-amount-error" [messageKey]="errorKey('amount')" [serverMessages]="errorsFor('amount')" />
+          </div>
+
+          <div class="field">
+            <label for="mp-date">{{ 'markPaid.date' | translate }}</label>
+            <input id="mp-date" type="date" formControlName="date" [max]="today"
+              [attr.aria-invalid]="isInvalid('date')" aria-describedby="mp-date-error" />
+            <app-field-error id="mp-date-error" [messageKey]="errorKey('date')" [serverMessages]="errorsFor('date')" />
+          </div>
+
+          <fieldset class="chips" aria-describedby="mp-category-error">
+            <legend>{{ 'markPaid.category' | translate }}</legend>
+            <div class="chips__list">
+              @for (category of categories(); track category.id) {
+                <label class="chip" [style.--swatch]="'var(--category-' + category.color + ')'">
+                  <input type="radio" formControlName="categoryId" [value]="category.id" />
+                  <span class="chip__body"><app-category-icon [name]="category.icon" /> {{ category.name }}</span>
+                </label>
+              }
+            </div>
+            <app-field-error id="mp-category-error" [messageKey]="errorKey('categoryId')" [serverMessages]="errorsFor('categoryId')" />
+          </fieldset>
+        </div>
+      }
+
+      @for (message of errorsFor('status'); track message) {
+        <div class="banner banner--error" role="alert">{{ message }}</div>
+      }
+
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+        <button type="submit" [disabled]="status() === 'saving'">
+          {{ status() === 'saving' ? ('form.saving' | translate) : (recording ? ('markPaid.submitRecord' | translate) : ('markPaid.submitDateOnly' | translate)) }}
+        </button>
+      </div>
+    </form>
+  }
+</app-modal>

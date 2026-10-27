@@ -34,6 +34,8 @@ export interface TransactionResponse {
   note: string | null;
   createdAt: string;
   updatedAt: string;
+  // Pago recurrente que originó el gasto al marcarlo como pagado (EP-14 HU-73); null en los demás.
+  recurringPaymentId: string | null;
 }
 
 // Totales de una moneda para todo el filtro (no solo la página); las transferencias no cuentan.

@@ -2,10 +2,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
-import { dateLabel, localeFor } from '../../../core/format/money';
+import { dateLabel, localeFor, moneyFormatter } from '../../../core/format/money';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
-import { AlertWindow, SubscriptionResponse } from '../models/subscription.models';
+import { AlertWindow, MarkPaidRequest, MarkPaidResponse, SubscriptionResponse } from '../models/subscription.models';
 import { SubscriptionService } from './subscription-service';
 
 /** Ventanas en las que Próximos cobros ofrece "Marcar como pagado": lo vencido y lo que vence pronto. */
@@ -22,17 +22,31 @@ export class SubscriptionActions {
   private readonly i18n = inject(I18nService);
 
   /**
-   * Marca el cobro actual como pagado (HU-57): la API mueve la próxima fecha un ciclo. No registra dinero, así que
-   * el aviso solo habla de la nueva fecha.
+   * Marca el cobro actual como pagado. Sin `request` solo se mueve la próxima fecha (HU-57); con él también se registra
+   * el gasto en la cuenta (HU-73) y el aviso dice cuánto y dónde. Los 400 de campos los muestra el diálogo, no un toast.
    */
-  markPaid(subscription: Pick<SubscriptionResponse, 'id' | 'name'>): Observable<SubscriptionResponse> {
-    return this.subscriptions.markPaid(subscription.id).pipe(
+  markPaid(subscription: Pick<SubscriptionResponse, 'id' | 'name'>, request: MarkPaidRequest | null = null): Observable<MarkPaidResponse> {
+    return this.subscriptions.markPaid(subscription.id, request).pipe(
       tap({
-        next: (updated) => {
-          const date = dateLabel(updated.nextBillingDate, localeFor(this.i18n.language()));
-          this.toast.success(this.i18n.translate('toast.markedPaid', { name: updated.name, date }));
+        next: ({ subscription: updated, transaction }) => {
+          const locale = localeFor(this.i18n.language());
+          const date = dateLabel(updated.nextBillingDate, locale);
+          this.toast.success(
+            transaction
+              ? this.i18n.translate('toast.paymentRecorded', {
+                  name: updated.name,
+                  amount: moneyFormatter(transaction.currency, locale)(transaction.amount),
+                  account: transaction.accountName,
+                  date,
+                })
+              : this.i18n.translate('toast.markedPaid', { name: updated.name, date }),
+          );
         },
-        error: (error: HttpErrorResponse) => this.toast.httpError(error),
+        error: (error: HttpErrorResponse) => {
+          if (error.status !== 400 || !request) {
+            this.toast.httpError(error);
+          }
+        },
       }),
     );
   }

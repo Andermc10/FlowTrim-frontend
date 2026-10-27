@@ -37,6 +37,8 @@ import { productToday } from '../../../core/format/product-calendar';
 import { FieldError } from '../../../core/forms/field-error';
 import { ErrorMessages, FormValidators, visibleErrorKey } from '../../../core/forms/form-validators';
 import { CategoryIcon } from '../../../core/ui/icon/category-icon';
+import { MoneyPipe } from '../../../core/format/money.pipe';
+import { TransactionResponse } from '../../transactions/transactions.models';
 
 type FormStatus = 'idle' | 'loading' | 'saving' | 'error';
 
@@ -59,7 +61,7 @@ const fieldMessages: Record<FieldName, ErrorMessages> = {
 
 @Component({
   selector: 'app-subscription-form',
-  imports: [ReactiveFormsModule, TranslatePipe, FieldError, CategoryIcon],
+  imports: [ReactiveFormsModule, TranslatePipe, FieldError, CategoryIcon, MoneyPipe],
   templateUrl: './subscription-form.html',
   styleUrl: './subscription-form.scss',
 })
@@ -97,6 +99,8 @@ export class SubscriptionForm implements OnInit {
   // Valores guardados al editar: una cuenta o categoría archivada después sigue visible si ya era la elegida.
   private readonly savedAccountId = signal<string | null>(null);
   private readonly savedCategoryId = signal<string | null>(null);
+  // Últimos gastos registrados al marcar el pago como pagado (EP-14 HU-73); solo al editar.
+  protected readonly payments = signal<TransactionResponse[]>([]);
   protected readonly accountOptions = computed(() =>
     this.accounts().filter((a) => !a.isArchived || a.id === this.savedAccountId()),
   );
@@ -181,6 +185,10 @@ export class SubscriptionForm implements OnInit {
         this.savedAccountId.set(subscription.defaultAccountId);
         this.savedCategoryId.set(subscription.categoryId);
         this.originalNextBillingDate = subscription.nextBillingDate;
+        this.service
+          .listPayments(id)
+          .pipe(catchError(() => of([] as TransactionResponse[])), takeUntilDestroyed(this.destroyRef))
+          .subscribe((payments) => this.payments.set(payments));
         this.form.markAsPristine();
         this.dirtyChange.emit(false);
         this.status.set('idle');
