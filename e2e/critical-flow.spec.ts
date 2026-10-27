@@ -338,6 +338,28 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(row.locator('.status')).toHaveText('Completed');
   });
 
+  await test.step('EP-15 HU-77: a savings goal with a contribution', async () => {
+    await page.getByRole('link', { name: 'Goals' }).first().click();
+    await page.getByRole('button', { name: 'Create your first goal' }).click();
+    const goalDialog = page.getByRole('dialog', { name: 'New goal' });
+    await goalDialog.getByLabel('Name').fill('Trip');
+    await goalDialog.getByLabel('Target amount').fill('1000000');
+    await goalDialog.getByRole('button', { name: 'Create goal' }).click();
+    const card = page.locator('.card').filter({ hasText: 'Trip' });
+    await expect(card).toContainText('0 %');
+
+    await card.getByRole('button', { name: 'Add or withdraw' }).click();
+    const contribution = page.getByRole('dialog', { name: 'Add or withdraw: Trip' });
+    await contribution.getByLabel('Amount (COP)').fill('250000');
+    await contribution.getByRole('button', { name: 'Save' }).click();
+    await expect(card).toContainText('25 %');
+    await expect(card).toContainText('COP 250,000');
+
+    await card.getByRole('button', { name: 'Delete goal: Trip' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete goal' }).click();
+    await expect(page.getByText('No savings goals yet.')).toBeVisible();
+  });
+
   await test.step('account A deletes its data', async () => {
     await page.goto('/app/subscriptions');
     for (const name of ['Netflix', 'Gym', 'Cloud Storage', 'Water bill', 'Laptop']) {

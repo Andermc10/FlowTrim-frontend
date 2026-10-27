@@ -1,0 +1,37 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="field field--wide">
+    <label for="goal-name">{{ 'form.name' | translate }}</label>
+    <input id="goal-name" type="text" formControlName="name" maxlength="60" autocomplete="off"
+      [placeholder]="'goals.form.namePlaceholder' | translate" [attr.aria-invalid]="isInvalid('name')" aria-describedby="goal-name-error" />
+    <app-field-error id="goal-name-error" [messageKey]="errorKey('name')" [serverMessages]="errorsFor('name')" />
+  </div>
+
+  <div class="field">
+    <label for="goal-target">{{ 'goals.form.target' | translate }}</label>
+    <input id="goal-target" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="target"
+      placeholder="3000000" [attr.aria-invalid]="isInvalid('target')" aria-describedby="goal-target-error" />
+    <app-field-error id="goal-target-error" [messageKey]="errorKey('target')" [serverMessages]="errorsFor('target')" />
+  </div>
+
+  <div class="field">
+    <label for="goal-currency">{{ 'form.currency' | translate }}</label>
+    <input id="goal-currency" type="text" maxlength="3" autocomplete="off" formControlName="currency" placeholder="COP"
+      [attr.aria-invalid]="isInvalid('currency')" aria-describedby="goal-currency-error" (input)="upperCaseCurrency()" />
+    <app-field-error id="goal-currency-error" [messageKey]="errorKey('currency')" [serverMessages]="errorsFor('currency')" />
+  </div>
+
+  <div class="field field--wide">
+    <label for="goal-date">{{ 'goals.form.targetDate' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+    <input id="goal-date" type="date" formControlName="targetDate" [min]="today"
+      [attr.aria-invalid]="isInvalid('targetDate')" aria-describedby="goal-date-hint goal-date-error" />
+    <small id="goal-date-hint" class="hint">{{ 'goals.form.targetDateHint' | translate }}</small>
+    <app-field-error id="goal-date-error" [messageKey]="errorKey('targetDate')" [serverMessages]="errorsFor('targetDate')" />
+  </div>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? ('form.saving' | translate) : (goal ? ('form.saveChanges' | translate) : ('goals.form.create' | translate)) }}
+    </button>
+  </div>
+</form>
