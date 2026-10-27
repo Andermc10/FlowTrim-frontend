@@ -113,6 +113,11 @@ export const routes: Routes = [
             title: 'analytics.tabReport',
             loadComponent: () => import('./features/reports/report-page/report-page').then((m) => m.ReportPage),
           },
+          {
+            path: 'statement',
+            title: 'analytics.tabStatement',
+            loadComponent: () => import('./features/statements/statement-page/statement-page').then((m) => m.StatementPage),
+          },
         ],
       },
       {

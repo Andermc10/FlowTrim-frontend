@@ -245,6 +245,11 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(page.locator('.card').filter({ hasText: 'Food' })).toContainText('87.5 % · Close to the limit');
     await page.getByRole('link', { name: 'Today' }).first().click();
     await expect(page.locator('.panel--budgets')).toContainText('Food');
+    // EP-16 HU-78: el estado de cuenta del mes refleja ese gasto en Comida.
+    await page.goto('/app/analytics/statement');
+    await expect(page.getByRole('tab', { name: 'Statement' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('.block').filter({ hasText: 'COP' })).toContainText('−COP 35,000');
+    await expect(page.locator('.categories')).toContainText('Food');
     await page.goto('/app/transactions');
     await row.filter({ hasText: 'COP 35,000' }).getByRole('button', { name: /Delete transaction/ }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Delete transaction' }).click();

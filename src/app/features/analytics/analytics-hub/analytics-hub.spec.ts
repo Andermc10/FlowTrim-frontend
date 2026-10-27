@@ -27,6 +27,7 @@ describe('AnalyticsHub', () => {
             children: [
               { path: '', pathMatch: 'full', component: ChartsStub },
               { path: 'report', component: ReportStub },
+              { path: 'statement', component: ReportStub },
             ],
           },
         ]),
@@ -47,9 +48,9 @@ describe('AnalyticsHub', () => {
   it('marks the active tab and keeps only it in the tab order', async () => {
     const page = await open('/app/analytics/report');
 
-    expect(page.tabs().map((tab) => tab.textContent?.trim())).toEqual(['Charts', 'Report']);
-    expect(page.tabs().map((tab) => tab.getAttribute('aria-selected'))).toEqual(['false', 'true']);
-    expect(page.tabs().map((tab) => tab.tabIndex)).toEqual([-1, 0]);
+    expect(page.tabs().map((tab) => tab.textContent?.trim())).toEqual(['Charts', 'Report', 'Statement']);
+    expect(page.tabs().map((tab) => tab.getAttribute('aria-selected'))).toEqual(['false', 'true', 'false']);
+    expect(page.tabs().map((tab) => tab.tabIndex)).toEqual([-1, 0, -1]);
     expect(page.element.querySelector('[role="tabpanel"]')?.textContent).toContain('report');
   });
 
@@ -59,6 +60,8 @@ describe('AnalyticsHub', () => {
     page.tabs()[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
     expect(document.activeElement).toBe(page.tabs()[1]);
     page.tabs()[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    expect(document.activeElement).toBe(page.tabs()[2]);
+    page.tabs()[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
     expect(document.activeElement).toBe(page.tabs()[0]);
   });
 
@@ -96,6 +99,6 @@ describe('Analytics routes', () => {
     const analytics = workspace.children!.find((route) => route.path === 'analytics');
 
     expect(report?.redirectTo).toBe('analytics/report');
-    expect(analytics?.children?.map((child) => child.path)).toEqual(['', 'report']);
+    expect(analytics?.children?.map((child) => child.path)).toEqual(['', 'report', 'statement']);
   });
 });

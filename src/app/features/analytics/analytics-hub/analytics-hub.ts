@@ -3,10 +3,11 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
-/** Pestañas del módulo: gráficos y reporte imprimible sobre los mismos datos (HU-59). */
+/** Pestañas del módulo: gráficos, reporte imprimible (HU-59) y estado de cuenta mensual (EP-16 HU-78). */
 export const analyticsTabs = [
   { path: '/app/analytics', labelKey: 'analytics.tabCharts', exact: true },
   { path: '/app/analytics/report', labelKey: 'analytics.tabReport', exact: false },
+  { path: '/app/analytics/statement', labelKey: 'analytics.tabStatement', exact: false },
 ] as const;
 
 /**

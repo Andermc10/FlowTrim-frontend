@@ -1,0 +1,72 @@
+<section class="statement">
+  <div class="month-nav" role="group" [attr.aria-label]="'transactions.month' | translate">
+    <button type="button" class="icon-button" [attr.aria-label]="'transactions.previousMonth' | translate" (click)="changeMonth(-1)">‹</button>
+    <label class="month-picker">
+      <span class="month-picker__title">{{ monthTitle() }}</span>
+      <input type="month" [value]="month()" [attr.aria-label]="'transactions.month' | translate" #m (change)="setMonth(m.value)" />
+    </label>
+    <button type="button" class="icon-button" [attr.aria-label]="'transactions.nextMonth' | translate" (click)="changeMonth(1)">›</button>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'statement.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (statement()!.currencies.length === 0) {
+    <p class="notice">{{ 'statement.empty' | translate }}</p>
+  } @else {
+    @for (currency of statement()!.currencies; track currency.currency) {
+      <article class="block" [attr.aria-label]="currency.currency">
+        <h2>{{ currency.currency }}</h2>
+        <dl class="figures">
+          <div><dt>{{ 'statement.income' | translate }}</dt><dd class="income">+{{ currency.income | money: currency.currency }}</dd></div>
+          <div><dt>{{ 'statement.expenses' | translate }}</dt><dd class="expense">−{{ currency.expense | money: currency.currency }}</dd></div>
+          <div><dt>{{ 'statement.net' | translate }}</dt><dd>{{ currency.net | money: currency.currency }}</dd></div>
+          <div>
+            <dt>{{ 'statement.savingsRate' | translate }}</dt>
+            <dd>{{ currency.savingsRate === null ? ('statement.noIncome' | translate) : currency.savingsRate + ' %' }}</dd>
+          </div>
+        </dl>
+
+        <p class="comparison">
+          @if (currency.expenseChange !== null) {
+            <span aria-hidden="true">{{ currency.expenseChange > 0 ? '↑' : currency.expenseChange < 0 ? '↓' : '=' }}</span>
+          }
+          {{ changeKey(currency.expenseChange) | translate: { percent: abs(currency.expenseChange ?? 0), month: previousTitle() } }}
+          <span class="muted">
+            · {{ 'statement.previous' | translate: { month: previousTitle() } }}
+            +{{ currency.previousIncome | money: currency.currency }} / −{{ currency.previousExpense | money: currency.currency }}
+          </span>
+        </p>
+
+        @if (currency.topCategories.length > 0) {
+          <table class="categories">
+            <caption>{{ 'statement.topCategories' | translate }}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{{ 'statement.category' | translate }}</th>
+                <th scope="col">{{ 'statement.amount' | translate }}</th>
+                <th scope="col">{{ 'statement.share' | translate }}</th>
+                <th scope="col">{{ previousTitle() }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (category of currency.topCategories; track category.categoryId) {
+                <tr [style.--swatch]="'var(--category-' + category.color + ')'">
+                  <th scope="row"><app-category-icon [name]="category.icon" /> {{ category.name }}</th>
+                  <td>{{ category.amount | money: currency.currency }}</td>
+                  <td>{{ category.share }} %</td>
+                  <td class="muted">{{ category.previousAmount | money: currency.currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </article>
+    }
+    <p class="hint">{{ 'statement.note' | translate }}</p>
+  }
+</section>
