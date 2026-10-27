@@ -42,12 +42,13 @@ import { TransactionResponse } from '../../transactions/transactions.models';
 
 type FormStatus = 'idle' | 'loading' | 'saving' | 'error';
 
-type FieldName = 'name' | 'category' | 'amount' | 'currency' | 'nextBillingDate' | 'paymentUrl';
+type FieldName = 'name' | 'category' | 'amount' | 'currency' | 'nextBillingDate' | 'paymentUrl' | 'totalInstalments' | 'paidInstalments';
 
 /** Límites del dominio (Subscription.NameMaxLength / CategoryMaxLength / PaymentUrlMaxLength en la API). */
 export const nameMaxLength = 120;
 export const categoryMaxLength = 60;
 export const paymentUrlMaxLength = 500;
+export const maxInstalments = 600;
 
 // Mensaje de cada regla, en el orden en que se muestran (HU-55).
 const fieldMessages: Record<FieldName, ErrorMessages> = {
@@ -57,6 +58,8 @@ const fieldMessages: Record<FieldName, ErrorMessages> = {
   currency: [['currencyCode', 'form.currencyCode']],
   nextBillingDate: [['required', 'form.dateRequired'], ['notBefore', 'form.dateInPast']],
   paymentUrl: [['httpsUrl', 'form.paymentUrlInvalid']],
+  totalInstalments: [['required', 'form.instalmentsRequired'], ['min', 'form.instalmentsRange'], ['max', 'form.instalmentsRange'], ['integer', 'form.instalmentsRange']],
+  paidInstalments: [['min', 'form.paidRange'], ['integer', 'form.paidRange'], ['paidBelowTotal', 'form.paidRange']],
 };
 
 @Component({
@@ -134,11 +137,28 @@ export class SubscriptionForm implements OnInit {
     ]),
     status: this.fb.nonNullable.control<SubscriptionStatus>('Active', [Validators.required]),
     paymentUrl: this.fb.nonNullable.control('', [FormValidators.httpsUrl(paymentUrlMaxLength)]),
+    // Validadores activos solo en un plan de cuotas (ver applyInstalmentRules).
+    totalInstalments: this.fb.control<number | null>(null),
+    paidInstalments: this.fb.control<number | null>(0),
     defaultAccountId: this.fb.nonNullable.control(''),
     categoryId: this.fb.nonNullable.control(''),
   });
 
+  /** Cuotas pagadas del plan que se edita (las cuenta "marcar como pagado"; aquí solo se muestran). */
+  protected readonly savedPaidInstalments = signal(0);
+
+  protected get isInstalment(): boolean {
+    return this.form.controls.kind.value === 'Instalment';
+  }
+
   ngOnInit(): void {
+    this.applyInstalmentRules();
+    this.form.controls.kind.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.applyInstalmentRules());
+    this.form.controls.totalInstalments.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.form.controls.paidInstalments.updateValueAndValidity({ emitEvent: false }));
     this.form.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.dirtyChange.emit(this.form.dirty));
@@ -148,6 +168,27 @@ export class SubscriptionForm implements OnInit {
       this.editingId.set(id);
       this.load(id);
     }
+  }
+
+  // Total de cuotas entre 1 y 600 y cuotas ya pagadas menores que el total, solo en un plan de cuotas (HU-74).
+  private applyInstalmentRules(): void {
+    const { totalInstalments, paidInstalments } = this.form.controls;
+    if (this.isInstalment) {
+      totalInstalments.setValidators([Validators.required, Validators.min(1), Validators.max(maxInstalments), FormValidators.integer]);
+      paidInstalments.setValidators([
+        Validators.min(0),
+        FormValidators.integer,
+        (control) => {
+          const total = totalInstalments.value;
+          return control.value !== null && total !== null && control.value >= total ? { paidBelowTotal: true } : null;
+        },
+      ]);
+    } else {
+      totalInstalments.clearValidators();
+      paidInstalments.clearValidators();
+    }
+    totalInstalments.updateValueAndValidity({ emitEvent: false });
+    paidInstalments.updateValueAndValidity({ emitEvent: false });
   }
 
   // Cuentas y categorías (también archivadas, para mostrar la ya elegida); un fallo deja las listas vacías.
@@ -181,7 +222,10 @@ export class SubscriptionForm implements OnInit {
           paymentUrl: subscription.paymentUrl ?? '',
           defaultAccountId: subscription.defaultAccountId ?? '',
           categoryId: subscription.categoryId ?? '',
+          totalInstalments: subscription.totalInstalments,
+          paidInstalments: subscription.paidInstalments,
         });
+        this.savedPaidInstalments.set(subscription.paidInstalments);
         this.savedAccountId.set(subscription.defaultAccountId);
         this.savedCategoryId.set(subscription.categoryId);
         this.originalNextBillingDate = subscription.nextBillingDate;
@@ -220,13 +264,16 @@ export class SubscriptionForm implements OnInit {
       paymentUrl: value.paymentUrl.trim() || null,
       defaultAccountId: value.defaultAccountId || null,
       categoryId: value.categoryId || null,
+      totalInstalments: value.kind === 'Instalment' ? value.totalInstalments : null,
+      paidInstalments: value.kind === 'Instalment' ? (value.paidInstalments ?? 0) : null,
     };
 
     this.status.set('saving');
 
     const editingId = this.editingId();
     if (editingId) {
-      const request: UpdateSubscriptionRequest = { ...base, status: value.status };
+      // Las cuotas pagadas no se editan: las lleva "marcar como pagado".
+      const request: UpdateSubscriptionRequest = { ...base, paidInstalments: undefined, status: value.status };
       this.service.update(editingId, request).subscribe({
         next: () => this.finishSave('toast.subscriptionUpdated', base.name),
         error: (error: HttpErrorResponse) => this.handleError(error),

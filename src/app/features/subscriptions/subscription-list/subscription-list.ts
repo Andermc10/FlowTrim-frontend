@@ -79,6 +79,12 @@ export class SubscriptionList implements OnInit {
     this.payTargetId.set(subscription.id);
   }
 
+  /** Plan de cuotas con todas sus cuotas pagadas (EP-14 HU-74). */
+  protected isCompleted(subscription: SubscriptionResponse): boolean {
+    return subscription.kind === 'Instalment' && subscription.totalInstalments !== null
+      && subscription.paidInstalments >= subscription.totalInstalments;
+  }
+
   protected handlePaid(): void {
     this.payTargetId.set(null);
     this.load();

@@ -31,6 +31,28 @@
         <app-field-error id="kind-error" [serverMessages]="errorsFor('kind')" />
       </div>
 
+      @if (isInstalment) {
+        <div class="field">
+          <label for="totalInstalments">{{ 'form.totalInstalments' | translate }}</label>
+          <input id="totalInstalments" type="number" inputmode="numeric" min="1" max="600" step="1" formControlName="totalInstalments"
+            placeholder="12" [attr.aria-invalid]="isInvalid('totalInstalments')" aria-describedby="totalInstalments-error" />
+          <app-field-error id="totalInstalments-error" [messageKey]="errorKey('totalInstalments')" [serverMessages]="errorsFor('totalInstalments')" />
+        </div>
+        @if (isEdit()) {
+          <p class="field instalments-progress" role="status">
+            {{ 'instalments.progress' | translate: { paid: savedPaidInstalments(), total: form.controls.totalInstalments.value ?? '—' } }}
+          </p>
+        } @else {
+          <div class="field">
+            <label for="paidInstalments">{{ 'form.paidInstalments' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+            <input id="paidInstalments" type="number" inputmode="numeric" min="0" step="1" formControlName="paidInstalments"
+              [attr.aria-invalid]="isInvalid('paidInstalments')" aria-describedby="paidInstalments-hint paidInstalments-error" />
+            <small id="paidInstalments-hint" class="hint">{{ 'form.paidInstalmentsHint' | translate }}</small>
+            <app-field-error id="paidInstalments-error" [messageKey]="errorKey('paidInstalments')" [serverMessages]="errorsFor('paidInstalments')" />
+          </div>
+        }
+      }
+
       <div class="field">
         <label for="name">{{ 'form.name' | translate }}</label>
         <input

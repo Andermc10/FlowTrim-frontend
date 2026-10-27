@@ -118,3 +118,10 @@ button.secondary {
   gap: 0.75rem;
   font-size: 0.8rem;
 }
+
+.instalments-progress {
+  justify-content: flex-end;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}

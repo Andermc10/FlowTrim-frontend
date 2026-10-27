@@ -64,7 +64,7 @@ describe('UpcomingPanel mark as paid', () => {
     httpMock.expectOne(`${base}/a`).flush({
       id: 'a', name: 'Gym', category: null, amount: 38900, currency: 'COP', billingCycle: 'Monthly',
       nextBillingDate: '2026-10-18', status: 'Active', kind: 'Subscription', paymentUrl: null, defaultAccountId: null,
-      categoryId: null, monthlyEquivalent: 38900, createdAt: '2026-09-01T00:00:00Z', updatedAt: '2026-09-01T00:00:00Z',
+      categoryId: null, monthlyEquivalent: 38900, totalInstalments: null, paidInstalments: 0, createdAt: '2026-09-01T00:00:00Z', updatedAt: '2026-09-01T00:00:00Z',
     });
     httpMock.expectOne(`${environment.apiUrl}/api/accounts`).flush([]);
     httpMock.expectOne((request) => request.url === `${environment.apiUrl}/api/categories`).flush([]);
@@ -79,7 +79,7 @@ describe('UpcomingPanel mark as paid', () => {
       subscription: {
         id: 'a', name: 'Gym', category: null, amount: 38900, currency: 'COP', billingCycle: 'Monthly',
         nextBillingDate: '2026-11-18', status: 'Active', kind: 'Subscription', paymentUrl: null, defaultAccountId: null,
-        categoryId: null, monthlyEquivalent: 38900, createdAt: '2026-09-01T00:00:00Z', updatedAt: '2026-10-20T15:00:00Z',
+        categoryId: null, monthlyEquivalent: 38900, totalInstalments: null, paidInstalments: 0, createdAt: '2026-09-01T00:00:00Z', updatedAt: '2026-10-20T15:00:00Z',
       },
       transaction: null,
       completed: false,

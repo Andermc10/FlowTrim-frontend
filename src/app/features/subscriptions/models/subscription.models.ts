@@ -8,7 +8,7 @@ export type BillingCycle = (typeof billingCycles)[number];
 export type SubscriptionStatus = 'Active' | 'Inactive';
 
 // Tipo de pago recurrente (EP-14 D2). La API y el código conservan el nombre "subscription".
-export const subscriptionKinds = ['Subscription', 'Bill'] as const;
+export const subscriptionKinds = ['Subscription', 'Bill', 'Instalment'] as const;
 export type SubscriptionKind = (typeof subscriptionKinds)[number];
 
 export interface CreateSubscriptionRequest {
@@ -22,6 +22,9 @@ export interface CreateSubscriptionRequest {
   paymentUrl: string | null;
   defaultAccountId: string | null;
   categoryId: string | null;
+  // Plan de cuotas (EP-14 HU-74): total obligatorio; las ya pagadas solo al crear un plan empezado.
+  totalInstalments: number | null;
+  paidInstalments?: number | null;
 }
 
 export interface SubscriptionResponse {
@@ -38,6 +41,8 @@ export interface SubscriptionResponse {
   defaultAccountId: string | null;
   categoryId: string | null;
   monthlyEquivalent: number;
+  totalInstalments: number | null;
+  paidInstalments: number;
   createdAt: string;
   updatedAt: string;
 }

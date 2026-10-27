@@ -243,3 +243,32 @@
     justify-content: flex-end;
   }
 }
+
+// Avance de un plan de cuotas (EP-14 HU-74): barra y texto "3 de 12 pagadas".
+.instalments {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  margin-top: 0.25rem;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+}
+
+.instalments__bar {
+  overflow: hidden;
+  width: 4.5rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--color-surface-soft);
+}
+
+.instalments__bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.status--completed {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}

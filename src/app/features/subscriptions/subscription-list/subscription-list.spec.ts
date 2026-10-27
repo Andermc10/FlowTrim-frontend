@@ -13,7 +13,7 @@ describe('SubscriptionList recurring payments', () => {
 
   const payment = (id: string, name: string, kind: SubscriptionKind, paymentUrl: string | null = null): SubscriptionResponse => ({
     id, name, category: null, amount: 100, currency: 'COP', billingCycle: 'Monthly', nextBillingDate: '2026-11-01',
-    status: 'Active', kind, paymentUrl, defaultAccountId: null, categoryId: null, monthlyEquivalent: 100,
+    status: 'Active', kind, paymentUrl, defaultAccountId: null, categoryId: null, monthlyEquivalent: 100, totalInstalments: null, paidInstalments: 0,
     createdAt: '2026-10-01T00:00:00Z', updatedAt: '2026-10-01T00:00:00Z',
   });
 
@@ -61,5 +61,22 @@ describe('SubscriptionList recurring payments', () => {
     expect(links[0].href).toBe('https://pay.example.com/rent');
     expect(links[0].target).toBe('_blank');
     expect(links[0].rel).toBe('noopener noreferrer');
+  });
+
+  it('shows instalment progress and a completed badge for a fully paid plan (HU-74)', () => {
+    const fixture = TestBed.createComponent(SubscriptionList);
+    fixture.detectChanges();
+    httpMock.expectOne(`${environment.apiUrl}/api/subscriptions?page=1&pageSize=100`).flush({
+      items: [
+        { ...payment('p', 'Laptop', 'Instalment'), totalInstalments: 12, paidInstalments: 3 },
+        { ...payment('q', 'Phone', 'Instalment'), status: 'Inactive', totalInstalments: 6, paidInstalments: 6 },
+      ],
+      page: 1, pageSize: 100, totalCount: 2,
+    });
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect([...element.querySelectorAll('.instalments')].map((e) => e.textContent?.trim())).toEqual(['3 of 12 paid', '6 of 6 paid']);
+    expect([...element.querySelectorAll('.status')].map((e) => e.textContent?.trim())).toEqual(['Active', 'Completed']);
   });
 });
