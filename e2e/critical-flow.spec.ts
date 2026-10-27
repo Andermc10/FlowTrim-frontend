@@ -278,6 +278,22 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await page.getByLabel('Filter by type').selectOption('');
   });
 
+  await test.step('EP-14 HU-75: the calendar places the weekly bill on its day', async () => {
+    const due = nextBillingDate(2);
+    await page.getByRole('link', { name: 'Calendar' }).first().click();
+    await expect(page.getByRole('heading', { name: 'What is due, day by day.' })).toBeVisible();
+    if (due.slice(0, 7) !== nextBillingDate(0).slice(0, 7)) {
+      await page.getByRole('button', { name: 'Next month' }).click();
+    }
+    const day = Number(due.slice(8));
+    await page.locator('.grid .cell:not(.cell--blank)').nth(day - 1).click();
+    const panel = page.locator('.panel');
+    await expect(panel).toContainText('Water bill');
+    await expect(panel).toContainText('COP 25,000');
+    await expect(panel.getByRole('link', { name: /Pay at provider/ })).toHaveAttribute('href', 'https://pay.example.com/water');
+    await page.screenshot({ path: `${checkpoints}/10-calendar.png`, fullPage: true });
+  });
+
   await test.step('EP-14 HU-74: paying the last instalment completes the plan', async () => {
     await page.goto('/app/subscriptions');
     await page.getByRole('button', { name: 'Add payment' }).click();

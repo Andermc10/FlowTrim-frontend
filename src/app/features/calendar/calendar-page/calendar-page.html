@@ -1,0 +1,148 @@
+<section class="calendar">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'calendar.kicker' | translate }}</p>
+      <h1>{{ 'calendar.title' | translate }}</h1>
+      <p class="lede">{{ 'calendar.lede' | translate }}</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="month-nav" role="group" [attr.aria-label]="'transactions.month' | translate">
+      <button type="button" class="icon-button" [attr.aria-label]="'transactions.previousMonth' | translate" (click)="changeMonth(-1)">‹</button>
+      <label class="month-picker">
+        <span class="month-picker__title">{{ monthTitle() }}</span>
+        <input type="month" [value]="month()" [attr.aria-label]="'transactions.month' | translate" #m (change)="setMonth(m.value)" />
+      </label>
+      <button type="button" class="icon-button" [attr.aria-label]="'transactions.nextMonth' | translate" (click)="changeMonth(1)">›</button>
+    </div>
+    @if (status() === 'success') {
+      <ul class="totals" [attr.aria-label]="'calendar.totals' | translate">
+        @for (total of calendar()!.totals; track total.currency) {
+          <li>
+            <span>{{ 'calendar.expected' | translate }} <strong>{{ total.expected | money: total.currency }}</strong></span>
+            <span>{{ 'calendar.spent' | translate }} <strong>{{ total.recordedExpense | money: total.currency }}</strong></span>
+            <span>{{ 'calendar.received' | translate }} <strong>{{ total.recordedIncome | money: total.currency }}</strong></span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'calendar.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    @if (busyDays().length === 0) {
+      <p class="notice">{{ 'calendar.empty' | translate }}</p>
+    }
+
+    <div class="layout">
+      <!-- Cuadrícula del mes (escritorio): cada día es un botón que abre su detalle en el panel. -->
+      <div class="grid" role="group" [attr.aria-label]="monthTitle()">
+        @for (weekday of weekdays(); track $index) {
+          <span class="grid__weekday" aria-hidden="true">{{ weekday }}</span>
+        }
+        @for (cell of cells(); track $index) {
+          @if (cell) {
+            <button
+              type="button"
+              class="cell"
+              [class.cell--today]="cell.day.date === calendar()!.today"
+              [class.cell--selected]="cell.day.date === selectedDate()"
+              [class.cell--overdue]="hasOverdue(cell.day)"
+              [attr.aria-pressed]="cell.day.date === selectedDate()"
+              [attr.aria-label]="dayLabel(cell.day.date)"
+              (click)="select(cell.day)"
+            >
+              <span class="cell__number">{{ cell.number }}</span>
+              @for (total of expectedByCurrency(cell.day); track total.currency) {
+                <span class="cell__expected">{{ total.amount | money: total.currency }}</span>
+              }
+              @for (recorded of cell.day.recorded; track recorded.currency) {
+                @if (recorded.expense > 0) {
+                  <span class="cell__spent">−{{ recorded.expense | money: recorded.currency }}</span>
+                }
+              }
+            </button>
+          } @else {
+            <span class="cell cell--blank" aria-hidden="true"></span>
+          }
+        }
+      </div>
+
+      @if (selectedDay(); as day) {
+        <aside class="panel" aria-live="polite">
+          <ng-container [ngTemplateOutlet]="dayDetail" [ngTemplateOutletContext]="{ $implicit: day }" />
+        </aside>
+      }
+    </div>
+
+    <!-- Lista de días con algo (móvil). -->
+    <ol class="day-list">
+      @for (day of busyDays(); track day.date) {
+        <li class="day-list__item" [class.day-list__item--today]="day.date === calendar()!.today">
+          <ng-container [ngTemplateOutlet]="dayDetail" [ngTemplateOutletContext]="{ $implicit: day }" />
+        </li>
+      }
+    </ol>
+  }
+
+  <ng-template #dayDetail let-day>
+    <h2 class="detail__title">
+      {{ dayLabel(day.date) }}
+      @if (day.date === calendar()!.today) {
+        <span class="badge">{{ 'upcoming.today' | translate }}</span>
+      }
+    </h2>
+    @if (day.expected.length === 0 && day.recorded.length === 0) {
+      <p class="muted">{{ 'calendar.nothing' | translate }}</p>
+    }
+    @if (day.expected.length > 0) {
+      <h3 class="detail__label">{{ 'calendar.expectedCharges' | translate }}</h3>
+      <ul class="detail__list">
+        @for (charge of day.expected; track charge.subscriptionId) {
+          <li class="charge">
+            <span class="charge__name">
+              {{ charge.name }}
+              @if (charge.isOverdue) {
+                <span class="badge badge--overdue">{{ 'alert.Overdue' | translate }}</span>
+              }
+            </span>
+            <strong>{{ charge.amount | money: charge.currency }}</strong>
+            <span class="charge__actions">
+              <button type="button" class="btn btn--ghost" (click)="markPaid(charge.subscriptionId)">{{ 'subscriptions.markPaid' | translate }}</button>
+              @if (charge.paymentUrl) {
+                <a class="pay-link" [href]="charge.paymentUrl" target="_blank" rel="noopener noreferrer">{{ 'subscriptions.payAtProvider' | translate }} <span aria-hidden="true">↗</span><span class="visually-hidden">{{ 'common.opensInNewTab' | translate }}</span></a>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+      <p class="hint">{{ 'upcoming.disclaimer' | translate }}</p>
+    }
+    @if (day.recorded.length > 0) {
+      <h3 class="detail__label">{{ 'calendar.recorded' | translate }}</h3>
+      <ul class="detail__list">
+        @for (recorded of day.recorded; track recorded.currency) {
+          <li class="recorded">
+            @if (recorded.expense > 0) {
+              <span>{{ 'calendar.spent' | translate }} <strong>−{{ recorded.expense | money: recorded.currency }}</strong></span>
+            }
+            @if (recorded.income > 0) {
+              <span>{{ 'calendar.received' | translate }} <strong>+{{ recorded.income | money: recorded.currency }}</strong></span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </ng-template>
+
+  @if (payTargetId(); as id) {
+    <app-mark-paid-dialog [subscriptionId]="id" (paid)="handlePaid()" (closeRequested)="payTargetId.set(null)" />
+  }
+</section>
