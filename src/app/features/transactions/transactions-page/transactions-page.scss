@@ -387,3 +387,10 @@
     flex-direction: column-reverse;
   }
 }
+
+// Importar CSV y Agregar movimiento juntos en la cabecera (EP-16 HU-79).
+.heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
