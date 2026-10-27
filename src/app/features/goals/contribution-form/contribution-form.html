@@ -1,0 +1,39 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <p class="hint field--wide">
+    {{ 'goals.contribution.saved' | translate: { saved: (goal.saved | money: goal.currency), target: (goal.target | money: goal.currency) } }}
+  </p>
+
+  <fieldset class="modes">
+    <legend class="visually-hidden">{{ 'goals.contribution.type' | translate }}</legend>
+    <label class="mode"><input type="radio" formControlName="mode" value="deposit" /> {{ 'goals.contribution.deposit' | translate }}</label>
+    <label class="mode"><input type="radio" formControlName="mode" value="withdrawal" /> {{ 'goals.contribution.withdrawal' | translate }}</label>
+  </fieldset>
+
+  <div class="field">
+    <label for="contribution-amount">{{ 'goals.contribution.amount' | translate }} ({{ goal.currency }})</label>
+    <input id="contribution-amount" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="amount"
+      [attr.aria-invalid]="isInvalid('amount')" aria-describedby="contribution-amount-error" />
+    <app-field-error id="contribution-amount-error" [messageKey]="errorKey('amount')" [serverMessages]="errorsFor('amount')" />
+  </div>
+
+  <div class="field">
+    <label for="contribution-date">{{ 'goals.contribution.date' | translate }}</label>
+    <input id="contribution-date" type="date" formControlName="date" [max]="today"
+      [attr.aria-invalid]="isInvalid('date')" aria-describedby="contribution-date-error" />
+    <app-field-error id="contribution-date-error" [messageKey]="errorKey('date')" [serverMessages]="errorsFor('date')" />
+  </div>
+
+  <div class="field field--wide">
+    <label for="contribution-note">{{ 'goals.contribution.note' | translate }} <span class="optional">{{ 'form.optional' | translate }}</span></label>
+    <input id="contribution-note" type="text" maxlength="200" autocomplete="off" formControlName="note"
+      [attr.aria-invalid]="isInvalid('note')" aria-describedby="contribution-note-error" />
+    <app-field-error id="contribution-note-error" [messageKey]="errorKey('note')" [serverMessages]="errorsFor('note')" />
+  </div>
+
+  <p class="hint field--wide">{{ 'goals.contribution.declared' | translate }}</p>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" [disabled]="saving()">{{ saving() ? ('form.saving' | translate) : ('goals.contribution.save' | translate) }}</button>
+  </div>
+</form>

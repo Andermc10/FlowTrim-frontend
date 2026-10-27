@@ -1,0 +1,111 @@
+<section class="goals">
+  <div class="page-heading">
+    <div>
+      <p class="section-kicker">{{ 'goals.kicker' | translate }}</p>
+      <h1>{{ 'goals.title' | translate }}</h1>
+      <p class="lede">{{ 'goals.lede' | translate }}</p>
+    </div>
+    <button class="btn" type="button" (click)="editor.set('new')"><app-icon name="plus" /> {{ 'goals.add' | translate }}</button>
+  </div>
+
+  @if (status() === 'loading') {
+    <p class="muted" role="status">{{ 'common.loading' | translate }}</p>
+  } @else if (status() === 'error') {
+    <div class="banner banner--error" role="alert">
+      {{ 'goals.loadError' | translate }}
+      <button type="button" class="link" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (goals().length === 0) {
+    <div class="empty">
+      <p>{{ 'goals.empty' | translate }}</p>
+      <button class="btn" type="button" (click)="editor.set('new')">{{ 'goals.addFirst' | translate }}</button>
+    </div>
+  } @else {
+    <ul class="cards">
+      @for (goal of goals(); track goal.id) {
+        <li class="card" [class.card--completed]="goal.completed">
+          <header class="card__head">
+            <h2 class="card__name">{{ goal.name }}</h2>
+            @if (goal.completed) {
+              <span class="badge">{{ 'goals.completed' | translate }}</span>
+            } @else if (goal.isOverdue) {
+              <span class="badge badge--overdue">{{ 'goals.overdue' | translate }}</span>
+            }
+          </header>
+          <p class="card__figures">
+            <strong>{{ goal.saved | money: goal.currency }}</strong>
+            <span class="muted">/ {{ goal.target | money: goal.currency }}</span>
+          </p>
+          <div class="meter" [attr.aria-label]="'goals.progress' | translate: { percent: goal.percent }">
+            <span class="meter__track" aria-hidden="true"><span class="meter__fill" [style.width.%]="goal.percent > 100 ? 100 : goal.percent"></span></span>
+            <span class="meter__label">{{ goal.percent }} %</span>
+          </div>
+          <dl class="facts">
+            @if (goal.targetDate) {
+              <div><dt>{{ 'goals.targetDate' | translate }}</dt><dd>{{ date(goal.targetDate) }}</dd></div>
+            }
+            @if (goal.requiredPerMonth !== null) {
+              <div><dt>{{ 'goals.requiredPerMonth' | translate }}</dt><dd>{{ goal.requiredPerMonth | money: goal.currency }}</dd></div>
+            }
+            @if (!goal.completed) {
+              <div>
+                <dt>{{ 'goals.estimate' | translate }}</dt>
+                <dd>{{ goal.estimatedCompletion ? monthLabel(goal.estimatedCompletion) : ('goals.notEnoughData' | translate) }}</dd>
+              </div>
+            }
+          </dl>
+          <div class="card__actions">
+            <button type="button" class="btn btn--ghost" (click)="contributeTo.set(goal)">{{ 'goals.contribute' | translate }}</button>
+            <button type="button" class="link" (click)="openDetail(goal)">{{ 'goals.history' | translate: { count: goal.contributionsCount } }}</button>
+            <span class="card__icons">
+              <button type="button" class="icon-button" [attr.aria-label]="'goals.edit' | translate: { name: goal.name }" (click)="editor.set(goal)"><app-icon name="edit" /></button>
+              <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'goals.delete' | translate: { name: goal.name }" (click)="deleteTarget.set(goal)"><app-icon name="delete" /></button>
+            </span>
+          </div>
+        </li>
+      }
+    </ul>
+    <p class="hint">{{ 'goals.note' | translate }}</p>
+  }
+
+  @if (editor(); as current) {
+    <app-modal [title]="(current === 'new' ? 'goals.form.createTitle' : 'goals.form.editTitle') | translate" (closeRequested)="editor.set(null)">
+      <app-goal-form [goal]="editing()" (saved)="afterSave()" (closeRequested)="editor.set(null)" />
+    </app-modal>
+  }
+
+  @if (contributeTo(); as goal) {
+    <app-modal [title]="'goals.contribution.title' | translate: { name: goal.name }" (closeRequested)="contributeTo.set(null)">
+      <app-contribution-form [goal]="goal" (saved)="afterSave()" (closeRequested)="contributeTo.set(null)" />
+    </app-modal>
+  }
+
+  @if (detail(); as current) {
+    <app-modal [title]="'goals.historyTitle' | translate: { name: current.goal.name }" (closeRequested)="detail.set(null)">
+      @if (current.contributions.length === 0) {
+        <p class="muted">{{ 'goals.noContributions' | translate }}</p>
+      } @else {
+        <ul class="history">
+          @for (contribution of current.contributions; track contribution.id) {
+            <li>
+              <span>{{ date(contribution.date) }}</span>
+              <span class="muted">{{ contribution.note ?? '' }}</span>
+              <strong [class.history__withdrawal]="contribution.amount < 0">{{ contribution.amount > 0 ? '+' : '' }}{{ contribution.amount | money: current.goal.currency }}</strong>
+              <button type="button" class="icon-button icon-button--danger" [attr.aria-label]="'goals.deleteContribution' | translate" (click)="deleteContribution(current.goal, contribution)"><app-icon name="delete" /></button>
+            </li>
+          }
+        </ul>
+      }
+    </app-modal>
+  }
+
+  @if (deleteTarget(); as target) {
+    <app-modal [title]="'goals.deleteTitle' | translate" (closeRequested)="deleteTarget.set(null)">
+      <p class="modal-copy">{{ 'goals.deleteText' | translate: { name: target.name } }}</p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="deleteTarget.set(null)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="danger-button" (click)="confirmDelete()"><app-icon name="delete" /> {{ 'goals.deleteConfirm' | translate }}</button>
+      </div>
+    </app-modal>
+  }
+</section>
