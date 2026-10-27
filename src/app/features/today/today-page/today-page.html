@@ -82,6 +82,23 @@
       }
 
       <div class="panels">
+        @if (today.budgetsToWatch.length > 0) {
+          <section class="panel panel--budgets" aria-labelledby="today-budgets">
+            <header class="panel__head">
+              <h2 id="today-budgets">{{ 'today.budgets' | translate }}</h2>
+              <a class="link" routerLink="/app/budgets">{{ 'today.seeAll' | translate }}</a>
+            </header>
+            <ul class="budget-watch">
+              @for (budget of today.budgetsToWatch; track budget.id) {
+                <li>
+                  <span class="budget-watch__name">{{ budget.categoryName }}</span>
+                  <span class="muted">{{ budget.spent | money: budget.currency }} / {{ budget.limit | money: budget.currency }}</span>
+                  <app-budget-meter [percent]="budget.percent" [state]="budget.state" />
+                </li>
+              }
+            </ul>
+          </section>
+        }
         <section class="panel" aria-labelledby="today-accounts">
           <header class="panel__head">
             <h2 id="today-accounts">{{ 'today.accounts' | translate }}</h2>
@@ -130,7 +147,7 @@
           </header>
           @if (today.chargesUntilMonthEnd.length > 0) {
             <ul class="list">
-              @for (charge of today.chargesUntilMonthEnd; track charge.subscriptionId) {
+              @for (charge of today.chargesUntilMonthEnd; track charge.subscriptionId + charge.nextBillingDate) {
                 <li>
                   <span class="list__main">
                     <strong>{{ charge.name }}</strong>

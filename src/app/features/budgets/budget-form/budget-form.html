@@ -1,0 +1,48 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (budget; as current) {
+    <p class="summary">
+      <strong>{{ current.categoryName }}</strong> · {{ current.currency }}
+    </p>
+  } @else {
+    <fieldset class="chips" aria-describedby="budget-category-error">
+      <legend>{{ 'budgets.form.category' | translate }}</legend>
+      <div class="chips__list">
+        @for (category of categories(); track category.id) {
+          <label class="chip" [style.--swatch]="'var(--category-' + category.color + ')'">
+            <input type="radio" formControlName="categoryId" [value]="category.id" />
+            <span class="chip__body"><app-category-icon [name]="category.icon" /> {{ category.name }}</span>
+          </label>
+        } @empty {
+          <p class="hint">{{ 'budgets.form.noCategories' | translate }}</p>
+        }
+      </div>
+      <app-field-error id="budget-category-error" [messageKey]="errorKey('categoryId')" [serverMessages]="errorsFor('categoryId')" />
+    </fieldset>
+
+    <div class="field">
+      <label for="budget-currency">{{ 'form.currency' | translate }}</label>
+      <select id="budget-currency" formControlName="currency" aria-describedby="budget-currency-error">
+        @for (currency of currencies(); track currency) {
+          <option [value]="currency">{{ currency }}</option>
+        }
+      </select>
+      <app-field-error id="budget-currency-error" [messageKey]="errorKey('currency')" [serverMessages]="errorsFor('currency')" />
+    </div>
+  }
+
+  <div class="field">
+    <label for="budget-limit">{{ 'budgets.form.limit' | translate }}</label>
+    <input id="budget-limit" type="number" inputmode="decimal" step="0.01" min="0.01" formControlName="limit"
+      [placeholder]="'budgets.form.limitPlaceholder' | translate" [attr.aria-invalid]="isInvalid('limit')"
+      aria-describedby="budget-limit-hint budget-limit-error" />
+    <small id="budget-limit-hint" class="hint">{{ 'budgets.form.limitHint' | translate }}</small>
+    <app-field-error id="budget-limit-error" [messageKey]="errorKey('limit')" [serverMessages]="errorsFor('limit')" />
+  </div>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="closeRequested.emit()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" [disabled]="saving()">
+      {{ saving() ? ('form.saving' | translate) : (isEdit ? ('form.saveChanges' | translate) : ('budgets.form.create' | translate)) }}
+    </button>
+  </div>
+</form>

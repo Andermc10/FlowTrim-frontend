@@ -24,6 +24,7 @@ export const navGroups: readonly NavGroup[] = [
       { path: '/app', labelKey: 'nav.today', icon: '☀', exact: true },
       { path: '/app/transactions', labelKey: 'nav.transactions', icon: '≡' },
       { path: '/app/calendar', labelKey: 'nav.calendar', icon: '▦' },
+      { path: '/app/budgets', labelKey: 'nav.budgets', icon: '◑' },
       { path: '/app/accounts', labelKey: 'nav.accounts', icon: '◧' },
       { path: '/app/categories', labelKey: 'nav.categories', icon: '◈' },
     ],

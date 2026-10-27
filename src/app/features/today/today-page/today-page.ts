@@ -10,6 +10,7 @@ import { TransactionResponse } from '../../transactions/transactions.models';
 import { dateLabel, localeFor } from '../../../core/format/money';
 import { MoneyPipe } from '../../../core/format/money.pipe';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { BudgetMeter } from '../../budgets/budget-meter/budget-meter';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { CategoryIcon } from '../../../core/ui/icon/category-icon';
 
@@ -22,7 +23,7 @@ type PageStatus = 'loading' | 'success' | 'error';
  */
 @Component({
   selector: 'app-today-page',
-  imports: [RouterLink, TranslatePipe, MoneyPipe, CategoryIcon],
+  imports: [RouterLink, TranslatePipe, MoneyPipe, CategoryIcon, BudgetMeter],
   templateUrl: './today-page.html',
   styleUrl: './today-page.scss',
 })
