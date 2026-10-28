@@ -245,6 +245,12 @@ test('CriticalFlow_SignInToInsights_AndIsolation', async ({ page }) => {
     await expect(page.locator('.card').filter({ hasText: 'Food' })).toContainText('87.5 % · Close to the limit');
     await page.getByRole('link', { name: 'Today' }).first().click();
     await expect(page.locator('.panel--budgets')).toContainText('Food');
+    // EP-16 HU-80: el asistente responde sobre los presupuestos con la misma cifra que la página.
+    await page.goto('/app/insights');
+    await page.getByRole('button', { name: 'How are my budgets?' }).click();
+    await expect(page.locator('.result')).toHaveAttribute('aria-busy', 'false');
+    await expect(page.locator('.figures li').filter({ hasText: 'Spent' })).toContainText('35,000');
+    await expect(page.locator('.sources').getByRole('link', { name: 'Budgets' })).toHaveAttribute('href', '/app/budgets');
     // EP-16 HU-78: el estado de cuenta del mes refleja ese gasto en Comida.
     await page.goto('/app/analytics/statement');
     await expect(page.getByRole('tab', { name: 'Statement' })).toHaveAttribute('aria-selected', 'true');
