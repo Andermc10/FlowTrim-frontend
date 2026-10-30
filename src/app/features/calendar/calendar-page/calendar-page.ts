@@ -10,7 +10,7 @@ import { MarkPaidDialog } from '../../subscriptions/mark-paid-dialog/mark-paid-d
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MoneyPipe } from '../../../core/format/money.pipe';
-import { localeFor } from '../../../core/format/money';
+import { capitalizeFirst, localeFor, monthTitle } from '../../../core/format/money';
 import { productToday } from '../../../core/format/product-calendar';
 
 type PageStatus = 'loading' | 'success' | 'error';
@@ -43,11 +43,7 @@ export class CalendarPage implements OnInit {
 
   private readonly reload$ = new Subject<void>();
 
-  protected readonly monthTitle = computed(() => {
-    const [year, monthNumber] = this.month().split('-').map(Number);
-    return new Intl.DateTimeFormat(localeFor(this.i18n.language()), { month: 'long', year: 'numeric', timeZone: 'UTC' })
-      .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
-  });
+  protected readonly monthTitle = computed(() => monthTitle(this.month(), localeFor(this.i18n.language())));
 
   /** Nombres cortos de lunes a domingo en el idioma de la interfaz (5 ene 2026 fue lunes). */
   protected readonly weekdays = computed(() => {
@@ -140,9 +136,10 @@ export class CalendarPage implements OnInit {
   /** Etiqueta larga del día para el panel y la lista ("lunes, 20 de octubre"). */
   protected dayLabel(date: string): string {
     const [year, monthNumber, day] = date.split('-').map(Number);
-    return new Intl.DateTimeFormat(localeFor(this.i18n.language()), {
-      weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC',
-    }).format(new Date(Date.UTC(year, monthNumber - 1, day)));
+    const locale = localeFor(this.i18n.language());
+    const label = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
+      .format(new Date(Date.UTC(year, monthNumber - 1, day)));
+    return capitalizeFirst(label, locale);
   }
 
   protected markPaid(subscriptionId: string): void {

@@ -16,6 +16,23 @@ export function moneyFormatter(currency: string, locale: string): (value: number
   return (value: number) => formatter.format(value);
 }
 
+/** Primera letra en mayúscula según el idioma ("octubre de 2026" → "Octubre de 2026"); el resto no cambia. */
+export function capitalizeFirst(value: string, locale: string): string {
+  return value.charAt(0).toLocaleUpperCase(locale) + value.slice(1);
+}
+
+/** Mes `yyyy-MM` con nombre largo, para usar dentro de una frase ("octubre de 2026" / "October 2026"). */
+export function monthName(month: string, locale: string): string {
+  const [year, monthNumber] = month.split('-').map(Number);
+  return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
+}
+
+/** Mes `yyyy-MM` como título del selector de mes ("Octubre de 2026" / "October 2026"). */
+export function monthTitle(month: string, locale: string): string {
+  return capitalizeFirst(monthName(month, locale), locale);
+}
+
 /** Etiqueta corta de un mes `yyyy-MM` (p. ej. "Feb 27" / "feb 27"). */
 export function monthLabel(month: string, locale: string): string {
   const [year, monthNumber] = month.split('-').map(Number);

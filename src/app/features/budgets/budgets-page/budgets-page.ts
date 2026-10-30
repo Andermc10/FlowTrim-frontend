@@ -12,7 +12,7 @@ import { QuickAddService } from '../../transactions/quick-add/quick-add.service'
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MoneyPipe } from '../../../core/format/money.pipe';
-import { localeFor } from '../../../core/format/money';
+import { localeFor, monthTitle } from '../../../core/format/money';
 import { productToday } from '../../../core/format/product-calendar';
 import { Icon } from '../../../core/ui/icon/icon';
 import { CategoryIcon } from '../../../core/ui/icon/category-icon';
@@ -47,11 +47,7 @@ export class BudgetsPage implements OnInit {
 
   private readonly reload$ = new Subject<void>();
 
-  protected readonly monthTitle = computed(() => {
-    const [year, monthNumber] = this.month().split('-').map(Number);
-    return new Intl.DateTimeFormat(localeFor(this.i18n.language()), { month: 'long', year: 'numeric', timeZone: 'UTC' })
-      .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
-  });
+  protected readonly monthTitle = computed(() => monthTitle(this.month(), localeFor(this.i18n.language())));
 
   protected readonly editing = computed(() => {
     const editor = this.editor();

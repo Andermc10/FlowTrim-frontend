@@ -103,7 +103,7 @@
 
     <main class="workspace-main">
       <div class="workspace-topbar">
-        <div class="workspace-eyebrow">FLOWTRIM / PERSONAL FINANCE CONTROL</div>
+        <div class="workspace-eyebrow">{{ 'nav.eyebrow' | translate }}</div>
         <!-- Registro rápido (HU-67): también con la tecla N. -->
         <button class="quick-add-trigger" type="button" [attr.aria-keyshortcuts]="'N'" [attr.title]="'quickAdd.shortcutHint' | translate" (click)="openQuickAdd()">
           <span aria-hidden="true">+</span> {{ 'quickAdd.open' | translate }}
