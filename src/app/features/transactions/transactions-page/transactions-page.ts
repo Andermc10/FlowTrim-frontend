@@ -13,7 +13,7 @@ import { AccountResponse } from '../../accounts/accounts.models';
 import { AccountsService } from '../../accounts/accounts-service';
 import { CategoryResponse } from '../../categories/categories.models';
 import { CategoriesService } from '../../categories/categories-service';
-import { dateLabel, localeFor } from '../../../core/format/money';
+import { dateLabel, localeFor, monthTitle } from '../../../core/format/money';
 import { MoneyPipe } from '../../../core/format/money.pipe';
 import { productToday } from '../../../core/format/product-calendar';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -74,11 +74,7 @@ export class TransactionsPage implements OnInit {
   protected readonly hasMore = computed(() => this.items().length < this.totalCount());
   protected readonly hasActiveAccounts = computed(() => this.accounts().some((account) => !account.isArchived));
   protected readonly filtered = computed(() => !!(this.accountId() || this.categoryId() || this.type() || this.search()));
-  protected readonly monthTitle = computed(() => {
-    const [year, monthNumber] = this.month().split('-').map(Number);
-    return new Intl.DateTimeFormat(localeFor(this.i18n.language()), { month: 'long', year: 'numeric', timeZone: 'UTC' })
-      .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
-  });
+  protected readonly monthTitle = computed(() => monthTitle(this.month(), localeFor(this.i18n.language())));
 
   // Cada cambio de filtro pide la primera página; switchMap descarta la respuesta de un filtro anterior.
   private readonly reload$ = new Subject<void>();

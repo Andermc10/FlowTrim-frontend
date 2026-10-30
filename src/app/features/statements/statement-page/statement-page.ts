@@ -9,7 +9,7 @@ import { monthOf, shiftMonth } from '../../transactions/transaction-days';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MoneyPipe } from '../../../core/format/money.pipe';
-import { localeFor } from '../../../core/format/money';
+import { localeFor, monthName, monthTitle } from '../../../core/format/money';
 import { productToday } from '../../../core/format/product-calendar';
 import { CategoryIcon } from '../../../core/ui/icon/category-icon';
 
@@ -35,8 +35,10 @@ export class StatementPage implements OnInit {
   protected readonly statement = signal<StatementResponse | null>(null);
   private readonly reload$ = new Subject<void>();
 
-  protected readonly monthTitle = computed(() => this.title(this.month()));
-  protected readonly previousTitle = computed(() => this.title(shiftMonth(this.month(), -1)));
+  protected readonly monthTitle = computed(() => monthTitle(this.month(), localeFor(this.i18n.language())));
+  // Va dentro de una frase: sin mayúscula inicial en español.
+  protected readonly previousTitle = computed(() => monthName(shiftMonth(this.month(), -1), localeFor(this.i18n.language())));
+  protected readonly previousHeading = computed(() => monthTitle(shiftMonth(this.month(), -1), localeFor(this.i18n.language())));
 
   ngOnInit(): void {
     this.reload$
@@ -84,9 +86,4 @@ export class StatementPage implements OnInit {
     return Math.abs(value);
   }
 
-  private title(month: string): string {
-    const [year, monthNumber] = month.split('-').map(Number);
-    return new Intl.DateTimeFormat(localeFor(this.i18n.language()), { month: 'long', year: 'numeric', timeZone: 'UTC' })
-      .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
-  }
 }
