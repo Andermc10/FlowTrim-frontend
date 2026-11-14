@@ -56,9 +56,11 @@
   --color-primary-soft-strong: rgba(8, 127, 137, 0.23);
   // Sobre el turquesa oscuro del tema claro el texto oscuro daba 4,04:1; el blanco da más de 5:1.
   --color-on-primary: #ffffff;
-  --color-success: #008f61;
-  --color-success-soft: rgba(0, 143, 97, 0.12);
-  --color-warning: #a86400;
+  // Verde y ámbar más oscuros (antes #008f61 y #a86400): aquellos daban 4,12:1 y 4,20:1 en las superficies suaves,
+  // por debajo de WCAG AA. Estos superan 4,5:1 en blanco, fondo y superficie suave; la app móvil usa los mismos.
+  --color-success: #007f55;
+  --color-success-soft: rgba(0, 127, 85, 0.12);
+  --color-warning: #995a00;
   --color-danger: #c63d47;
   --color-shadow: rgba(28, 62, 60, 0.14);
   // Tonos oscuros con contraste suficiente sobre blanco.
